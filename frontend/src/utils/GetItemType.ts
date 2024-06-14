@@ -1,4 +1,4 @@
-export default function TypeMinMax(
+export default function GetItemType(
   saleType: string,
   itemType: string,
   polygon: string,
