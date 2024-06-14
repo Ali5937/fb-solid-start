@@ -1,10 +1,13 @@
 import { createAsync, useNavigate, useSearchParams } from "@solidjs/router";
+import { Link, Meta, MetaProvider, Title } from "@solidjs/meta";
 import { useParams } from "@solidjs/router";
 import { createSignal } from "solid-js";
+import { isServer } from "solid-js/web";
 import Cookies from "js-cookie";
 import List from "~/components/list/list";
+import Navbar from "~/components/navbar/navbar";
 import GetItemType from "~/utils/GetItemType";
-import { isServer } from "solid-js/web";
+import GetInitialMapArea from "~/utils/GetInitialMapArea";
 
 const baseUrl = "http://localhost:5000/api";
 
@@ -18,9 +21,7 @@ const getData = async (
   itemSort: string
 ) => {
   "use server";
-
   const type = GetItemType(saleType, itemType, polygon, polygon2);
-
   const response = await fetch(
     `${baseUrl}/items?` +
       new URLSearchParams({
@@ -36,19 +37,10 @@ const getData = async (
   return res;
 };
 
-function turnArrayOfBoundsIntoString(arr: []) {
-  let str = "";
-  for (let i = 0; i < arr.length; i++) {
-    str += `${arr[i][0]}_${arr[i][1]}${i < arr.length - 1 ? "," : ""}`;
-  }
-  return str;
-}
-
 export default function Index() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentRentMax, setCurrentRentMax] = createSignal<number>(5000);
   const [currentBuyMax, setCurrentBuyMax] = createSignal<number>(1000000);
-
   let oldSaleType;
   let oldItemType;
   let oldRentPrice: [number, number] = [0, currentRentMax()];
@@ -104,9 +96,7 @@ export default function Index() {
   const [theme, setTheme] = createSignal<string>(
     Cookies.get("theme") || "light-theme"
   );
-  // const [contrast, setContrast] = createSignal<string>(
-  //   Cookies.get("contrast") || "normal-contrast"
-  // );
+
   const [userId, setUserId] = createSignal<number>(0);
   const [saleType, setSaleType] = createSignal<string>(oldSaleType || "rent"); // rent, buy
   const [itemType, setItemType] = createSignal<string>(
@@ -133,19 +123,27 @@ export default function Index() {
   const [selectedItem, setSelectedItem] = createSignal(null);
   const [highlightedItemLngLat, setHighlightedItemLngLat] = createSignal("");
 
-  const polygonString1 =
-    "216.96420669539265_71.20965521670146,175.84243399719955_71.20965521670146,134.72066129900645_71.20965521670146,134.72066129900645_-5.925702538707981,175.84243399719955_-5.925702538707981,216.96420669539265_-5.925702538707981,216.96420669539265_71.20965521670146";
-  const polygonString2 =
-    "-131.04446636169598_70.61556862446744,-172.1662390598886_70.61556862446744,-213.28801175808118_70.61556862446744,-213.28801175808118_-7.729608822966171,-172.1662390598886_-7.729608822966171,-131.04446636169598_-7.729608822966171,-131.04446636169598_70.61556862446744";
+  let polygonString1 = searchParams.poly;
+  let polygonString2 = searchParams.poly2 ?? "";
+
+  if (!polygonString1 || polygonString1 === "undefined") {
+    polygonString1 = GetInitialMapArea(
+      mapLocation()[0],
+      mapLocation()[1],
+      mapLocation()[2]
+    );
+  }
+
   const newUrl = `/${saleType()}/${itemType()}/${region()}/${id()}/${
     saleType() === "buy"
       ? `${buyPriceRange()[0]}/${buyPriceRange()[1]}`
       : `${rentPriceRange()[0]}/${rentPriceRange()[1]}`
-  }/${mapLocation()[0]}/${mapLocation()[1]}/${mapLocation()[2]}${
-    searchParams.poly ? "/?poly=" + polygonString1 : ""
-  }${searchParams.poly2 ? "&poly2=" + polygonString2 : ""}`;
+  }/${mapLocation()[0]}/${mapLocation()[1]}/${
+    mapLocation()[2]
+  }/?poly=${polygonString1}${
+    searchParams.poly2 ? "&poly2=" + searchParams.poly2 : ""
+  }`;
 
-  // setSearchParams({ poly: polygonString1, poly2: polygonString2 });
   const navigate = useNavigate();
   navigate(newUrl);
 
@@ -170,8 +168,37 @@ export default function Index() {
     { deferStream: true }
   );
   return (
-    <main>
-      <List initialItems={initialItems()} />
-    </main>
+    <MetaProvider>
+      <Title>Solid App</Title>
+      <Meta name="description" content={`${saleType()} ${itemType()}`}></Meta>
+      {/* CHORE: In description(Meta tag) ad location of country/region/city if searched by it */}
+      <Link rel="dns-prefetch" href="https://tiles.stadiamaps.com"></Link>
+      <div id="app" class={`${theme()}`}>
+        <Navbar
+          baseUrl={baseUrl}
+          theme={theme}
+          setTheme={setTheme}
+          userId={userId}
+          setUserId={setUserId}
+          saleType={saleType}
+          setSaleType={setSaleType}
+          itemType={itemType}
+          setItemType={setItemType}
+          currentRentMax={currentRentMax}
+          currentBuyMax={currentBuyMax}
+          rentPriceRange={rentPriceRange}
+          setRentPriceRange={setRentPriceRange}
+          buyPriceRange={buyPriceRange}
+          setBuyPriceRange={setBuyPriceRange}
+          currencyData={currencyData}
+          setCurrencyData={setCurrencyData}
+          currentCurrency={currentCurrency}
+          setCurrentCurrency={setCurrentCurrency}
+          displayUnits={displayUnits}
+          setDisplayUnits={setDisplayUnits}
+        />
+        <main>{/* <List initialItems={initialItems()} /> */}</main>
+      </div>
+    </MetaProvider>
   );
 }

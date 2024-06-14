@@ -5,6 +5,7 @@
     "@solidjs/router": "^0.13.3",
     "@solidjs/start": "^1.0.1",
     "js-cookie": "^3.0.5",
+    "nouislider": "^15.8.0",
     "solid-js": "^1.8.17",
     "turf-polygon": "^1.0.3",
     "vinxi": "^0.3.11"

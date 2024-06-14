@@ -1,0 +1,143 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  margin: var(--side-margin);
+  height: var(--standard-size);
+}
+
+.navbar button svg {
+  width: auto;
+  margin: calc(var(--side-margin) / 3);
+}
+
+.nav-parent {
+  display: flex;
+  gap: var(--side-margin);
+}
+
+.nav-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: var(--standard-size);
+  font-weight: 700;
+  line-height: 1;
+  z-index: 15;
+}
+
+.nav-button-element {
+  align-self: center;
+  font-size: var(--nav-text);
+  z-index: 12;
+}
+
+.dropdown-element-left,
+.dropdown-element-right {
+  position: fixed;
+  top: calc(var(--standard-size) + (var(--border-width) * 4));
+  width: calc(var(--standard-size) * 8);
+  min-height: var(--standard-size);
+  z-index: 10;
+}
+
+.dropdown-element-left {
+  left: calc(var(--border-width) * 2);
+}
+
+.dropdown-element-right {
+  right: calc(var(--border-width) * 2);
+}
+
+.search-nav {
+  display: flex;
+  width: var(--standard-size);
+  font-size: var(--nav-text);
+}
+
+.search-nav input {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-weight: 400;
+}
+
+.filter-nav {
+  width: calc(var(--standard-size) * 2);
+}
+
+.logo-nav {
+  display: flex;
+  align-items: end;
+  justify-content: space-evenly;
+  flex: 1;
+  max-width: 500px;
+}
+
+.logo-image {
+  flex-shrink: 0;
+  margin: 0 0 0 var(--side-margin);
+  width: var(--standard-size);
+  height: var(--standard-size);
+}
+
+.logo-text {
+  margin: 0 var(--side-margin);
+  font-family: "Chango";
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.message-nav {
+  width: var(--standard-size);
+}
+
+.login-nav {
+  width: calc(var(--standard-size) * 2);
+}
+
+.currency-nav {
+  display: flex;
+  align-items: center;
+  width: var(--standard-size);
+}
+
+.currency-text div:nth-child(1) {
+  font-size: calc(var(--standard-size) / 2);
+}
+
+.currency-symbols {
+  font-size: calc(var(--standard-size) / 2.4);
+  /* margin-bottom: var(--border-width); */
+  /* line-height: 0.5; */
+}
+
+.options-nav {
+  width: var(--standard-size);
+}
+
+@media (max-width: 1024px) {
+  .logo-text {
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo-text {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .logo-text {
+    display: none;
+  }
+}
+
+@media (max-width: 370px) {
+  .logo-nav {
+    display: none;
+  }
+}
