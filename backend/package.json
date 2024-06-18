@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "@elysiajs/cors": "latest",
+    "@elysiajs/jwt": "latest",
+    "dotenv": "^16.3.1",
+    "elysia": "latest",
+    "pg": "^8.11.3",
+    "uuid": "^9.0.1"
+  },
+  "name": "backend",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
