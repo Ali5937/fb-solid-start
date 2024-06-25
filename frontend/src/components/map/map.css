@@ -1,0 +1,46 @@
+.map-ssr {
+  background-color: blue;
+}
+
+.map-parent {
+  position: relative;
+  cursor: default;
+  flex: 1;
+  border-style: solid;
+  border-width: var(--border-width) var(--border-width) 0 0;
+  border-color: var(--c3) var(--c3b);
+}
+
+.map {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+.draw-parent {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: var(--side-margin);
+  margin-left: var(--side-margin);
+  margin-top: var(--side-margin);
+  z-index: 1;
+}
+
+.pencil-button > svg {
+  margin-top: calc(var(--border-width) * -2);
+  padding: calc(var(--border-width) / 2);
+}
+
+.pencil-cursor:hover {
+  cursor: url("../../assets/pencil-icon.svg") 0 120, auto !important;
+}
+
+.maplibregl-ctrl {
+  background-color: var(--c1) !important;
+}
+
+.maplibregl-ctrl-attrib-inner,
+.maplibregl-ctrl-attrib-inner > a {
+  color: var(--c4) !important;
+}
