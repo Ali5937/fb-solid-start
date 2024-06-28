@@ -80,10 +80,6 @@ button:hover {
   cursor: pointer;
 }
 
-button:active:not(.highlighted-dropdown) {
-  border-color: var(--c3b) var(--c3) var(--c3) var(--c3b);
-}
-
 input {
   background-color: var(--c1);
   color: var(--c4);
@@ -99,12 +95,22 @@ input {
   background: var(--c1);
 }
 
-button ::-webkit-scrollbar-track {
+/* button ::-webkit-scrollbar-track {
   background: var(--c2);
-}
+} */
 
 ::-webkit-scrollbar-thumb {
   background-color: var(--c3);
+}
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
 }
 
 .highlighted {

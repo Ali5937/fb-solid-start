@@ -5,8 +5,7 @@ import userRoutes from "./routes/user-routes";
 
 const port = 5000;
 const app = new Elysia();
-// app.use(compression());
-// compression(app);
+
 app.use(
   cors({
     origin: /localhost.*/,

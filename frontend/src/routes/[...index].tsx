@@ -12,7 +12,6 @@ import List from "~/components/list/list";
 import Navbar from "~/components/navbar/navbar";
 import GetItemType from "~/utils/GetItemType";
 import GetInitialMapArea from "~/utils/GetInitialMapArea";
-// import Map from "~/components/map/map";
 import { clientOnly } from "@solidjs/start";
 import { getRequestEvent } from "solid-js/web";
 import { isbot } from "isbot";
