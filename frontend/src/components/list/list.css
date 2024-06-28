@@ -85,8 +85,14 @@
 }
 
 .icon-arrow-border {
+  display: flex;
   width: var(--standard-size);
-  height: var(--standard-size);
+  height: 100%;
+  cursor: pointer;
+}
+
+.icon-arrow-border:nth-child(1) {
+  rotate: 180deg;
 }
 
 .list-item img {
