@@ -65,7 +65,7 @@ export default function List(props: any) {
     >
       <div
         class={`list-arrow button-style`}
-        onClick={() => props.setIsListOpen(!props.isListOpen())}
+        onMouseDown={() => props.setIsListOpen(!props.isListOpen())}
       >
         <IconArrow />
       </div>

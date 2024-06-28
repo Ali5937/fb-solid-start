@@ -5,17 +5,14 @@ export default function Filter(props: any) {
   return (
     <div
       class="dropdown-element-left button-style"
-      onmousedown={(event) => {
-        event.stopPropagation();
-      }}
-      onclick={(event) => {
+      onMouseDown={(event) => {
         event.stopPropagation();
       }}
     >
       <div class="filter-container">
         <button
           class={props.saleType() === "rent" ? "highlighted" : ""}
-          onClick={() => {
+          onMouseDown={() => {
             props.setSaleType("rent");
             if (props.itemType() === "land") {
               props.setItemType("apartment");
@@ -26,7 +23,7 @@ export default function Filter(props: any) {
         </button>
         <button
           class={props.saleType() === "buy" ? "highlighted" : ""}
-          onClick={() => {
+          onMouseDown={() => {
             props.setSaleType("buy");
             if (props.itemType() === "shared") {
               props.setItemType("house");
@@ -40,13 +37,13 @@ export default function Filter(props: any) {
       <div class="filter-container">
         <button
           class={props.itemType() === "apartment" ? "highlighted" : ""}
-          onClick={() => props.setItemType("apartment")}
+          onMouseDown={() => props.setItemType("apartment")}
         >
           Apartment
         </button>
         <button
           class={props.itemType() === "house" ? "highlighted" : ""}
-          onClick={() => props.setItemType("house")}
+          onMouseDown={() => props.setItemType("house")}
         >
           House
         </button>
@@ -55,7 +52,7 @@ export default function Filter(props: any) {
             class={
               props.itemType() === "shared" ? "highlighted" : "shared-button"
             }
-            onClick={() => props.setItemType("shared")}
+            onMouseDown={() => props.setItemType("shared")}
           >
             Shared
           </button>
@@ -63,13 +60,12 @@ export default function Filter(props: any) {
         <Show when={props.saleType() === "buy"}>
           <button
             class={props.itemType() === "land" ? "highlighted" : ""}
-            onClick={() => props.setItemType("land")}
+            onMouseDown={() => props.setItemType("land")}
           >
             Land
           </button>
         </Show>
       </div>
-      {/* <div class="split-line"></div> */}
       <div class="slider-container">
         <DualSlider
           currentRentMax={props.currentRentMax}

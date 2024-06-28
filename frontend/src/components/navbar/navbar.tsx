@@ -55,10 +55,7 @@ export default function Navbar(props: any) {
           class={`search-nav nav-button ${
             openDropdownNumber() === 1 && isDropdownOpen() ? "highlighted" : ""
           }`}
-          onmousedown={() =>
-            openDropdownNumber() === 1 && setIsDropdownOpen(false)
-          }
-          onClick={() => setDropdown(1)}
+          onMouseDown={() => setDropdown(1)}
         >
           <div class="nav-button-element">&#128270;</div>
           <Suspense>
@@ -72,10 +69,7 @@ export default function Navbar(props: any) {
           class={`filter-nav nav-button ${
             openDropdownNumber() === 2 && isDropdownOpen() ? "highlighted" : ""
           }`}
-          onmousedown={() =>
-            openDropdownNumber() === 2 && setIsDropdownOpen(false)
-          }
-          onClick={() => setDropdown(2)}
+          onMouseDown={() => setDropdown(2)}
         >
           <div class="nav-button-element">
             {props.saleType()[0].toUpperCase() + props.saleType().slice(1)}
@@ -111,10 +105,7 @@ export default function Navbar(props: any) {
           class={`message-nav nav-button ${
             openDropdownNumber() === 3 && isDropdownOpen() ? "highlighted" : ""
           }`}
-          onmousedown={() =>
-            openDropdownNumber() === 3 && setIsDropdownOpen(false)
-          }
-          onClick={() => setDropdown(3)}
+          onMouseDown={() => setDropdown(3)}
         >
           <IconMessage />
           <Suspense>
@@ -128,10 +119,7 @@ export default function Navbar(props: any) {
           class={`login-nav nav-button ${
             openDropdownNumber() === 4 && isDropdownOpen() ? "highlighted" : ""
           }`}
-          onmousedown={() =>
-            openDropdownNumber() === 4 && setIsDropdownOpen(false)
-          }
-          onClick={() => setDropdown(4)}
+          onMouseDown={() => setDropdown(4)}
         >
           <div class="nav-button-element">Login</div>
           <Suspense>
@@ -145,10 +133,7 @@ export default function Navbar(props: any) {
           class={`currency-nav nav-button ${
             openDropdownNumber() === 5 && isDropdownOpen() ? "highlighted" : ""
           }`}
-          onmousedown={() =>
-            openDropdownNumber() === 5 && setIsDropdownOpen(false)
-          }
-          onClick={() => setDropdown(5)}
+          onMouseDown={() => setDropdown(5)}
         >
           {props.currentCurrency() ? (
             <div class="currency-text">
@@ -179,10 +164,7 @@ export default function Navbar(props: any) {
           class={`options-nav nav-button ${
             openDropdownNumber() === 6 && isDropdownOpen() ? "highlighted" : ""
           }`}
-          onmousedown={() =>
-            openDropdownNumber() === 6 && setIsDropdownOpen(false)
-          }
-          onClick={() => setDropdown(6)}
+          onMouseDown={() => setDropdown(6)}
         >
           <IconOptions />
           <Suspense>

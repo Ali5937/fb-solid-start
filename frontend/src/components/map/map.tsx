@@ -562,7 +562,7 @@ export default function Map(props: any) {
           ref={newPencilButton}
           class="pencil-button"
           aria-label="Pencil"
-          onClick={clickPencil}
+          onMouseDown={clickPencil}
         >
           <IconPencil />
         </button>
@@ -570,7 +570,7 @@ export default function Map(props: any) {
           ref={trashButton}
           class="trash-button"
           aria-label="Trash"
-          onClick={clickTrash}
+          onMouseDown={clickTrash}
         >
           <IconTrash />
         </button>

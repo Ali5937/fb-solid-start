@@ -34,10 +34,7 @@ export default function Currency(props: any) {
   return (
     <div
       class="dropdown-element-right button-style"
-      onmousedown={(event) => {
-        event.stopPropagation();
-      }}
-      onclick={(event) => {
+      onMouseDown={(event) => {
         event.stopPropagation();
       }}
     >
@@ -46,7 +43,7 @@ export default function Currency(props: any) {
           class={`currency-button ${
             currencySelection() === 1 ? "highlighted" : ""
           }`}
-          onClick={() => {
+          onMouseDown={() => {
             changeCurrency(null);
             setCurrencySelection(1);
           }}
@@ -57,7 +54,7 @@ export default function Currency(props: any) {
           class={`currency-button ${
             currencySelection() === 2 ? "highlighted" : ""
           }`}
-          onClick={() => {
+          onMouseDown={() => {
             changeCurrency(props.currencyData().USD);
             setCurrencySelection(2);
           }}
@@ -71,7 +68,7 @@ export default function Currency(props: any) {
           class={`currency-button ${
             currencySelection() === 3 ? "highlighted" : ""
           }`}
-          onClick={() => {
+          onMouseDown={() => {
             changeCurrency(props.currencyData().EUR);
             setCurrencySelection(3);
           }}
@@ -85,7 +82,7 @@ export default function Currency(props: any) {
           class={`currency-button ${
             currencySelection() === 4 ? "highlighted" : ""
           }`}
-          onClick={() => {
+          onMouseDown={() => {
             changeCurrency(props.currencyData().GBP);
             setCurrencySelection(4);
           }}
@@ -98,7 +95,7 @@ export default function Currency(props: any) {
       </div>
       <div
         class="other-currency-dropdown"
-        onClick={() => {
+        onMouseDown={() => {
           setShowOtherCurrencies(!showOtherCurrencies());
         }}
       >
@@ -120,7 +117,7 @@ export default function Currency(props: any) {
               const value = props.currencyData()[key];
               return (
                 <div
-                  onClick={() => {
+                  onMouseDown={() => {
                     changeCurrency(value);
                   }}
                 >
@@ -135,7 +132,7 @@ export default function Currency(props: any) {
       <div class="units">
         <button
           class={props.displayUnits() === "m" ? "highlighted" : ""}
-          onClick={() => {
+          onMouseDown={() => {
             props.setDisplayUnits("m");
           }}
         >
@@ -143,7 +140,7 @@ export default function Currency(props: any) {
         </button>
         <button
           class={props.displayUnits() === "ft" ? "highlighted" : ""}
-          onClick={() => {
+          onMouseDown={() => {
             props.setDisplayUnits("ft");
           }}
         >

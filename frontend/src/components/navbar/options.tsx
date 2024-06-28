@@ -13,16 +13,13 @@ export default function Options(props: any) {
   return (
     <div
       class="dropdown-element-right button-style"
-      onmousedown={(event) => {
-        event.stopPropagation();
-      }}
-      onclick={(event) => {
+      onMouseDown={(event) => {
         event.stopPropagation();
       }}
     >
       <div class="theme">
         <div>Dark Mode: </div>
-        <button class="theme-button" onClick={toggleTheme}>
+        <button class="theme-button" onMouseDown={toggleTheme}>
           <Show when={props.theme() === "dark-theme"}>
             <IconSun />
           </Show>

@@ -19,13 +19,14 @@ export default function ItemSortButton(props: any) {
     <div class={`list-button-parent${windowOpen() ? " window-open" : ""}`}>
       <div class={`list-button-window${windowOpen() ? " window-open" : ""}`}>
         <div class="list-button-current">
-          <button onClick={() => setWindowOpen(!windowOpen())}>
+          <button onMouseDown={() => setWindowOpen(!windowOpen())}>
             {currentItemSort()}
           </button>
         </div>
         <div class="list-button-all">
           <button
-            onClick={() => {
+            class={`${props.itemSort() === "new" ? "highlighted" : ""}`}
+            onMouseDown={() => {
               setWindowOpen(!windowOpen());
               props.setItemSort("new");
               setCurrentItemSort("New");
@@ -34,7 +35,8 @@ export default function ItemSortButton(props: any) {
             New
           </button>
           <button
-            onClick={() => {
+            class={`${props.itemSort() === "low" ? "highlighted" : ""}`}
+            onMouseDown={() => {
               setWindowOpen(!windowOpen());
               props.setItemSort("low");
               setCurrentItemSort("Price: Low");
@@ -43,7 +45,8 @@ export default function ItemSortButton(props: any) {
             Price: Low
           </button>
           <button
-            onClick={() => {
+            class={`${props.itemSort() === "high" ? "highlighted" : ""}`}
+            onMouseDown={() => {
               setWindowOpen(!windowOpen());
               props.setItemSort("high");
               setCurrentItemSort("Price: High");

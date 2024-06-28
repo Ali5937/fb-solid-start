@@ -11,10 +11,7 @@ export default function SearchBar(props: any) {
   return (
     <div
       class="dropdown-element-left button-style"
-      onmousedown={(event) => {
-        event.stopPropagation();
-      }}
-      onclick={(event) => {
+      onMouseDown={(event) => {
         event.stopPropagation();
       }}
     >

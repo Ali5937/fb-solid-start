@@ -43,20 +43,20 @@ function Item(props: any) {
     >
       <div class="icon-arrow-border-parent">
         <Show when={props.isFocused()}>
-          <div class="icon-x-border" onclick={() => props.setIsFocused(false)}>
+          <div
+            class="icon-x-border"
+            onMouseDown={() => props.setIsFocused(false)}
+          >
             <XIcon />
           </div>
         </Show>
         <div
-          class="icon-arrow-border arrow-left"
-          onClick={() => updateImageNumber(-1)}
+          class="icon-arrow-border"
+          onMouseDown={() => updateImageNumber(-1)}
         >
           <ArrowIconBorder />
         </div>
-        <div
-          class="icon-arrow-border arrow-right"
-          onClick={() => updateImageNumber(1)}
-        >
+        <div class="icon-arrow-border" onMouseDown={() => updateImageNumber(1)}>
           <ArrowIconBorder />
         </div>
       </div>
@@ -64,7 +64,7 @@ function Item(props: any) {
         src={images[imageNumber()]}
         class="unselectable"
         alt=""
-        onClick={() => {
+        onMouseDown={() => {
           if (
             props.selectedItem() &&
             props.selectedItem().id === props.item.id
