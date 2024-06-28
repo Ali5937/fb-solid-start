@@ -12,15 +12,20 @@ export default function Filter(props: any) {
         event.stopPropagation();
       }}
     >
-      <div class="search-container">
+      <div class="filter-container">
         <button
-          class={props.saleType() === "rent" ? "highlighted-filter" : ""}
-          onClick={() => props.setSaleType("rent")}
+          class={props.saleType() === "rent" ? "highlighted" : ""}
+          onClick={() => {
+            props.setSaleType("rent");
+            if (props.itemType() === "land") {
+              props.setItemType("apartment");
+            }
+          }}
         >
           Rent
         </button>
         <button
-          class={props.saleType() === "buy" ? "highlighted-filter" : ""}
+          class={props.saleType() === "buy" ? "highlighted" : ""}
           onClick={() => {
             props.setSaleType("buy");
             if (props.itemType() === "shared") {
@@ -32,15 +37,15 @@ export default function Filter(props: any) {
         </button>
       </div>
       <div class="nav-line"></div>
-      <div class="search-container">
+      <div class="filter-container">
         <button
-          class={props.itemType() === "apartment" ? "highlighted-filter" : ""}
+          class={props.itemType() === "apartment" ? "highlighted" : ""}
           onClick={() => props.setItemType("apartment")}
         >
           Apartment
         </button>
         <button
-          class={props.itemType() === "house" ? "highlighted-filter" : ""}
+          class={props.itemType() === "house" ? "highlighted" : ""}
           onClick={() => props.setItemType("house")}
         >
           House
@@ -48,25 +53,23 @@ export default function Filter(props: any) {
         <Show when={props.saleType() === "rent"}>
           <button
             class={
-              props.itemType() === "shared"
-                ? "highlighted-filter"
-                : "shared-button"
+              props.itemType() === "shared" ? "highlighted" : "shared-button"
             }
             onClick={() => props.setItemType("shared")}
           >
-            {window.innerWidth >= 1000 ? "Shared Apartment" : "Shared"}
+            Shared
           </button>
         </Show>
         <Show when={props.saleType() === "buy"}>
           <button
-            class={props.itemType() === "land" ? "highlighted-filter" : ""}
+            class={props.itemType() === "land" ? "highlighted" : ""}
             onClick={() => props.setItemType("land")}
           >
             Land
           </button>
         </Show>
       </div>
-      <div class="nav-line"></div>
+      {/* <div class="split-line"></div> */}
       <div class="slider-container">
         <DualSlider
           currentRentMax={props.currentRentMax}

@@ -5,9 +5,7 @@ export default function SearchBar(props: any) {
 
   onMount(() => {
     if (inputRef) {
-      setTimeout(() => {
-        inputRef.focus();
-      }, 1);
+      inputRef.focus();
     }
   });
   return (

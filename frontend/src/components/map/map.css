@@ -6,9 +6,6 @@
   position: relative;
   cursor: default;
   flex: 1;
-  border-style: solid;
-  border-width: var(--border-width) var(--border-width) 0 0;
-  border-color: var(--c3) var(--c3b);
 }
 
 .map {

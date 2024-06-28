@@ -317,7 +317,7 @@ export default function Map(props: any) {
             : mapMarkerColor[0],
         "circle-stroke-width": 1,
         "circle-stroke-color":
-          props.theme() === "dark-theme" ? "black" : "white",
+          props.theme() === "dark-theme" ? "white" : "black",
       },
     });
   }

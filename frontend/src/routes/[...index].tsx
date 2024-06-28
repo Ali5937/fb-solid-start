@@ -1,14 +1,23 @@
-import { createAsync, useNavigate, useSearchParams } from "@solidjs/router";
+import {
+  createAsync,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "@solidjs/router";
 import { Link, Meta, MetaProvider, Title } from "@solidjs/meta";
-import { useParams } from "@solidjs/router";
-import { createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { isServer } from "solid-js/web";
 import Cookies from "js-cookie";
 import List from "~/components/list/list";
 import Navbar from "~/components/navbar/navbar";
 import GetItemType from "~/utils/GetItemType";
 import GetInitialMapArea from "~/utils/GetInitialMapArea";
+// import Map from "~/components/map/map";
+import { clientOnly } from "@solidjs/start";
+import { getRequestEvent } from "solid-js/web";
+import { isbot } from "isbot";
 
+const Map = clientOnly(() => import("../components/map/map"));
 const baseUrl = "http://localhost:5000/api";
 
 const getData = async (
@@ -48,6 +57,7 @@ export default function Index() {
   let oldLng: number = 0;
   let oldLat: number = 0;
   let oldZoom: number = 0;
+  let initialSelectedId: number = 0;
 
   let oldRegion;
   let oldId: string = "";
@@ -70,31 +80,31 @@ export default function Index() {
   }
 
   const urlParams = { ...useParams() }.index.split("/");
-  if (urlParams.length === 4) {
-    oldSaleType = urlParams[0];
-    oldItemType = urlParams[1];
+  // console.log(urlParams);
+  oldSaleType = urlParams[0];
+  oldItemType = urlParams[1];
 
-    if (oldSaleType === "buy")
-      oldRentPrice = [
-        Number(urlParams[2]) || oldRentPrice[0],
-        Number(urlParams[3]) || oldRentPrice[1],
-      ];
-    else
-      oldBuyPrice = [
-        Number(urlParams[2]) || oldBuyPrice[0],
-        Number(urlParams[3]) || oldBuyPrice[1],
-      ];
-  }
+  if (oldSaleType === "buy")
+    oldRentPrice = [
+      Number(urlParams[2]) || oldRentPrice[0],
+      Number(urlParams[3]) || oldRentPrice[1],
+    ];
+  else
+    oldBuyPrice = [
+      Number(urlParams[2]) || oldBuyPrice[0],
+      Number(urlParams[3]) || oldBuyPrice[1],
+    ];
 
   const expires = 365;
   const [windowWidth, setWindowWidth] = createSignal<number | null>(
     isServer ? null : window.innerWidth
   );
+
   const [canUseCookies, setCanUseCookies] = createSignal<boolean>(
     Cookies.get("canUseCookies") ? true : false
   );
   const [theme, setTheme] = createSignal<string>(
-    Cookies.get("theme") || "light-theme"
+    Cookies.get("theme") || "dark-theme"
   );
 
   const [userId, setUserId] = createSignal<number>(0);
@@ -134,39 +144,51 @@ export default function Index() {
     );
   }
 
-  const newUrl = `/${saleType()}/${itemType()}/${region()}/${id()}/${
-    saleType() === "buy"
-      ? `${buyPriceRange()[0]}/${buyPriceRange()[1]}`
-      : `${rentPriceRange()[0]}/${rentPriceRange()[1]}`
-  }/${mapLocation()[0]}/${mapLocation()[1]}/${
-    mapLocation()[2]
-  }/?poly=${polygonString1}${
-    searchParams.poly2 ? "&poly2=" + searchParams.poly2 : ""
-  }`;
-
-  const navigate = useNavigate();
-  navigate(newUrl);
-
-  //Old: http://localhost:3000/#/buy/house/0/1000000/13.3629/47.601/4/
-  //New: http://localhost:3000/buy/house/region/id/0/1000000/13.3629/47.601/4/
-  ///region = "germany-bavaria-munich" if none selected = "region"
-  //id = "593475" if none selected = "id"
-
   const min = saleType() === "buy" ? buyPriceRange()[0] : rentPriceRange()[0];
   const max = saleType() === "buy" ? buyPriceRange()[1] : rentPriceRange()[1];
-  const initialItems = createAsync(
-    () =>
-      getData(
-        saleType(),
-        itemType(),
-        min.toString(),
-        max.toString(),
-        polygonString1,
-        polygonString2,
-        itemSort()
-      ),
-    { deferStream: true }
-  );
+
+  const event = getRequestEvent();
+  if (isbot(event?.request.headers.get("User-Agent"))) {
+    setPropertyItems(
+      createAsync(
+        () =>
+          getData(
+            saleType(),
+            itemType(),
+            min.toString(),
+            max.toString(),
+            polygonString1,
+            polygonString2,
+            itemSort()
+          ),
+        { deferStream: true }
+      )
+    );
+  }
+
+  if (!isServer)
+    window.addEventListener("resize", () => setWindowWidth(window.innerWidth));
+
+  createEffect(() => {
+    const newUrl = `/${saleType()}/${itemType()}${
+      region() === "region" ? "" : `/${region()}`
+    }${id() === "id" ? "" : `/${id()}`}`;
+
+    const navigate = useNavigate();
+    navigate(newUrl);
+
+    setSearchParams({
+      poly: polygonString1,
+      poly2: searchParams.poly2 ?? "",
+    });
+  });
+
+  //Old: http://localhost:3000/#/buy/house/0/1000000/13.3629/47.601/4/
+  //New: http://localhost:3000/user-region/buy/house?region(optional)="example"&id(optional)="example"
+  //user-region = "us" for usa or "all" for anything else
+  ///region = "germany-bavaria-munich"
+  //id = "593475"
+
   return (
     <MetaProvider>
       <Title>Solid App</Title>
@@ -197,7 +219,46 @@ export default function Index() {
           displayUnits={displayUnits}
           setDisplayUnits={setDisplayUnits}
         />
-        <main>{/* <List initialItems={initialItems()} /> */}</main>
+        <main>
+          <Map
+            baseUrl={baseUrl}
+            theme={theme}
+            saleType={saleType}
+            itemType={itemType}
+            rentPriceRange={rentPriceRange}
+            buyPriceRange={buyPriceRange}
+            mapLocation={mapLocation}
+            setMapLocation={setMapLocation}
+            currentCurrency={currentCurrency}
+            displayUnits={displayUnits}
+            propertyItems={propertyItems}
+            setPropertyItems={setPropertyItems}
+            itemSort={itemSort}
+            selectedItem={selectedItem}
+            setSelectedItem={setSelectedItem}
+            highlightedItemLngLat={highlightedItemLngLat}
+            isListOpen={isListOpen}
+            setIsListOpen={setIsListOpen}
+            initialSelectedId={initialSelectedId}
+          />
+          <List
+            baseUrl={baseUrl}
+            isListOpen={isListOpen}
+            windowWidth={windowWidth}
+            setIsListOpen={setIsListOpen}
+            propertyItems={propertyItems}
+            setPropertyItems={setPropertyItems}
+            currencyData={currencyData}
+            currentCurrency={currentCurrency}
+            displayUnits={displayUnits}
+            itemSort={itemSort}
+            setItemSort={setItemSort}
+            selectedItem={selectedItem}
+            setSelectedItem={setSelectedItem}
+            setHighlightedItemLngLat={setHighlightedItemLngLat}
+            initialSelectedId={initialSelectedId}
+          />
+        </main>
       </div>
     </MetaProvider>
   );
