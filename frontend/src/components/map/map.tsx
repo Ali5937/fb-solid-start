@@ -510,6 +510,7 @@ export default function Map(props: any) {
     props.theme();
     props.saleType();
     props.itemType();
+    props.itemSort();
     props.rentPriceRange();
     props.buyPriceRange();
     setPriceRange();
