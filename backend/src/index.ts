@@ -2,6 +2,7 @@ import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import itemRoutes from "./routes/item-routes";
 import userRoutes from "./routes/user-routes";
+import searchRoutes from "./routes/search-routes";
 
 const port = 5000;
 const app = new Elysia();
@@ -15,6 +16,7 @@ app.use(
 );
 itemRoutes(app);
 userRoutes(app);
+searchRoutes(app);
 app.listen(port);
 
 console.log(`🦊 Elysia is running on port ${app.server?.port}...`);

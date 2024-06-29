@@ -1,18 +1,11 @@
-import {
-  Show,
-  Suspense,
-  createEffect,
-  createSignal,
-  lazy,
-  onCleanup,
-} from "solid-js";
+import { Show, Suspense, createSignal, lazy, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 import IconLogo from "../../assets/icon-logo";
 import IconMessage from "~/assets/icon-message";
 import IconOptions from "../../assets/icon-options";
 import "./navbar.css";
 
-const SearchBar = lazy(() => import("./searchbar"));
+const SearchBar = lazy(() => import("./searchBar"));
 const Filter = lazy(() => import("./filter"));
 const Message = lazy(() => import("./message"));
 const Login = lazy(() => import("./login"));
@@ -60,7 +53,7 @@ export default function Navbar(props: any) {
           <div class="nav-button-element">&#128270;</div>
           <Suspense>
             <Show when={openDropdownNumber() === 1}>
-              <SearchBar />
+              <SearchBar baseUrl={props.baseUrl} />
             </Show>
           </Suspense>
         </button>

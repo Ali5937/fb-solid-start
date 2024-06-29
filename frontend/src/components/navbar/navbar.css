@@ -66,6 +66,24 @@
   font-weight: 400;
 }
 
+.search-results {
+  position: absolute;
+  background-color: var(--c2);
+  width: 100%;
+  height: auto;
+  top: calc(var(--standard-size) - var(--border-width));
+  left: 0;
+  right: 0;
+  text-align: start;
+  font-size: var(--font-size-m);
+  font-weight: normal;
+}
+
+.search-results div {
+  display: flex;
+  padding: var(--side-margin);
+}
+
 .filter-nav {
   width: calc(var(--standard-size) * 2);
 }
