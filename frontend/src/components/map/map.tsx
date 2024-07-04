@@ -31,8 +31,6 @@ export default function Map(props: any) {
   let minMaxLng = [0, 0];
   const [isMapLoaded, setIsMapLoaded] = createSignal(false);
   const [markers, setMarkers] = createSignal<any>();
-  const [canDraw, setCanDraw] = createSignal(false);
-  const [isDrawing, setIsDrawing] = createSignal(false);
 
   let markerImg = document.createElement("div");
   markerImg.setAttribute("class", "map-marker-symbol");
@@ -56,19 +54,18 @@ export default function Map(props: any) {
   }
 
   async function clickPencil() {
-    setIsDrawing(true);
-    // console.log(draw);
     if (!draw) {
       await loadDraw();
     }
     draw.changeMode("draw_polygon");
-    // console.log(draw);
+    removeOldPolys();
   }
 
   function clickTrash() {
     draw?.deleteAll();
     removeMarkers();
     handleSearch();
+    if (draw) draw.changeMode("simple_select");
   }
 
   function checkIfSelectedItemIsVisibleOnMap() {
@@ -98,8 +95,6 @@ export default function Map(props: any) {
       const selectedShape = polygon([polygonArray]);
       const mapBounds = polygon([getMapBounds(true)]);
 
-      console.log(selectedShape);
-      console.log(mapBounds);
       const intersection = intersect(
         featureCollection([selectedShape, mapBounds])
       );
@@ -116,7 +111,6 @@ export default function Map(props: any) {
       //Set polygonArray to the visible screen space
       polygonArray =
         map.getZoom() >= 6 ? getMapBounds(true) : getMapBounds(false);
-
       minMaxLng = [0, 0];
 
       for (let i = 0; i < polygonArray.length; i++) {
@@ -131,7 +125,6 @@ export default function Map(props: any) {
 
       if (polyWidth > 180) {
         if (polyWidth > 220) {
-          // console.log(polygonArray);
           polygonArray = [];
           poly = "";
           poly2 = "";
@@ -180,7 +173,7 @@ export default function Map(props: any) {
       );
 
       const responseData = await response.json();
-      if (responseData) {
+      if (responseData.length > 0) {
         lowestPrice = responseData[0].euro_price;
         highestPrice = responseData[0].euro_price;
 
@@ -190,12 +183,11 @@ export default function Map(props: any) {
           if (euroPrice > highestPrice) highestPrice = euroPrice;
         });
 
-        const reverseData = [...responseData].reverse(); //Todo: check if can be reversed on server
         const sourceObject = {
           type: "geojson",
           data: {
             type: "FeatureCollection",
-            features: reverseData.map((marker: any) => ({
+            features: responseData.map((marker: any) => ({
               type: "Feature",
               geometry: {
                 type: "Point",
@@ -219,15 +211,12 @@ export default function Map(props: any) {
 
         setMarkers(sourceObject);
         props.setPropertyItems(responseData);
-
-        checkIfSelectedItemIsVisibleOnMap();
-      } else {
-        console.error("Error:", response.statusText);
       }
+
+      checkIfSelectedItemIsVisibleOnMap();
     } catch (error) {
       console.error("Fetch request error:", error);
     }
-
     // console.timeEnd("fetchTime");
   }
 
@@ -310,9 +299,9 @@ export default function Map(props: any) {
                 ["linear"],
                 ["get", "euroPrice"],
                 lowestPrice,
-                mapMarkerColor[0],
-                highestPrice,
                 mapMarkerColor[1],
+                highestPrice,
+                mapMarkerColor[0],
               ]
             : mapMarkerColor[0],
         "circle-stroke-width": 1,
@@ -333,22 +322,6 @@ export default function Map(props: any) {
         ? props.rentPriceRange()
         : props.buyPriceRange();
   }
-
-  // onMount(() => {
-  //   const dummyPencilButton = document.createElement("button");
-  //   dummyPencilButton.id = "dummy-pencil-parent";
-  //   const img = document.createElement("img");
-  //   img.src = pencilIcon;
-  //   img.alt;
-  //   dummyPencilButton.appendChild(img);
-  //   if (!canDraw() && drawParent) drawParent.appendChild(dummyPencilButton);
-
-  //   dummyPencilButton.addEventListener("click", () => {
-  //     setCanDraw(true);
-  //     dummyPencilButton.remove();
-  //     loadDraw();
-  //   });
-  // });
 
   async function loadDraw() {
     const MapboxDraw = (await import("@mapbox/mapbox-gl-draw")).default;
@@ -373,13 +346,6 @@ export default function Map(props: any) {
     });
 
     map.addControl(draw);
-    // pencilButton = document.querySelector(
-    //   ".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon"
-    // );
-    // const img = document.createElement("img");
-    // img.src = pencilIcon;
-    // pencilButton.appendChild(img);
-    // pencilButton.click();
   }
 
   createEffect(() => {
@@ -393,7 +359,8 @@ export default function Map(props: any) {
       zoom: mapLocation[2],
       minZoom: 1,
       maxZoom: 20,
-      //   attributionControl: true,
+      pitchWithRotate: false,
+      dragRotate: false,
     });
 
     let popup = new maplibregl.Popup({
@@ -452,15 +419,6 @@ export default function Map(props: any) {
       handleSearch();
     });
 
-    map.on("draw.modechange", function () {
-      if (draw.getMode() === "draw_polygon") {
-        removeOldPolys();
-        map.getContainer().classList.add("pencil-cursor");
-      } else {
-        map.getContainer().classList.remove("pencil-cursor");
-      }
-    });
-
     map.on("draw.create", async function () {
       handleSearch();
     });
@@ -488,14 +446,6 @@ export default function Map(props: any) {
       setIsMapLoaded(true);
     });
 
-    map.on("load", function () {
-      if (canDraw()) {
-        draw.changeMode("draw_polygon");
-        removeOldPolys();
-        map.getContainer().classList.add("pencil-cursor");
-      }
-    });
-
     onCleanup(() => {
       if (pencilButton) pencilButton.remove();
 
@@ -517,23 +467,11 @@ export default function Map(props: any) {
     removeMarkers();
     handleSearch();
     setIsMapLoaded(false);
-
-    // if (props.contrast() === "normal-contrast")
-    //   mapMarkerColor = ["#FF3333", "#2624B3"];
-    // else if (props.theme() === "dark-theme")
-    //   mapMarkerColor = ["#FFE8FE", "#3D86A8"];
-    // else mapMarkerColor = ["#FF3333", "#000080"];
   });
 
   createEffect(() => {
     if (isMapLoaded() && markers()) loadMarkers();
   });
-
-  //   createEffect(() => {
-  //     if (pencilButton)
-  //       if (props.isListOpen()) pencilButton.classList.add("removed-under-1000");
-  //       else pencilButton.classList.remove("removed-under-1000");
-  //   });
 
   createEffect(() => {
     marker.remove();
@@ -576,10 +514,7 @@ export default function Map(props: any) {
           <IconTrash />
         </button>
       </div>
-      <div
-        ref={mapContainer}
-        class={`map maplibregl-map ${isDrawing() ? "pencil-cursor" : ""}`}
-      ></div>
+      <div ref={mapContainer} class={`map maplibregl-map`}></div>
     </div>
   );
 }

@@ -84,6 +84,15 @@
   padding: var(--side-margin);
 }
 
+.search-results div:hover {
+  cursor: pointer;
+  background-color: var(--c1);
+}
+
+.search-results div:not(:last-child) {
+  border-bottom: 1px solid white;
+}
+
 .filter-nav {
   width: calc(var(--standard-size) * 2);
 }

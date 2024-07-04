@@ -25,12 +25,14 @@
 }
 
 .pencil-button > svg {
-  margin-top: calc(var(--border-width) * -2);
+  width: 100%;
+  height: 100%;
+  /* margin-top: calc(var(--border-width) * -2); */
   padding: calc(var(--border-width) / 2);
 }
 
-.pencil-cursor:hover {
-  cursor: url("../../assets/pencil-icon.svg") 0 120, auto !important;
+.mode-draw_polygon canvas:hover {
+  cursor: url("../../assets/icon-pencil.svg") 0 120, auto !important;
 }
 
 .maplibregl-ctrl {
