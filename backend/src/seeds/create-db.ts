@@ -12,7 +12,9 @@ const client = new Client({
 
 try {
   await client.connect();
-  await client.query(`DROP DATABASE IF EXISTS ${process.env.POSTGRESQL_DATABASE} WITH (FORCE)`);
+  await client.query(
+    `DROP DATABASE IF EXISTS ${process.env.POSTGRESQL_DATABASE} WITH (FORCE)`
+  );
   await client.query(`CREATE DATABASE ${process.env.POSTGRESQL_DATABASE}`);
   console.log("Database created succesfully");
 } catch (error: any) {

@@ -99,32 +99,66 @@ async function createTables() {
     await client.query(createTableQueryItems);
     await client.query(createTableQueryMessages);
 
-    await client.query(`CREATE TABLE items_type_0_rent_apartment PARTITION OF items FOR VALUES FROM (1) TO (2);`);
-    await client.query(`CREATE TABLE items_type_0_rent_house PARTITION OF items FOR VALUES FROM (2) TO (3);`);
-    await client.query(`CREATE TABLE items_type_0_rent_shared PARTITION OF items FOR VALUES FROM (3) TO (4);`);
-    await client.query(`CREATE TABLE items_type_0_buy_apartment PARTITION OF items FOR VALUES FROM (4) TO (5);`);
-    await client.query(`CREATE TABLE items_type_0_buy_house PARTITION OF items FOR VALUES FROM (5) TO (6);`);
-    await client.query(`CREATE TABLE items_type_0_buy_land PARTITION OF items FOR VALUES FROM (6) TO (7);`);
+    await client.query(
+      `CREATE TABLE items_type_0_rent_apartment PARTITION OF items FOR VALUES FROM (1) TO (2);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_0_rent_house PARTITION OF items FOR VALUES FROM (2) TO (3);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_0_rent_shared PARTITION OF items FOR VALUES FROM (3) TO (4);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_0_buy_apartment PARTITION OF items FOR VALUES FROM (4) TO (5);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_0_buy_house PARTITION OF items FOR VALUES FROM (5) TO (6);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_0_buy_land PARTITION OF items FOR VALUES FROM (6) TO (7);`
+    );
 
-    await client.query(`CREATE TABLE items_type_1_rent_apartment PARTITION OF items FOR VALUES FROM (7) TO (8);`);
-    await client.query(`CREATE TABLE items_type_1_rent_house PARTITION OF items FOR VALUES FROM (8) TO (9);`);
-    await client.query(`CREATE TABLE items_type_1_rent_shared PARTITION OF items FOR VALUES FROM (9) TO (10);`);
-    await client.query(`CREATE TABLE items_type_1_buy_apartment PARTITION OF items FOR VALUES FROM (10) TO (11);`);
-    await client.query(`CREATE TABLE items_type_1_buy_house PARTITION OF items FOR VALUES FROM (11) TO (12);`);
-    await client.query(`CREATE TABLE items_type_1_buy_land PARTITION OF items FOR VALUES FROM (12) TO (13);`);
+    await client.query(
+      `CREATE TABLE items_type_1_rent_apartment PARTITION OF items FOR VALUES FROM (7) TO (8);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_1_rent_house PARTITION OF items FOR VALUES FROM (8) TO (9);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_1_rent_shared PARTITION OF items FOR VALUES FROM (9) TO (10);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_1_buy_apartment PARTITION OF items FOR VALUES FROM (10) TO (11);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_1_buy_house PARTITION OF items FOR VALUES FROM (11) TO (12);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_1_buy_land PARTITION OF items FOR VALUES FROM (12) TO (13);`
+    );
 
-    await client.query(`CREATE TABLE items_type_2_rent_apartment PARTITION OF items FOR VALUES FROM (13) TO (14);`);
-    await client.query(`CREATE TABLE items_type_2_rent_house PARTITION OF items FOR VALUES FROM (14) TO (15);`);
-    await client.query(`CREATE TABLE items_type_2_rent_shared PARTITION OF items FOR VALUES FROM (15) TO (16);`);
-    await client.query(`CREATE TABLE items_type_2_buy_apartment PARTITION OF items FOR VALUES FROM (16) TO (17);`);
-    await client.query(`CREATE TABLE items_type_2_buy_house PARTITION OF items FOR VALUES FROM (17) TO (18);`);
-    await client.query(`CREATE TABLE items_type_2_buy_land PARTITION OF items FOR VALUES FROM (18) TO (19);`);
+    await client.query(
+      `CREATE TABLE items_type_2_rent_apartment PARTITION OF items FOR VALUES FROM (13) TO (14);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_2_rent_house PARTITION OF items FOR VALUES FROM (14) TO (15);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_2_rent_shared PARTITION OF items FOR VALUES FROM (15) TO (16);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_2_buy_apartment PARTITION OF items FOR VALUES FROM (16) TO (17);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_2_buy_house PARTITION OF items FOR VALUES FROM (17) TO (18);`
+    );
+    await client.query(
+      `CREATE TABLE items_type_2_buy_land PARTITION OF items FOR VALUES FROM (18) TO (19);`
+    );
 
-    await client.query("CREATE INDEX idx_coordinates ON items USING GIST(coordinates);");
-
-    // await client.query('CREATE INDEX idx_composite_filter ON items (sale_type, item_type, euro_price, created_at, coordinates, original_price, size, currency_code, currency_name, currency_symbol, first_picture);');
-    // await client.query('CREATE INDEX idx_composite_filter ON items USING GIST(coordinates) INCLUDE (sale_type, item_type, euro_price, created_at, original_price, size, currency_code, currency_name, currency_symbol, first_picture);');
-    // await client.query('CREATE INDEX idx_composite_filter ON items USING GIST(coordinates) INCLUDE (euro_price, created_at, original_price, size, currency_code, currency_name, currency_symbol, first_picture);');
+    await client.query(
+      "CREATE INDEX idx_coordinates ON items USING GIST(coordinates);"
+    );
 
     await client.query(`
 		ALTER TABLE items
