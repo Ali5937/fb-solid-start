@@ -1,7 +1,3 @@
-.map-ssr {
-  background-color: blue;
-}
-
 .map-parent {
   position: relative;
   cursor: default;
@@ -27,7 +23,6 @@
 .pencil-button > svg {
   width: 100%;
   height: 100%;
-  /* margin-top: calc(var(--border-width) * -2); */
   padding: calc(var(--border-width) / 2);
 }
 

@@ -2,35 +2,16 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: var(--side-margin);
-  width: 55%;
-  max-width: 1000px;
-  padding-left: var(--side-margin);
-  background-color: var(--c1);
-  font-weight: bold;
+  height: calc(100vh - (var(--standard-size) + (var(--side-margin) * 2)));
   overflow: scroll;
   overflow-x: hidden;
-  z-index: 2;
-}
-
-.list-arrow {
-  position: fixed;
-  display: none;
-  background-color: var(--c2);
-  z-index: 10;
-}
-
-.list-arrow svg {
-  width: 100%;
-  height: 100%;
-  margin: calc(var(--border-width) * -1);
-  padding: var(--border-width);
 }
 
 .list .list-button-parent {
   display: none;
 }
 
-.list.is-open .list-button-parent {
+.panel.is-open .list-button-parent {
   position: fixed;
   display: flex;
   flex-direction: column;
@@ -43,7 +24,7 @@
   overflow: hidden;
 }
 
-.list.is-open .list-button-parent.window-open {
+.panel.is-open .list-button-parent.window-open {
   height: calc(var(--standard-size) * 3 + (var(--side-margin) * 2));
 }
 
@@ -103,25 +84,13 @@
 }
 
 @media (max-width: 1024px) {
-  .list:not(.is-open) {
+  .panel:not(.is-open) {
     position: fixed;
     width: 0px;
     overflow-y: hidden;
   }
 
-  .list.is-open {
+  .panel.is-open {
     width: 100%;
-  }
-
-  .list:not(.is-open) .list-arrow svg {
-    rotate: 180deg;
-  }
-
-  .list-arrow {
-    display: block;
-  }
-
-  .list:not(.is-open) .list-arrow {
-    transform: translateX(calc(var(--standard-size) * -1));
   }
 }

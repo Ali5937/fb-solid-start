@@ -416,6 +416,7 @@ export default function Map(props: any) {
         center.lat.toFixed(4),
         zoom.toFixed(1),
       ]);
+
       handleSearch();
     });
 
@@ -439,7 +440,7 @@ export default function Map(props: any) {
     map.on("click", "markers", function (e: any) {
       showPopUp(e);
       props.setSelectedItem(e.features[0].properties);
-      props.setIsListOpen(true);
+      props.setIsPanelOpen(true);
     });
 
     map.on("styledata", function () {
@@ -495,7 +496,7 @@ export default function Map(props: any) {
   onMount(() => marker.remove());
 
   return (
-    <div class={`map-parent ${props.isListOpen() ? "list-is-open" : ""}`}>
+    <div class={`map-parent ${props.isPanelOpen() ? "list-is-open" : ""}`}>
       <div ref={drawParent} class="draw-parent">
         <button
           ref={newPencilButton}

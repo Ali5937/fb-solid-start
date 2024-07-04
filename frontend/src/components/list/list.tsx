@@ -1,7 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from "solid-js";
 import "./list.css";
-import { isServer } from "solid-js/web";
-import IconArrow from "~/assets/icon-arrow";
 import ItemSortButton from "./item-sort-button";
 import Item from "./item";
 
@@ -51,26 +49,14 @@ export default function List(props: any) {
   });
 
   onMount(() => {
-    //@ts-ignore
     list.addEventListener("scroll", handleScroll);
     handleScroll();
   });
 
   return (
-    <div
-      ref={list}
-      class={`list ${
-        props.isListOpen() || props.windowWidth() >= 1024 ? "is-open" : ""
-      }`}
-    >
-      <div
-        class={`list-arrow button-style`}
-        onMouseDown={() => props.setIsListOpen(!props.isListOpen())}
-      >
-        <IconArrow />
-      </div>
+    <div ref={list} class={`list`}>
       <ItemSortButton
-        isListOpen={props.isListOpen}
+        isPanelOpen={props.isPanelOpen}
         itemSort={props.itemSort}
         setItemSort={props.setItemSort}
       />

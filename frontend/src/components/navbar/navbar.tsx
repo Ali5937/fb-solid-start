@@ -7,28 +7,27 @@ import "./navbar.css";
 
 const SearchBar = lazy(() => import("./searchBar"));
 const Filter = lazy(() => import("./filter"));
-const Message = lazy(() => import("./message"));
-const Login = lazy(() => import("./login"));
+const Message = lazy(() => import("../account/message"));
+const Login = lazy(() => import("../account/account"));
 const Currency = lazy(() => import("./currency"));
 const Options = lazy(() => import("./options"));
 
 export default function Navbar(props: any) {
-  const [openDropdownNumber, setOpenDropdownNumber] = createSignal<number>(0);
   const [isDropdownOpen, setIsDropdownOpen] = createSignal<boolean>(false);
 
   function setDropdown(dropNum: number) {
-    if (dropNum === openDropdownNumber()) {
-      setOpenDropdownNumber(0);
+    if (dropNum === props.openDropdownNumber()) {
+      props.setOpenDropdownNumber(0);
     } else {
-      setOpenDropdownNumber(dropNum);
+      props.setOpenDropdownNumber(dropNum);
       setIsDropdownOpen(true);
     }
   }
 
   function handleClickOutside(event: MouseEvent) {
     const target = event.target as Element;
-    if (!target?.closest(".nav-button")) {
-      setOpenDropdownNumber(0);
+    if (!target?.closest(".nav-button") && !target?.closest(".panel")) {
+      props.setOpenDropdownNumber(0);
       setIsDropdownOpen(false);
     }
   }
@@ -46,13 +45,15 @@ export default function Navbar(props: any) {
         <button
           aria-label="search-button"
           class={`search-nav nav-button ${
-            openDropdownNumber() === 1 && isDropdownOpen() ? "highlighted" : ""
+            props.openDropdownNumber() === 1 && isDropdownOpen()
+              ? "highlighted"
+              : ""
           }`}
           onMouseDown={() => setDropdown(1)}
         >
           <div class="nav-button-element">&#128270;</div>
           <Suspense>
-            <Show when={openDropdownNumber() === 1}>
+            <Show when={props.openDropdownNumber() === 1}>
               <SearchBar baseUrl={props.baseUrl} />
             </Show>
           </Suspense>
@@ -60,7 +61,9 @@ export default function Navbar(props: any) {
         <button
           aria-label="filter-button"
           class={`filter-nav nav-button ${
-            openDropdownNumber() === 2 && isDropdownOpen() ? "highlighted" : ""
+            props.openDropdownNumber() === 2 && isDropdownOpen()
+              ? "highlighted"
+              : ""
           }`}
           onMouseDown={() => setDropdown(2)}
         >
@@ -68,7 +71,7 @@ export default function Navbar(props: any) {
             {props.saleType()[0].toUpperCase() + props.saleType().slice(1)}
           </div>
           <Suspense>
-            <Show when={openDropdownNumber() === 2}>
+            <Show when={props.openDropdownNumber() === 2}>
               <Filter
                 currentRentMax={props.currentRentMax}
                 currentBuyMax={props.currentBuyMax}
@@ -93,7 +96,7 @@ export default function Navbar(props: any) {
         <div class="logo-text">Flat Bunny</div>
       </div>
       <div class="nav-parent">
-        <button
+        {/* <button
           aria-label="message-button"
           class={`message-nav nav-button ${
             openDropdownNumber() === 3 && isDropdownOpen() ? "highlighted" : ""
@@ -106,25 +109,27 @@ export default function Navbar(props: any) {
               <Message />
             </Show>
           </Suspense>
-        </button>
+        </button> */}
         <button
           aria-label="login-button"
           class={`login-nav nav-button ${
-            openDropdownNumber() === 4 && isDropdownOpen() ? "highlighted" : ""
+            props.openDropdownNumber() === 4 && isDropdownOpen()
+              ? "highlighted"
+              : ""
           }`}
-          onMouseDown={() => setDropdown(4)}
+          onMouseDown={() => {
+            setDropdown(4);
+            props.setIsPanelOpen(true);
+          }}
         >
           <div class="nav-button-element">Login</div>
-          <Suspense>
-            <Show when={openDropdownNumber() === 4}>
-              <Login />
-            </Show>
-          </Suspense>
         </button>
         <button
           aria-label="currency-button"
           class={`currency-nav nav-button ${
-            openDropdownNumber() === 5 && isDropdownOpen() ? "highlighted" : ""
+            props.openDropdownNumber() === 5 && isDropdownOpen()
+              ? "highlighted"
+              : ""
           }`}
           onMouseDown={() => setDropdown(5)}
         >
@@ -139,7 +144,7 @@ export default function Navbar(props: any) {
             </div>
           )}
           <Suspense>
-            <Show when={openDropdownNumber() === 5}>
+            <Show when={props.openDropdownNumber() === 5}>
               <Currency
                 baseUrl={props.baseUrl}
                 currentCurrency={props.currentCurrency}
@@ -155,13 +160,15 @@ export default function Navbar(props: any) {
         <button
           aria-label="option-button"
           class={`options-nav nav-button ${
-            openDropdownNumber() === 6 && isDropdownOpen() ? "highlighted" : ""
+            props.openDropdownNumber() === 6 && isDropdownOpen()
+              ? "highlighted"
+              : ""
           }`}
           onMouseDown={() => setDropdown(6)}
         >
           <IconOptions />
           <Suspense>
-            <Show when={openDropdownNumber() === 6}>
+            <Show when={props.openDropdownNumber() === 6}>
               <Options theme={props.theme} setTheme={props.setTheme} />
             </Show>
           </Suspense>

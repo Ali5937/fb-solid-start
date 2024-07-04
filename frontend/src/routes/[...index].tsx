@@ -5,7 +5,7 @@ import {
   useSearchParams,
 } from "@solidjs/router";
 import { Link, Meta, MetaProvider, Title } from "@solidjs/meta";
-import { createEffect, createSignal } from "solid-js";
+import { Show, Suspense, createEffect, createSignal } from "solid-js";
 import { isServer } from "solid-js/web";
 import Cookies from "js-cookie";
 import List from "~/components/list/list";
@@ -15,6 +15,8 @@ import GetInitialMapArea from "~/utils/GetInitialMapArea";
 import { clientOnly } from "@solidjs/start";
 import { getRequestEvent } from "solid-js/web";
 import { isbot } from "isbot";
+import Account from "~/components/account/account";
+import IconArrow from "~/assets/icon-arrow";
 
 const Map = clientOnly(() => import("../components/map/map"));
 const baseUrl = "http://localhost:5000/api";
@@ -95,8 +97,8 @@ export default function Index() {
     ];
 
   const expires = 365;
-  const [windowWidth, setWindowWidth] = createSignal<number | null>(
-    isServer ? null : window.innerWidth
+  const [windowWidth, setWindowWidth] = createSignal<number>(
+    isServer ? 0 : window.innerWidth
   );
 
   const [canUseCookies, setCanUseCookies] = createSignal<boolean>(
@@ -120,7 +122,7 @@ export default function Index() {
   const [mapLocation, setMapLocation] = createSignal<[number, number, number]>(
     oldLng ? [oldLng, oldLat, oldZoom] : [13.362, 47.601, 3.9]
   );
-  const [isListOpen, setIsListOpen] = createSignal<boolean>(true);
+  const [isPanelOpen, setIsPanelOpen] = createSignal<boolean>(true);
   const [displayUnits, setDisplayUnits] = createSignal(
     Cookies.get("displayUnits") || "m"
   );
@@ -131,6 +133,7 @@ export default function Index() {
   const [itemSort, setItemSort] = createSignal("new");
   const [selectedItem, setSelectedItem] = createSignal(null);
   const [highlightedItemLngLat, setHighlightedItemLngLat] = createSignal("");
+  const [openDropdownNumber, setOpenDropdownNumber] = createSignal<number>(0);
 
   let polygonString1 = searchParams.poly;
   let polygonString2 = searchParams.poly2 ?? "";
@@ -183,10 +186,10 @@ export default function Index() {
   });
 
   //Old: http://localhost:3000/#/buy/house/0/1000000/13.3629/47.601/4/
-  //New: http://localhost:3000/user-region/buy/house?region(optional)="example"&id(optional)="example"
+  //New: http://localhost:3000/user-region/buy/house?region="example"&id="example"
   //user-region = "us" for usa or "all" for anything else
-  ///region = "germany-bavaria-munich"
-  //id = "593475"
+  ///region(optional) = "germany-bavaria-munich"
+  //id(optional) = "593475"
 
   return (
     <MetaProvider>
@@ -199,6 +202,8 @@ export default function Index() {
           baseUrl={baseUrl}
           theme={theme}
           setTheme={setTheme}
+          openDropdownNumber={openDropdownNumber}
+          setOpenDropdownNumber={setOpenDropdownNumber}
           userId={userId}
           setUserId={setUserId}
           saleType={saleType}
@@ -217,6 +222,7 @@ export default function Index() {
           setCurrentCurrency={setCurrentCurrency}
           displayUnits={displayUnits}
           setDisplayUnits={setDisplayUnits}
+          setIsPanelOpen={setIsPanelOpen}
         />
         <main>
           <Map
@@ -236,27 +242,52 @@ export default function Index() {
             selectedItem={selectedItem}
             setSelectedItem={setSelectedItem}
             highlightedItemLngLat={highlightedItemLngLat}
-            isListOpen={isListOpen}
-            setIsListOpen={setIsListOpen}
+            isPanelOpen={isPanelOpen}
+            setIsPanelOpen={setIsPanelOpen}
             initialSelectedId={initialSelectedId}
           />
-          <List
-            baseUrl={baseUrl}
-            isListOpen={isListOpen}
-            windowWidth={windowWidth}
-            setIsListOpen={setIsListOpen}
-            propertyItems={propertyItems}
-            setPropertyItems={setPropertyItems}
-            currencyData={currencyData}
-            currentCurrency={currentCurrency}
-            displayUnits={displayUnits}
-            itemSort={itemSort}
-            setItemSort={setItemSort}
-            selectedItem={selectedItem}
-            setSelectedItem={setSelectedItem}
-            setHighlightedItemLngLat={setHighlightedItemLngLat}
-            initialSelectedId={initialSelectedId}
-          />
+          <div
+            class={`panel ${
+              isPanelOpen() || windowWidth() >= 1024 ? "is-open" : ""
+            }`}
+          >
+            <button
+              class={`list-switch`}
+              onMouseDown={() => {
+                if (openDropdownNumber() === 4) setOpenDropdownNumber(0);
+                else setIsPanelOpen(!isPanelOpen());
+              }}
+            >
+              {isPanelOpen() && openDropdownNumber() !== 4 ? "Map" : "List"}
+              <IconArrow />
+            </button>
+            <Suspense>
+              <Show when={openDropdownNumber() !== 4}>
+                <List
+                  baseUrl={baseUrl}
+                  windowWidth={windowWidth}
+                  isPanelOpen={isPanelOpen}
+                  setIsPanelOpen={setIsPanelOpen}
+                  propertyItems={propertyItems}
+                  setPropertyItems={setPropertyItems}
+                  currencyData={currencyData}
+                  currentCurrency={currentCurrency}
+                  displayUnits={displayUnits}
+                  itemSort={itemSort}
+                  setItemSort={setItemSort}
+                  selectedItem={selectedItem}
+                  setSelectedItem={setSelectedItem}
+                  setHighlightedItemLngLat={setHighlightedItemLngLat}
+                  initialSelectedId={initialSelectedId}
+                />
+              </Show>
+            </Suspense>
+            <Suspense>
+              <Show when={openDropdownNumber() === 4}>
+                <Account />
+              </Show>
+            </Suspense>
+          </div>
         </main>
       </div>
     </MetaProvider>

@@ -1,7 +1,7 @@
-export default function Login(props: any) {
+export default function Account(props: any) {
   return (
     <div
-      class="dropdown-element-right button-style"
+      class="account button-style"
       onMouseDown={(event) => {
         event.stopPropagation();
       }}
