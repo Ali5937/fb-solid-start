@@ -53,7 +53,7 @@ export default function (app: any) {
         };
         set: any;
       }) => {
-        // await new Promise((resolve) => setTimeout(resolve, 5000));
+        // await new Promise((resolve) => setTimeout(resolve, 3000));
 
         // console.time("query-time");
         const client = await pool.connect();

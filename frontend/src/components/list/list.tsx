@@ -5,7 +5,9 @@ import Item from "./item";
 
 export default function List(props: any) {
   let list: any;
-  const [visibleItemCount, setVisibleItemCount] = createSignal(0);
+  const [visibleItemCount, setVisibleItemCount] = createSignal(
+    props.isCrawler ? 500 : 0
+  );
   const [itemDetails, setItemDetails] = createSignal();
   const [isFocused, setIsFocused] = createSignal<boolean>(false);
   const [isLowHeight, setIsLowheight] = createSignal<boolean>(false);

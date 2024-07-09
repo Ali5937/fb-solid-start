@@ -49,9 +49,8 @@ const getData = async (
         polygon2,
         itemSort,
       })
-  );
-  const res = await response.json();
-  return res;
+  ).then((res) => res.json());
+  return response;
 };
 
 export default function Index() {
@@ -162,7 +161,8 @@ export default function Index() {
   const max = saleType() === "buy" ? buyPriceRange()[1] : rentPriceRange()[1];
 
   const event = getRequestEvent();
-  if (isbot(event?.request.headers.get("User-Agent"))) {
+  let isCrawler = isbot(event?.request.headers.get("User-Agent"));
+  if (isCrawler) {
     setPropertyItems(
       createAsync(
         () =>
@@ -192,7 +192,7 @@ export default function Index() {
       method: "GET",
       credentials: "include",
     }).then((res) => res.json());
-    console.log(result.message);
+
     if (result.message === "authorized") setIsLoggedIn(true);
     else setIsLoggedIn(false);
   }
@@ -296,6 +296,7 @@ export default function Index() {
               <Show when={!isProfileOpen()}>
                 <List
                   baseUrl={baseUrl}
+                  isCrawler={isCrawler}
                   windowWidth={windowWidth}
                   windowHeight={windowHeight}
                   isPanelOpen={isPanelOpen}
