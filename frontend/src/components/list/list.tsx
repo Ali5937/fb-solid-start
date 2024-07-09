@@ -7,10 +7,14 @@ export default function List(props: any) {
   let list: any;
   const [visibleItemCount, setVisibleItemCount] = createSignal(0);
   const [itemDetails, setItemDetails] = createSignal();
-  const [isFocused, setIsFocused] = createSignal(false);
+  const [isFocused, setIsFocused] = createSignal<boolean>(false);
+  const [isLowHeight, setIsLowheight] = createSignal<boolean>(false);
 
   function handleScroll() {
-    const itemHeight = window.innerHeight / 4;
+    const itemHeight =
+      props.windowHeight() < 768 && props.windowHeight() < props.windowWidth()
+        ? props.windowHeight() / 2
+        : props.windowHeight() / 4;
     const numberOfItemsInRow = 2;
     const itemsOnScreen = 8;
     const margin = 2;
@@ -48,14 +52,21 @@ export default function List(props: any) {
     }
   });
 
+  createEffect(() => {
+    setIsLowheight(
+      props.windowHeight() < 768 && props.windowHeight() < props.windowWidth()
+    );
+  });
+
   onMount(() => {
     list.addEventListener("scroll", handleScroll);
     handleScroll();
   });
 
   return (
-    <div ref={list} class={`list`}>
+    <div ref={list} class={`list ${isLowHeight() ? "low-height" : ""}`}>
       <ItemSortButton
+        setIsProfileOpen={props.setIsProfileOpen}
         isPanelOpen={props.isPanelOpen}
         itemSort={props.itemSort}
         setItemSort={props.setItemSort}

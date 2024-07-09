@@ -52,8 +52,14 @@
 
 .list-item {
   position: relative;
+  display: flex;
+  flex-direction: column;
   height: 25vh;
   background-color: var(--c2);
+}
+
+.low-height .list-item {
+  height: 50vh;
 }
 
 .icon-arrow-border-parent {
