@@ -13,8 +13,8 @@ const client = new Client({
 const createTableQueryUsers = `
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  email VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
   firm_id UUID,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 )`;
@@ -22,8 +22,8 @@ CREATE TABLE users (
 const createTableQueryFirms = `
 CREATE TABLE firms (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  email VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
   verified BOOLEAN NOT NULL,
   boost SMALLINT CHECK (boost >= 0),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -61,12 +61,11 @@ CREATE TABLE items (
   council_home BOOLEAN,
   is_deleted BOOLEAN,
   auction_date DATE,
-  address VARCHAR(255),
-  city VARCHAR(255) NOT NULL,
-  state VARCHAR(255),
-  nation VARCHAR(255) NOT NULL,
-  currency_name VARCHAR(50) NOT NULL,
-  currency_symbol VARCHAR(5) NOT NULL,
+  city TEXT NOT NULL,
+  state TEXT,
+  nation TEXT NOT NULL,
+  currency_name TEXT NOT NULL,
+  currency_symbol TEXT NOT NULL,
   currency_code CHAR(3) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -80,7 +79,7 @@ CREATE TABLE messages (
   receiver_id UUID NOT NULL,
   related_item_id BIGSERIAL NOT NULL,
   related_item_type SMALLINT NOT NULL,
-  content VARCHAR(500) NOT NULL,
+  content TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 )`;
