@@ -1,4 +1,4 @@
-import { For, Show, createSignal, onMount } from "solid-js";
+import { For, Show, createEffect, createSignal, onMount } from "solid-js";
 
 export default function SearchBar(props: any) {
   let inputRef: HTMLInputElement | undefined;
@@ -33,10 +33,12 @@ export default function SearchBar(props: any) {
     lastInputTime = Date.now();
   }
 
-  onMount(() => {
-    if (inputRef) {
-      inputRef.focus();
-    }
+  createEffect(() => {
+    setTimeout(() => {
+      if (inputRef) {
+        inputRef.focus();
+      }
+    }, 0);
   });
 
   return (
