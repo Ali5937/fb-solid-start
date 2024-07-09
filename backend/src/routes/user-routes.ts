@@ -1,11 +1,17 @@
-import { jwt } from "@elysiajs/jwt";
 import dotenv from "dotenv";
+import {
+  basicAuthModel,
+  jwtAccessSetup,
+  jwtRefreshSetup,
+} from "../middleware/jwtSetup";
 const { Pool } = require("pg");
 
 dotenv.config({ path: "../.env" });
 
-if (!process.env.JWT_SECRET) {
-  throw new Error("JWT_SECRET is not defined in the environment variables.");
+if (!process.env.JWT_SECRET_ACCESS) {
+  throw new Error(
+    "JWT_SECRET_ACCESS is not defined in the environment variables."
+  );
 }
 
 const pool = new Pool({
@@ -34,18 +40,14 @@ async function getEmail(client: any, email: string) {
 
 export default function (app: any) {
   app
-    // .use(
-    //   jwt({
-    //     name: "jwt",
-    //     secret: process.env.JWT_SECRET as string,
-    //     exp: "1h",
-    //   })
-    // )
+    .use(basicAuthModel)
+    .use(jwtAccessSetup)
+    .use(jwtRefreshSetup)
 
+    // needed?
     .get("/api/user/:id", async ({ cookie: { auth }, params }: any) => {
       return { auth, params };
     })
-
     .get("/api/user/email/:emailAddress", async ({ params }: any) => {
       const client = await pool.connect();
       const doesEmailExist = await getEmail(client, params.emailAddress);
@@ -77,11 +79,20 @@ export default function (app: any) {
     // if user does not exist already
     .post(
       "/api/user/signup",
-      async ({ body, jwt, cookie: { auth }, params }: { body: any; jwt: any; cookie: { auth: any }; params: any }) => {
+      async ({
+        body,
+        jwt,
+        cookie: { accessToken, refreshToken },
+      }: {
+        body: any;
+        jwt: any;
+        cookie: { accessToken: any; refreshToken: any };
+      }) => {
         const client = await pool.connect();
         try {
-          const doesEmailExist = await getEmail(client, params.emailAddress);
-          if (!doesEmailExist) return { status: 204, message: "User not found" };
+          const doesEmailExist = await getEmail(client, body.email);
+          if (doesEmailExist)
+            return { status: 409, message: "User exists already" };
 
           const passwordHash = await Bun.password.hash(body.password);
           const queryText = `
@@ -91,15 +102,29 @@ export default function (app: any) {
 
           const parameterValues = [body.email, passwordHash, body.firmId];
 
-          await pool.query({
+          const result = await pool.query({
             text: queryText,
             values: parameterValues,
           });
 
-          auth.set({
-            value: await jwt.sign(params),
+          // check if user exists
+          if (result.rows.length !== 1) return { status: "error" };
+          let userData = result.rows[0];
+          let userId: number | null = null;
+          userId = userData.id;
+
+          accessToken.set({
+            value: await jwt.sign({ id: userId }),
             httpOnly: true,
-            maxAge: 7 * 86400,
+            secure: true,
+            maxAge: 600, // 10 min
+            path: "/",
+          });
+          refreshToken.set({
+            value: await jwt.sign({ id: userId }),
+            httpOnly: true,
+            secure: true,
+            maxAge: 7 * 86400, // 7 days
             path: "/",
           });
 
@@ -116,9 +141,17 @@ export default function (app: any) {
     // if user exists already
     .post(
       "/api/user/login",
-      async ({ body, jwt, cookie: { auth }, params }: { body: any; jwt: any; cookie: { auth: any }; params: any }) => {
-        let userData: any;
-        let userId: number | null = null;
+      async ({
+        body,
+        jwtAccess,
+        jwtRefresh,
+        cookie: { accessToken, refreshToken },
+      }: {
+        body: any;
+        jwtAccess: any;
+        jwtRefresh: any;
+        cookie: { accessToken: any; refreshToken: any };
+      }) => {
         const client = await pool.connect();
         try {
           const queryText = `
@@ -131,28 +164,56 @@ export default function (app: any) {
             values: parameterValues,
           });
 
-          if (result.rows.length > 0) {
-            // check if user exists
-            userData = result.rows[0];
-            userId = userData.id;
-          }
+          // check if user exists
+          if (result.rows.length !== 1) return { status: "error" };
 
-          const isPasswordCorrect = await Bun.password.verify(body.password, userData.password_hash);
-          if (isPasswordCorrect) {
-            auth.set({
-              value: await jwt.sign(params),
-              httpOnly: true,
-              maxAge: 7 * 86400,
-              path: "/",
-            });
-            return { status: "success" };
-          } else return { status: "error" };
+          let userData = result.rows[0];
+          let userId = userData.id;
+
+          const isPasswordCorrect = await Bun.password.verify(
+            body.password,
+            userData.password_hash
+          );
+
+          if (!isPasswordCorrect) return { status: "error" };
+
+          accessToken.set({
+            value: await jwtAccess.sign({ id: userId }),
+            httpOnly: true,
+            secure: true,
+            maxAge: 600, // 10 min
+            path: "/",
+          });
+          refreshToken.set({
+            value: await jwtRefresh.sign({ id: userId }),
+            httpOnly: true,
+            secure: true,
+            maxAge: 7 * 86400, // 7 days
+            path: "/",
+          });
+
+          return { status: "success" };
         } catch (error: any) {
           console.error(error.message);
           return { status: "error", message: error.message };
         } finally {
           client.release();
         }
+      }
+    )
+    .post(
+      "/api/user/logout",
+      async ({
+        cookie: { accessToken, refreshToken },
+      }: {
+        cookie: { accessToken: any; refreshToken: any };
+      }) => {
+        accessToken.remove();
+        refreshToken.remove();
+        return {
+          status: "success",
+          message: "Logout successful",
+        };
       }
     );
 }

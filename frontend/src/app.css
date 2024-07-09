@@ -41,6 +41,7 @@ body {
 
   --standard-size: 60px;
   --side-margin: calc(var(--standard-size) / 5);
+  --font-size-xl: calc(var(--standard-size) / 1.5);
   --font-size-l: calc(var(--standard-size) / 2);
   --font-size-m: calc(var(--standard-size) / 3);
   --split-line: 1px solid hsl(210, 4%, 29%);
@@ -51,7 +52,6 @@ body {
 
 * {
   transition: background var(--speed);
-  transition: width var(--speed);
 }
 
 #app {
@@ -82,10 +82,18 @@ button:hover {
 }
 
 input {
-  background-color: var(--c1);
+  width: calc(var(--standard-size) * 9);
+  height: var(--standard-size);
   color: var(--c4);
+  background-color: var(--c1);
+  border: var(--border-width) solid;
+  border-color: var(--c3);
   padding: var(--side-margin);
   outline: none;
+}
+
+input:focus {
+  border-color: var(--c4);
 }
 
 ::-webkit-scrollbar {
@@ -125,8 +133,8 @@ button,
 }
 
 .arrow-icon {
-  width: 50%;
-  height: 100%;
+  width: calc(var(--standard-size) - var(--side-margin));
+  height: calc(var(--standard-size) - var(--side-margin));
 }
 
 .panel {
@@ -137,6 +145,7 @@ button,
   background-color: var(--c1);
   font-size: var(--font-size-m);
   font-weight: bold;
+  transition: width var(--speed);
   z-index: 15;
 }
 
@@ -181,5 +190,6 @@ button,
 @media (max-width: 480px) {
   body {
     --standard-size: 35px;
+    --font-size-m: 12px;
   }
 }

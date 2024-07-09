@@ -5,7 +5,14 @@ import {
   useSearchParams,
 } from "@solidjs/router";
 import { Link, Meta, MetaProvider, Title } from "@solidjs/meta";
-import { Show, Suspense, createEffect, createSignal } from "solid-js";
+import {
+  Show,
+  Suspense,
+  createEffect,
+  createSignal,
+  lazy,
+  onMount,
+} from "solid-js";
 import { isServer } from "solid-js/web";
 import Cookies from "js-cookie";
 import List from "~/components/list/list";
@@ -15,9 +22,9 @@ import GetInitialMapArea from "~/utils/GetInitialMapArea";
 import { clientOnly } from "@solidjs/start";
 import { getRequestEvent } from "solid-js/web";
 import { isbot } from "isbot";
-import Account from "~/components/account/account";
 import IconArrow from "~/assets/icon-arrow";
 
+const Account = lazy(() => import("~/components/account/account"));
 const Map = clientOnly(() => import("../components/map/map"));
 const baseUrl = "http://localhost:5000/api";
 
@@ -101,6 +108,10 @@ export default function Index() {
     isServer ? 0 : window.innerWidth
   );
 
+  const [windowHeight, setWindowHeight] = createSignal<number>(
+    isServer ? 0 : window.innerHeight
+  );
+
   const [canUseCookies, setCanUseCookies] = createSignal<boolean>(
     Cookies.get("canUseCookies") ? true : false
   );
@@ -108,7 +119,7 @@ export default function Index() {
     Cookies.get("theme") || "dark-theme"
   );
 
-  const [userId, setUserId] = createSignal<number>(0);
+  const [isLoggedIn, setIsLoggedIn] = createSignal<boolean>(false);
   const [saleType, setSaleType] = createSignal<string>(oldSaleType || "rent"); // rent, buy
   const [itemType, setItemType] = createSignal<string>(
     oldItemType || "apartment"
@@ -134,6 +145,7 @@ export default function Index() {
   const [selectedItem, setSelectedItem] = createSignal(null);
   const [highlightedItemLngLat, setHighlightedItemLngLat] = createSignal("");
   const [openDropdownNumber, setOpenDropdownNumber] = createSignal<number>(0);
+  const [isProfileOpen, setIsProfileOpen] = createSignal<boolean>(false);
 
   let polygonString1 = searchParams.poly;
   let polygonString2 = searchParams.poly2 ?? "";
@@ -168,8 +180,22 @@ export default function Index() {
     );
   }
 
-  if (!isServer)
-    window.addEventListener("resize", () => setWindowWidth(window.innerWidth));
+  if (!isServer) {
+    window.addEventListener("resize", () => {
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    });
+  }
+
+  async function checkIfLoggedIn() {
+    const result = await fetch(`${baseUrl}/profile/check-logged-in`, {
+      method: "GET",
+      credentials: "include",
+    }).then((res) => res.json());
+    console.log(result.message);
+    if (result.message === "authorized") setIsLoggedIn(true);
+    else setIsLoggedIn(false);
+  }
 
   createEffect(() => {
     const newUrl = `/${saleType()}/${itemType()}${
@@ -183,6 +209,10 @@ export default function Index() {
       poly: polygonString1,
       poly2: searchParams.poly2 ?? "",
     });
+  });
+
+  onMount(() => {
+    checkIfLoggedIn();
   });
 
   //Old: http://localhost:3000/#/buy/house/0/1000000/13.3629/47.601/4/
@@ -204,8 +234,10 @@ export default function Index() {
           setTheme={setTheme}
           openDropdownNumber={openDropdownNumber}
           setOpenDropdownNumber={setOpenDropdownNumber}
-          userId={userId}
-          setUserId={setUserId}
+          isProfileOpen={isProfileOpen}
+          setIsProfileOpen={setIsProfileOpen}
+          isPanelOpen={setIsPanelOpen}
+          setIsPanelOpen={setIsPanelOpen}
           saleType={saleType}
           setSaleType={setSaleType}
           itemType={itemType}
@@ -222,7 +254,6 @@ export default function Index() {
           setCurrentCurrency={setCurrentCurrency}
           displayUnits={displayUnits}
           setDisplayUnits={setDisplayUnits}
-          setIsPanelOpen={setIsPanelOpen}
         />
         <main>
           <Map
@@ -254,18 +285,19 @@ export default function Index() {
             <button
               class={`list-switch`}
               onMouseDown={() => {
-                if (openDropdownNumber() === 4) setOpenDropdownNumber(0);
+                if (isProfileOpen()) setIsProfileOpen(false);
                 else setIsPanelOpen(!isPanelOpen());
               }}
             >
-              {isPanelOpen() && openDropdownNumber() !== 4 ? "Map" : "List"}
+              {isPanelOpen() && !isProfileOpen() ? "Map" : "List"}
               <IconArrow />
             </button>
             <Suspense>
-              <Show when={openDropdownNumber() !== 4}>
+              <Show when={!isProfileOpen()}>
                 <List
                   baseUrl={baseUrl}
                   windowWidth={windowWidth}
+                  windowHeight={windowHeight}
                   isPanelOpen={isPanelOpen}
                   setIsPanelOpen={setIsPanelOpen}
                   propertyItems={propertyItems}
@@ -283,8 +315,12 @@ export default function Index() {
               </Show>
             </Suspense>
             <Suspense>
-              <Show when={openDropdownNumber() === 4}>
-                <Account />
+              <Show when={isProfileOpen()}>
+                <Account
+                  baseUrl={baseUrl}
+                  isLoggedIn={isLoggedIn}
+                  setIsLoggedIn={setIsLoggedIn}
+                />
               </Show>
             </Suspense>
           </div>

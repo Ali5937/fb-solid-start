@@ -137,7 +137,7 @@
   line-height: 1;
 }
 
-.login-nav {
+.account-nav {
   width: calc(var(--standard-size) * 2);
 }
 
@@ -239,10 +239,5 @@
 @media (max-width: 370px) {
   .logo-image {
     margin: 0;
-  }
-
-  .currency-text div:nth-child(2),
-  .other-currency-list {
-    font-size: 12px;
   }
 }

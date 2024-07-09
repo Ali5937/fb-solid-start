@@ -1,0 +1,48 @@
+.account {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: var(--standard-size);
+  margin-right: calc(var(--standard-size) + var(--side-margin));
+}
+
+.account-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--side-margin);
+}
+
+.account h2 {
+  font-size: var(--font-size-xl);
+  margin-bottom: calc(var(--side-margin) * 2);
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--side-margin);
+  width: 100%;
+  height: 100%;
+}
+
+.account button,
+.login button {
+  width: calc(var(--standard-size) * 3);
+}
+
+.separation {
+  width: 100%;
+  border-bottom: calc(var(--border-width) / 2) solid;
+  border-color: var(--c3);
+}
+
+.login-type {
+  font-size: var(--font-size-l);
+}
+
+.login-email-parent,
+.login-password-parent {
+  display: flex;
+  flex-direction: column;
+}

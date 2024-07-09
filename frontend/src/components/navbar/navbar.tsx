@@ -1,14 +1,11 @@
 import { Show, Suspense, createSignal, lazy, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 import IconLogo from "../../assets/icon-logo";
-import IconMessage from "~/assets/icon-message";
 import IconOptions from "../../assets/icon-options";
 import "./navbar.css";
 
 const SearchBar = lazy(() => import("./searchBar"));
 const Filter = lazy(() => import("./filter"));
-const Message = lazy(() => import("../account/message"));
-const Login = lazy(() => import("../account/account"));
 const Currency = lazy(() => import("./currency"));
 const Options = lazy(() => import("./options"));
 
@@ -26,7 +23,11 @@ export default function Navbar(props: any) {
 
   function handleClickOutside(event: MouseEvent) {
     const target = event.target as Element;
-    if (!target?.closest(".nav-button") && !target?.closest(".panel")) {
+    if (
+      !target?.closest(".nav-button") &&
+      !target?.closest(".panel") &&
+      props.openDropdownNumber() !== 4
+    ) {
       props.setOpenDropdownNumber(0);
       setIsDropdownOpen(false);
     }
@@ -112,14 +113,12 @@ export default function Navbar(props: any) {
         </button> */}
         <button
           aria-label="login-button"
-          class={`login-nav nav-button ${
-            props.openDropdownNumber() === 4 && isDropdownOpen()
-              ? "highlighted"
-              : ""
+          class={`account-nav nav-button ${
+            props.isProfileOpen() ? "highlighted" : ""
           }`}
           onMouseDown={() => {
-            setDropdown(4);
-            props.setIsPanelOpen(true);
+            props.setIsProfileOpen(!props.isProfileOpen());
+            props.setIsPanelOpen(!props.isPanelOpen());
           }}
         >
           <div class="nav-button-element">Login</div>
