@@ -17,9 +17,8 @@ export default function (app: any) {
       const client = await pool.connect();
       try {
         const queryText = `
-      SELECT * FROM items
-      WHERE id = $1
-      `;
+        SELECT * FROM items
+        WHERE id = $1`;
 
         const parameterValues = [query.id];
         const result = await client.query({
@@ -41,7 +40,6 @@ export default function (app: any) {
       "/api/items",
       async ({
         query,
-        set,
       }: {
         query: {
           type?: string;
