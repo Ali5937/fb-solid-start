@@ -54,23 +54,45 @@
 .search-nav {
   display: flex;
   font-size: var(--font-size-l);
-}
-
-.search-nav input {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
   font-weight: 400;
 }
 
-.search-results {
-  position: absolute;
+.search-nav input,
+.search-nav select {
+  width: 100%;
+  margin-top: var(--side-margin);
+}
+
+.search-nav select {
+  height: var(--standard-size);
+  margin-bottom: calc(var(--side-margin) * 2);
+  border: none;
+  border: var(--border-width) solid;
+  border-color: var(--c3) var(--c3b) var(--c3b) var(--c3);
+  font-size: var(--font-size-m);
+}
+
+.search-nav select,
+.search-nav option {
+  background-color: var(--c1);
+}
+
+.search-dropdown {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--c2);
+  padding: calc(var(--side-margin) * 2);
+}
+
+.select-country,
+.select-state {
+  display: flex;
+}
+
+.search-result-parent {
   background-color: var(--c2);
   width: 100%;
   height: auto;
-  top: calc(var(--standard-size) - var(--border-width));
   left: 0;
   right: 0;
   text-align: start;
@@ -78,18 +100,37 @@
   font-weight: normal;
 }
 
-.search-results div {
-  display: flex;
-  padding: var(--side-margin);
-}
-
-.search-results div:hover {
+.search-result-parent .search-result:hover {
   cursor: pointer;
   background-color: var(--c1);
 }
 
-.search-results div:not(:last-child) {
-  border-bottom: 1px solid white;
+.search-result-parent > div {
+  position: absolute;
+  width: calc(100% - var(--side-margin) * 4);
+  background-color: var(--c2);
+}
+
+.search-result {
+  display: grid;
+  grid-template-columns: 10fr 7fr;
+  padding: var(--side-margin);
+  gap: var(--side-margin);
+  border: 1px solid white;
+  border-top: none;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.search-result > div {
+  flex: 1;
+  overflow: hidden;
+}
+
+.search-result .city-name {
+  align-self: center;
+  font-size: var(--font-size-l);
+  line-height: 1.2;
 }
 
 .filter-nav {

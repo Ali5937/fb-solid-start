@@ -146,6 +146,16 @@ export default function Index() {
   const [openDropdownNumber, setOpenDropdownNumber] = createSignal<number>(0);
   const [isProfileOpen, setIsProfileOpen] = createSignal<boolean>(false);
 
+  const defaultCountry = "All Countries";
+  const defaultState = "All States";
+  const [states, setStates] = createSignal([]);
+  const [selectedState, setSelectedState] = createSignal("");
+  const [countries, setCountries] = createSignal<string[]>([""]);
+  const [selectedCountry, setSelectedCountry] = createSignal("");
+  const [originalCountries, setOriginalCountries] = createSignal<string[]>([
+    "",
+  ]);
+
   let polygonString1 = searchParams.poly;
   let polygonString2 = searchParams.poly2 ?? "";
 
@@ -230,6 +240,8 @@ export default function Index() {
       <div id="app" class={`${theme()}`}>
         <Navbar
           baseUrl={baseUrl}
+          defaultCountry={defaultCountry}
+          defaultState={defaultState}
           theme={theme}
           setTheme={setTheme}
           openDropdownNumber={openDropdownNumber}
@@ -254,6 +266,14 @@ export default function Index() {
           setCurrentCurrency={setCurrentCurrency}
           displayUnits={displayUnits}
           setDisplayUnits={setDisplayUnits}
+          states={states}
+          setStates={setStates}
+          selectedState={selectedState}
+          setSelectedState={setSelectedState}
+          countries={countries}
+          setCountries={setCountries}
+          selectedCountry={selectedCountry}
+          setSelectedCountry={setSelectedCountry}
         />
         <main>
           <Map
@@ -276,6 +296,8 @@ export default function Index() {
             isPanelOpen={isPanelOpen}
             setIsPanelOpen={setIsPanelOpen}
             initialSelectedId={initialSelectedId}
+            selectedState={selectedState}
+            selectedCountry={selectedCountry}
           />
           <div
             class={`panel ${

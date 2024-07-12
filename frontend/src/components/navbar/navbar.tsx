@@ -55,7 +55,18 @@ export default function Navbar(props: any) {
           <div class="nav-button-element">&#128270;</div>
           <Suspense>
             <Show when={props.openDropdownNumber() === 1}>
-              <SearchBar baseUrl={props.baseUrl} />
+              <SearchBar
+                baseUrl={props.baseUrl}
+                defaultCountry={props.defaultCountry}
+                states={props.states}
+                setStates={props.setStates}
+                selectedState={props.selectedState}
+                setSelectedState={props.setSelectedState}
+                countries={props.countries}
+                setCountries={props.setCountries}
+                selectedCountry={props.selectedCountry}
+                setSelectedCountry={props.setSelectedCountry}
+              />
             </Show>
           </Suspense>
         </button>

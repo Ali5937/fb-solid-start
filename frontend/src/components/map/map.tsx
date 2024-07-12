@@ -464,6 +464,8 @@ export default function Map(props: any) {
     props.itemSort();
     props.rentPriceRange();
     props.buyPriceRange();
+    props.selectedState();
+    props.selectedCountry();
     setPriceRange();
     removeMarkers();
     handleSearch();

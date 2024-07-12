@@ -13,12 +13,107 @@ const pool = new Pool({
 export default function (app: any) {
   app.get(
     "/api/search",
-    async ({ query }: { query: { inputValue: string } }) => {
-      const response = await fetch(
-        `https://api.geoapify.com/v1/geocode/autocomplete?text=${query.inputValue}&format=json&apiKey=${process.env.GIS_API}&type=city&limit=5`
-      );
-      const responseData = await response.json();
-      return { responseData: responseData };
+    async ({
+      query: { inputValue, stateName, countryName },
+    }: {
+      query: { inputValue: string; stateName: string; countryName: string };
+    }) => {
+      console.time("search");
+      const state = stateName || null;
+      const country = countryName || null;
+      const client = await pool.connect();
+      try {
+        const queryText = `
+        SELECT city_name, state_name, country_name
+        FROM cities
+        WHERE city_name ILIKE $1
+        AND (state_name ILIKE $2 OR $2 IS NULL)
+        AND (country_name ILIKE $3 OR $3 IS NULL)
+        ORDER BY ranking ASC
+        LIMIT 5;`;
+
+        const parameterValues = [inputValue + "%", state, country];
+
+        const result = await client.query({
+          text: queryText,
+          values: parameterValues,
+        });
+
+        // console.log(result.rows);
+
+        const resArray: string[][] = [];
+        result.rows.forEach((row: any) => {
+          resArray.push([row.city_name, row.state_name, row.country_name]);
+        });
+
+        console.timeEnd("search");
+        return { status: "success", data: result.rows };
+      } catch (error: any) {
+        console.error(error.message);
+        return { status: "error", message: error.message };
+      } finally {
+        client.release();
+      }
+    }
+  );
+
+  app.get("/api/get-countries", async () => {
+    const client = await pool.connect();
+    try {
+      console.time("search");
+      const queryText = `
+        SELECT country_name
+        FROM countries
+        ORDER BY country_name ASC;`;
+
+      const result = await client.query({
+        text: queryText,
+      });
+
+      const resArray: string[] = [];
+      result.rows.forEach((row: any) => {
+        resArray.push(row.country_name);
+      });
+
+      console.timeEnd("search");
+      return { status: "success", data: resArray };
+    } catch (error: any) {
+      console.error(error.message);
+      return { status: "error", message: error.message };
+    } finally {
+      client.release();
+    }
+  });
+
+  app.get(
+    "/api/get-results-by-country",
+    async ({ query: { country } }: { query: { country: string } }) => {
+      const client = await pool.connect();
+      try {
+        console.time("search");
+        const queryText = `
+        SELECT state_name
+        FROM states
+        WHERE COALESCE(country_name, $1) = $1;`;
+
+        const result = await client.query({
+          text: queryText,
+          values: [country],
+        });
+
+        const resArray: string[] = [];
+        result.rows.forEach((row: any) => {
+          resArray.push(row.state_name);
+        });
+
+        console.timeEnd("search");
+        return { status: "success", data: resArray };
+      } catch (error: any) {
+        console.error(error.message);
+        return { status: "error", message: error.message };
+      } finally {
+        client.release();
+      }
     }
   );
 }
