@@ -193,3 +193,10 @@ button,
     --font-size-m: 12px;
   }
 }
+
+@media (min-width: 480px) and (max-height: 480px) {
+  body {
+    --standard-size: 45px;
+    --font-size-m: 12px;
+  }
+}

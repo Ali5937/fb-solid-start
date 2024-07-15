@@ -237,7 +237,12 @@ export default function Index() {
       <Meta name="description" content={`${saleType()} ${itemType()}`}></Meta>
       {/* CHORE: In description(Meta tag) ad location of country/region/city if searched by it */}
       <Link rel="dns-prefetch" href="https://tiles.stadiamaps.com"></Link>
-      <div id="app" class={`${theme()}`}>
+      <div
+        id="app"
+        class={`${theme()} ${
+          windowWidth() > windowHeight() ? "landscape-mode" : ""
+        }`}
+      >
         <Navbar
           baseUrl={baseUrl}
           defaultCountry={defaultCountry}
