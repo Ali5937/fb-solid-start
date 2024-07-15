@@ -52,7 +52,8 @@ CREATE TABLE items (
   deposit SMALLINT CHECK (deposit >= 0),
   like_count SMALLINT NOT NULL CHECK (like_count >= 0),
   firm_boost SMALLINT CHECK (firm_boost >= 0),
-  pets_allowed SMALLINT NOT NULL CHECK (bed >= 0),
+  pets_allowed SMALLINT NOT NULL CHECK (pets_allowed >= 0),
+  ranking SMALLINT NOT NULL CHECK (ranking >= 0),
   cooling BOOLEAN,
   elevator BOOLEAN,
   garden BOOLEAN,
@@ -62,8 +63,8 @@ CREATE TABLE items (
   is_deleted BOOLEAN,
   auction_date DATE,
   city TEXT NOT NULL,
-  state TEXT,
-  nation TEXT NOT NULL,
+  state TEXT NOT NULL,
+  country TEXT NOT NULL,
   currency_name TEXT NOT NULL,
   currency_symbol TEXT NOT NULL,
   currency_code CHAR(3) NOT NULL,
@@ -169,6 +170,21 @@ async function createTables() {
 		ADD CONSTRAINT fk_items_firms
 		FOREIGN KEY (firm_id)
 		REFERENCES firms (id);
+	
+    ALTER TABLE items
+    ADD CONSTRAINT fk_items_cities
+    FOREIGN KEY (city, state, country, ranking)
+    REFERENCES cities (city_name, state_name, country_name, ranking);
+
+    ALTER TABLE items
+    ADD CONSTRAINT fk_items_states
+    FOREIGN KEY (state, country)
+    REFERENCES states (state_name, country_name);
+
+    ALTER TABLE items
+		ADD CONSTRAINT fk_items_countries
+		FOREIGN KEY (country)
+		REFERENCES countries (country_name);
 
 		ALTER TABLE users
 		ADD CONSTRAINT fk_users_firms

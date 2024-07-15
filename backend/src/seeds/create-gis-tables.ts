@@ -27,6 +27,19 @@ const createTables = async () => {
   await client.query("DROP TABLE IF EXISTS cities, states, countries;");
 
   await client.query(`
+    CREATE TABLE IF NOT EXISTS countries (
+      country_name TEXT PRIMARY KEY
+    );`);
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS states (
+      state_name TEXT,
+      country_name TEXT NOT NULL,
+      PRIMARY KEY (state_name, country_name),
+      FOREIGN KEY (country_name) REFERENCES countries (country_name)
+    );`);
+
+  await client.query(`
     CREATE TABLE IF NOT EXISTS cities (
       id BIGINT PRIMARY KEY,
       city_name TEXT NOT NULL,
@@ -34,48 +47,13 @@ const createTables = async () => {
       country_name TEXT NOT NULL,
       ranking SMALLINT NOT NULL,
       lat REAL NOT NULL,
-      lng REAL NOT NULL
+      lng REAL NOT NULL,
+      UNIQUE (city_name, state_name, country_name, ranking),
+      FOREIGN KEY (state_name, country_name) REFERENCES states (state_name, country_name)
     );`);
-
-  await client.query(`
-    CREATE TABLE IF NOT EXISTS states (
-      state_name TEXT,
-      country_name TEXT NOT NULL,
-      PRIMARY KEY (state_name, country_name)
-    );`);
-
-  await client.query(`
-    CREATE TABLE IF NOT EXISTS countries (
-      country_name TEXT PRIMARY KEY
-    );`);
-
-  await client.query(`
-  	ALTER TABLE cities
-    ADD CONSTRAINT fk_cities_states
-    FOREIGN KEY (state_name, country_name)
-    REFERENCES states (state_name, country_name);
-
-  	ALTER TABLE states
-  	ADD CONSTRAINT fk_states_countries
-  	FOREIGN KEY (country_name)
-  	REFERENCES countries (country_name);`);
-
-  await client.query(`
-    CREATE UNIQUE INDEX 
-    unique_city_lower ON cities (LOWER(city_name), LOWER(state_name), LOWER(country_name), ranking);`);
-  await client.query(`
-    CREATE UNIQUE INDEX 
-    unique_state_lower ON states (LOWER(state_name), LOWER(country_name));`);
-  await client.query(`
-    CREATE UNIQUE INDEX 
-    unique_country_lower ON countries (LOWER(country_name));`);
 
   await client.query(`
   	CREATE INDEX cities_trgm_gin ON cities USING gin (city_name gin_trgm_ops);`);
-  await client.query(`
-  	CREATE INDEX states_trgm_gin ON cities USING gin (state_name gin_trgm_ops);`);
-  await client.query(`
-  	CREATE INDEX countries_trgm_gin ON cities USING gin (country_name gin_trgm_ops);`);
 };
 
 const insertDataBatch = async (dataBatch: City[]) => {
@@ -122,7 +100,6 @@ const insertDataBatch = async (dataBatch: City[]) => {
 
     let num = 0;
     for (const data of dataBatch) {
-      // console.log(data);
       const insertQuery = `
         INSERT INTO cities (id, city_name, state_name, country_name, ranking, lat, lng)
         SELECT $1, $2, $3, $4, $5, $6, $7
@@ -142,7 +119,7 @@ const insertDataBatch = async (dataBatch: City[]) => {
       console.log(num++);
     }
 
-    console.timeEnd("insertTime"); // [1382.63s] insertTime = ~23 min
+    console.timeEnd("insertTime"); // [1382.63s] insertTime ~23 min
 
     console.log("Inserting finished successfully");
   } catch (error) {
@@ -155,7 +132,7 @@ const importCSV = async (filePath: string) => {
   await createTables();
 
   const rows: City[] = [];
-  console.time("csv-time"); // [285.33s] csv-time = ~4.75 min
+  console.time("csv-time"); // [285.33s] csv-time ~4.75 min
   fs.createReadStream(filePath)
     .pipe(csv())
     .on("data", (row: City) => {
