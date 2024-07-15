@@ -75,6 +75,7 @@ function Item(props: any) {
         }}
       />
       <span>
+        <div>{props.item.city}</div>
         <div>
           {Math.round(
             props.currentCurrency()

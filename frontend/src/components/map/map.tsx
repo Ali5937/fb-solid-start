@@ -22,13 +22,15 @@ export default function Map(props: any) {
   let priceRange: string[] = [];
   let oldCoordinates: [number, number] = [0, 0];
   let coordinates: [number, number] = [0, 0];
-  let poly = "";
-  let poly2 = "";
+  let poly: string = "";
+  let poly2: string = "";
   let isPopupShown = false;
   let lowestPrice = 0;
   let highestPrice = 0;
   let mapMarkerColor = ["#FF3333", "#2624B3"];
   let minMaxLng = [0, 0];
+  let locationLng = 0;
+  let locationLat = 0;
   const [isMapLoaded, setIsMapLoaded] = createSignal(false);
   const [markers, setMarkers] = createSignal<any>();
 
@@ -64,7 +66,7 @@ export default function Map(props: any) {
   function clickTrash() {
     draw?.deleteAll();
     removeMarkers();
-    handleSearch();
+    handleSearch(false);
     if (draw) draw.changeMode("simple_select");
   }
 
@@ -79,7 +81,7 @@ export default function Map(props: any) {
     // console.timeEnd("test");
   }
 
-  async function handleSearch() {
+  async function handleSearch(isMoveMap: boolean) {
     // console.time("fetchTime");
     let polygonArray: number[][];
     if (draw && draw.getAll().features[0]) {
@@ -139,7 +141,7 @@ export default function Map(props: any) {
 
     setPriceRange();
 
-    let type = [0];
+    let type: number[] = [0];
     if (props.itemType() === "apartment") type = [1];
     else if (props.itemType() === "house") type = [2];
     else if (props.itemType() === "shared" || props.itemType() === "land")
@@ -159,6 +161,8 @@ export default function Map(props: any) {
       else if (minMaxLng[1] < 180) type = [type[0], type[0] + 6, type[0] + 12];
       else type = [type[0], type[0] + 6, type[0] + 12];
 
+    if (isMoveMap) type = [type[0], type[0] + 6, type[0] + 12];
+
     try {
       const response = await fetch(
         `${props.baseUrl}/items?` +
@@ -166,9 +170,12 @@ export default function Map(props: any) {
             type: type.toString(),
             min: priceRange[0],
             max: priceRange[1],
-            polygon: poly || "",
-            polygon2: poly2,
+            polygon: isMoveMap ? "" : poly,
+            polygon2: isMoveMap ? "" : poly2,
             itemSort: props.itemSort(),
+            country: props.selectedCountry(),
+            state: props.selectedState(),
+            city: props.selectedCity(),
           })
       );
 
@@ -182,6 +189,10 @@ export default function Map(props: any) {
           if (euroPrice < lowestPrice) lowestPrice = euroPrice;
           if (euroPrice > highestPrice) highestPrice = euroPrice;
         });
+
+        // locationLng = responseData[0].lng;
+        // locationLat = responseData[0].lat;
+        // console.log(locationLng, locationLat);
 
         const sourceObject = {
           type: "geojson",
@@ -293,7 +304,7 @@ export default function Map(props: any) {
       paint: {
         "circle-radius": 10,
         "circle-color":
-          markerCount > 1
+          markerCount > 1 && highestPrice > lowestPrice
             ? [
                 "interpolate",
                 ["linear"],
@@ -417,11 +428,11 @@ export default function Map(props: any) {
         zoom.toFixed(1),
       ]);
 
-      handleSearch();
+      handleSearch(false);
     });
 
     map.on("draw.create", async function () {
-      handleSearch();
+      handleSearch(false);
     });
 
     map.on("mouseenter", "markers", function (e: any) {
@@ -464,12 +475,23 @@ export default function Map(props: any) {
     props.itemSort();
     props.rentPriceRange();
     props.buyPriceRange();
-    props.selectedState();
+    untrack(setPriceRange);
+    untrack(removeMarkers);
+    untrack(() => handleSearch(false));
+    untrack(() => setIsMapLoaded(false));
+  });
+
+  createEffect(() => {
     props.selectedCountry();
-    setPriceRange();
-    removeMarkers();
-    handleSearch();
-    setIsMapLoaded(false);
+    props.selectedState();
+    props.selectedCity();
+    if (
+      props.selectedCountry() ||
+      props.selectedState() ||
+      props.selectedCity()
+    ) {
+      untrack(() => handleSearch(true));
+    }
   });
 
   createEffect(() => {

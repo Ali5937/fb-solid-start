@@ -57,15 +57,18 @@ export default function Navbar(props: any) {
             <Show when={props.openDropdownNumber() === 1}>
               <SearchBar
                 baseUrl={props.baseUrl}
-                defaultCountry={props.defaultCountry}
                 states={props.states}
                 setStates={props.setStates}
                 selectedState={props.selectedState}
                 setSelectedState={props.setSelectedState}
+                defaultState={props.defaultState}
                 countries={props.countries}
                 setCountries={props.setCountries}
                 selectedCountry={props.selectedCountry}
                 setSelectedCountry={props.setSelectedCountry}
+                defaultCountry={props.defaultCountry}
+                selectedCity={props.selectedCity}
+                setSelectedCity={props.setSelectedCity}
               />
             </Show>
           </Suspense>

@@ -39,7 +39,17 @@ export default function (app: any) {
     .get(
       "/api/items",
       async ({
-        query,
+        query: {
+          type,
+          polygon,
+          polygon2,
+          min,
+          max,
+          itemSort,
+          country,
+          state,
+          city,
+        },
       }: {
         query: {
           type?: string;
@@ -48,27 +58,29 @@ export default function (app: any) {
           min: number;
           max: number;
           itemSort: string;
+          country: string;
+          state: string;
+          city: string;
         };
-        set: any;
       }) => {
         // await new Promise((resolve) => setTimeout(resolve, 3000));
 
-        // console.time("query-time");
+        console.time("/api/items, query-time");
         const client = await pool.connect();
-        const finalType = query.type
-          ? query.type
+        const finalType = type
+          ? type
               .split(",")
               .map((type) => (parseInt(type, 10) < 18 ? parseInt(type, 10) : 1))
-          : [11];
+          : null;
 
         let finalPolygon = "";
 
-        if (query.polygon)
-          finalPolygon = `POLYGON((${polyToString(query.polygon as string)}))`;
-        if (query.polygon2)
+        if (polygon)
+          finalPolygon = `POLYGON((${polyToString(polygon as string)}))`;
+        if (polygon2)
           finalPolygon = `MULTIPOLYGON(((${polyToString(
-            query.polygon as string
-          )})), ((${polyToString(query.polygon2 as string)})))`;
+            polygon as string
+          )})), ((${polyToString(polygon2 as string)})))`;
 
         function polyToString(poly: string) {
           const polygonPairs = poly.split(",").map((pairString) => {
@@ -86,13 +98,16 @@ export default function (app: any) {
           SELECT ST_Y(ST_TRANSFORM(coordinates::geometry, 4326)) AS lat,
           ST_X(ST_TRANSFORM(coordinates::geometry, 4326)) AS lng,
           type, euro_price, created_at, original_price,
-          size, currency_code, currency_name, currency_symbol, first_picture, created_at, id
+          size, currency_code, currency_name, currency_symbol, first_picture, created_at, id, city, state, country
           FROM items
           WHERE 
-            (COALESCE($1::text, '') = '' OR ST_Covers(ST_GeomFromText($1, 4326)::geography, coordinates)) AND 
-            type = ANY($2) 
+            ($1 = '' OR ST_Covers(ST_GeomFromText($1, 4326)::geography, coordinates))
+            AND ($2::smallint[] IS NULL OR type = ANY($2::smallint[]))
             AND euro_price >= $3
             AND euro_price <= COALESCE(NULLIF($4, '')::numeric, 1e10)
+            AND COALESCE(country = $6 OR $6 IS NULL)
+            AND COALESCE(state = $7 OR $7 IS NULL)
+            AND COALESCE(city = $8 OR $8 IS NULL)
             ORDER BY
             CASE
               WHEN $5 = 'new' THEN created_at
@@ -106,20 +121,24 @@ export default function (app: any) {
               WHEN $5 = 'high' THEN euro_price
               ELSE null
             END DESC
-          LIMIT 500;    
-          `;
+          LIMIT 500;`;
+
           const parameterValues = [
-            finalPolygon || null,
+            finalPolygon || "",
             finalType,
-            query.min,
-            query.max,
-            query.itemSort,
+            min,
+            max,
+            itemSort,
+            country || null,
+            state || null,
+            city || null,
           ];
           const result = await client.query({
             text: queryText,
             values: parameterValues,
           });
           const data = result.rows;
+          // console.log(data);
 
           const bufferData = Buffer.from(JSON.stringify(data));
           const gzipData = Bun.gzipSync(bufferData);
@@ -131,7 +150,7 @@ export default function (app: any) {
             },
           });
 
-          // console.timeEnd("query-time");
+          console.timeEnd("/api/items, query-time");
           return res;
         } catch (error: any) {
           console.error(error.message);

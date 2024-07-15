@@ -19,8 +19,8 @@ export default function (app: any) {
       query: { inputValue: string; stateName: string; countryName: string };
     }) => {
       console.time("search");
-      const state = stateName || null;
       const country = countryName || null;
+      const state = stateName || null;
       const client = await pool.connect();
       try {
         const queryText = `
@@ -39,12 +39,11 @@ export default function (app: any) {
           values: parameterValues,
         });
 
-        // console.log(result.rows);
-
         const resArray: string[][] = [];
         result.rows.forEach((row: any) => {
           resArray.push([row.city_name, row.state_name, row.country_name]);
         });
+        // console.log(result.rows);
 
         console.timeEnd("search");
         return { status: "success", data: result.rows };
@@ -60,7 +59,7 @@ export default function (app: any) {
   app.get("/api/get-countries", async () => {
     const client = await pool.connect();
     try {
-      console.time("search");
+      console.time("get-countries");
       const queryText = `
         SELECT country_name
         FROM countries
@@ -75,7 +74,7 @@ export default function (app: any) {
         resArray.push(row.country_name);
       });
 
-      console.timeEnd("search");
+      console.timeEnd("get-countries");
       return { status: "success", data: resArray };
     } catch (error: any) {
       console.error(error.message);
@@ -90,11 +89,12 @@ export default function (app: any) {
     async ({ query: { country } }: { query: { country: string } }) => {
       const client = await pool.connect();
       try {
-        console.time("search");
+        console.time("get-results-by-country");
         const queryText = `
         SELECT state_name
         FROM states
-        WHERE COALESCE(country_name, $1) = $1;`;
+        WHERE COALESCE(country_name, $1) = $1
+        ORDER BY state_name;`;
 
         const result = await client.query({
           text: queryText,
@@ -106,7 +106,7 @@ export default function (app: any) {
           resArray.push(row.state_name);
         });
 
-        console.timeEnd("search");
+        console.timeEnd("get-results-by-country");
         return { status: "success", data: resArray };
       } catch (error: any) {
         console.error(error.message);

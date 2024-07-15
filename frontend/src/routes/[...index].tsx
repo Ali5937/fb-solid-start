@@ -87,7 +87,6 @@ export default function Index() {
   }
 
   const urlParams = { ...useParams() }.index.split("/");
-  // console.log(urlParams);
   oldSaleType = urlParams[0];
   oldItemType = urlParams[1];
 
@@ -123,7 +122,6 @@ export default function Index() {
   const [itemType, setItemType] = createSignal<string>(
     oldItemType || "apartment"
   ); // apartment, house, shared, land
-  const [region, setRegion] = createSignal<string>(oldRegion || "region");
   const [id, setId] = createSignal<string>(oldId.toString() || "id");
   const [rentPriceRange, setRentPriceRange] =
     createSignal<[number, number]>(oldRentPrice);
@@ -140,7 +138,7 @@ export default function Index() {
   const [currentCurrency, setCurrentCurrency] =
     createSignal(finalCurrentCurrency);
   const [propertyItems, setPropertyItems] = createSignal(null);
-  const [itemSort, setItemSort] = createSignal("new");
+  const [itemSort, setItemSort] = createSignal("low");
   const [selectedItem, setSelectedItem] = createSignal(null);
   const [highlightedItemLngLat, setHighlightedItemLngLat] = createSignal("");
   const [openDropdownNumber, setOpenDropdownNumber] = createSignal<number>(0);
@@ -148,13 +146,11 @@ export default function Index() {
 
   const defaultCountry = "All Countries";
   const defaultState = "All States";
-  const [states, setStates] = createSignal([]);
-  const [selectedState, setSelectedState] = createSignal("");
   const [countries, setCountries] = createSignal<string[]>([""]);
-  const [selectedCountry, setSelectedCountry] = createSignal("");
-  const [originalCountries, setOriginalCountries] = createSignal<string[]>([
-    "",
-  ]);
+  const [states, setStates] = createSignal([]);
+  const [selectedCountry, setSelectedCountry] = createSignal<string>("");
+  const [selectedState, setSelectedState] = createSignal<string>("");
+  const [selectedCity, setSelectedCity] = createSignal<string>("");
 
   let polygonString1 = searchParams.poly;
   let polygonString2 = searchParams.poly2 ?? "";
@@ -209,16 +205,25 @@ export default function Index() {
 
   createEffect(() => {
     const newUrl = `/${saleType()}/${itemType()}${
-      region() === "region" ? "" : `/${region()}`
+      !selectedCountry() && !selectedState() && !selectedCity()
+        ? ""
+        : `/${selectedCountry() || "Country"}-${
+            selectedState() || "AllStates"
+          }-${selectedCity() || "AllCities"}`
     }${id() === "id" ? "" : `/${id()}`}`;
 
     const navigate = useNavigate();
-    navigate(newUrl);
+    navigate(newUrl, { replace: true });
 
-    setSearchParams({
-      poly: polygonString1,
-      poly2: searchParams.poly2 ?? "",
-    });
+    // setSearchParams(
+    //   {
+    //     country: selectedCountry(),
+    //     state: selectedState(),
+    //     city: selectedCity(),
+    //     // poly: polygonString1,
+    //     // poly2: searchParams.poly2 ?? "",
+    //   },
+    // );
   });
 
   onMount(() => {
@@ -271,14 +276,16 @@ export default function Index() {
           setCurrentCurrency={setCurrentCurrency}
           displayUnits={displayUnits}
           setDisplayUnits={setDisplayUnits}
-          states={states}
-          setStates={setStates}
-          selectedState={selectedState}
-          setSelectedState={setSelectedState}
           countries={countries}
           setCountries={setCountries}
           selectedCountry={selectedCountry}
           setSelectedCountry={setSelectedCountry}
+          states={states}
+          setStates={setStates}
+          selectedState={selectedState}
+          setSelectedState={setSelectedState}
+          selectedCity={selectedCity}
+          setSelectedCity={setSelectedCity}
         />
         <main>
           <Map
@@ -301,8 +308,9 @@ export default function Index() {
             isPanelOpen={isPanelOpen}
             setIsPanelOpen={setIsPanelOpen}
             initialSelectedId={initialSelectedId}
-            selectedState={selectedState}
             selectedCountry={selectedCountry}
+            selectedState={selectedState}
+            selectedCity={selectedCity}
           />
           <div
             class={`panel ${
