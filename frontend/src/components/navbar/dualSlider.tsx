@@ -11,9 +11,9 @@ export default function DualSlider(props: any) {
 
   createEffect(() => {
     if (props.saleType() === "rent") {
-      setMaxValue(props.currentRentMax());
+      setMaxValue(props.rentMax);
     } else if (props.saleType() === "buy") {
-      setMaxValue(props.currentBuyMax());
+      setMaxValue(props.buyMax);
     }
 
     if (sliderInstance) {

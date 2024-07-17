@@ -55,12 +55,14 @@ const getData = async (
 
 export default function Index() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [currentRentMax, setCurrentRentMax] = createSignal<number>(5000);
-  const [currentBuyMax, setCurrentBuyMax] = createSignal<number>(1000000);
+  const rentMax = 5000;
+  const buyMax = 1000000;
   let oldSaleType;
   let oldItemType;
   let oldRentPrice: [number, number] = [0, currentRentMax()];
   let oldBuyPrice: [number, number] = [0, currentBuyMax()];
+  let oldRentPrice: [number, number] = [0, rentMax];
+  let oldBuyPrice: [number, number] = [0, buyMax];
   let oldLng: number = 0;
   let oldLat: number = 0;
   let oldZoom: number = 0;
@@ -264,8 +266,8 @@ export default function Index() {
           setSaleType={setSaleType}
           itemType={itemType}
           setItemType={setItemType}
-          currentRentMax={currentRentMax}
-          currentBuyMax={currentBuyMax}
+          rentMax={rentMax}
+          buyMax={buyMax}
           rentPriceRange={rentPriceRange}
           setRentPriceRange={setRentPriceRange}
           buyPriceRange={buyPriceRange}

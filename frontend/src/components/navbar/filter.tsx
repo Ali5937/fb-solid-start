@@ -68,8 +68,8 @@ export default function Filter(props: any) {
       </div>
       <div class="slider-container">
         <DualSlider
-          currentRentMax={props.currentRentMax}
-          currentBuyMax={props.currentBuyMax}
+          rentMax={props.rentMax}
+          buyMax={props.buyMax}
           saleType={props.saleType}
           rentPriceRange={props.rentPriceRange}
           setRentPriceRange={props.setRentPriceRange}

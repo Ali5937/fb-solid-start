@@ -88,8 +88,8 @@ export default function Navbar(props: any) {
           <Suspense>
             <Show when={props.openDropdownNumber() === 2}>
               <Filter
-                currentRentMax={props.currentRentMax}
-                currentBuyMax={props.currentBuyMax}
+                rentMax={props.rentMax}
+                buyMax={props.buyMax}
                 saleType={props.saleType}
                 setSaleType={props.setSaleType}
                 itemType={props.itemType}
