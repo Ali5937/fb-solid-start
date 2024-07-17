@@ -21,6 +21,7 @@ body,
 
 .light-theme {
   --c1: hsl(221, 10%, 80%);
+  --c1-transparent: hsla(222, 10%, 80%, 0.95);
   --c2: hsl(221, 15%, 71%);
   --c3: hsl(222, 12%, 61%);
   --c3b: color-mix(in hsl, var(--c3) 50%, var(--c4) 50%);
@@ -29,6 +30,7 @@ body,
 
 .dark-theme {
   --c1: hsl(222, 10%, 15%);
+  --c1-transparent: hsla(217, 11%, 15%, 0.95);
   --c2: hsl(220, 15%, 25%);
   --c3: hsl(220, 12%, 35%);
   --c3b: color-mix(in hsl, var(--c1) 50%, var(--c2) 50%);
@@ -162,22 +164,30 @@ button,
   width: 100%;
 }
 
+.panel:not(.is-open) .list-switch svg {
+  rotate: 180deg;
+}
+
+.icon-x-border {
+  width: calc(var(--standard-size) * 2);
+  height: calc(var(--standard-size) * 2);
+}
+
+.icon-arrow-border:hover,
+.icon-x-border:hover {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.panel .icon-x-border {
+  position: absolute;
+  right: var(--side-margin);
+}
+
 @media (max-width: 1024px) {
   .panel {
     position: fixed;
     width: 100%;
-  }
-
-  .panel:not(.is-open) .list-switch svg {
-    rotate: 180deg;
-  }
-
-  .list-switch {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-left: var(--side-margin);
-    right: var(--side-margin);
   }
 }
 

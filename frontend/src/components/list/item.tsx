@@ -34,6 +34,12 @@ function Item(props: any) {
             : "selected-list-item"
           : ""
       }
+      onMouseDown={() => {
+        if (props.selectedItem() && props.selectedItem().id === props.item.id) {
+          props.setIsFocused(true);
+        }
+        props.setSelectedItem(props.item);
+      }}
       onMouseEnter={() => {
         props.setHighlightedItemLngLat([props.item.lng, props.item.lat]);
       }}
@@ -42,7 +48,13 @@ function Item(props: any) {
       }}
     >
       <div class="icon-arrow-border-parent">
-        <Show when={props.isFocused()}>
+        <Show
+          when={
+            props.selectedItem() &&
+            props.selectedItem().id === props.item.id &&
+            props.isFocused()
+          }
+        >
           <div
             class="icon-x-border"
             onMouseDown={() => props.setIsFocused(false)}
@@ -51,12 +63,21 @@ function Item(props: any) {
           </div>
         </Show>
         <div
-          class="icon-arrow-border"
-          onMouseDown={() => updateImageNumber(-1)}
+          class="icon-arrow-border rotated-arrow"
+          onMouseDown={(event) => {
+            event.stopPropagation();
+            updateImageNumber(-1);
+          }}
         >
           <ArrowIconBorder />
         </div>
-        <div class="icon-arrow-border" onMouseDown={() => updateImageNumber(1)}>
+        <div
+          class="icon-arrow-border"
+          onMouseDown={(event) => {
+            event.stopPropagation();
+            updateImageNumber(1);
+          }}
+        >
           <ArrowIconBorder />
         </div>
       </div>
@@ -74,7 +95,13 @@ function Item(props: any) {
           props.setSelectedItem(props.item);
         }}
       />
-      <span>
+      <span
+        class="description"
+        onMouseDown={(event) => {
+          if (props.selectedItem() && props.selectedItem().id === props.item.id)
+            event.stopPropagation();
+        }}
+      >
         <div>{props.item.city}</div>
         <div>
           {Math.round(
@@ -97,20 +124,20 @@ function Item(props: any) {
             <sup>2</sup>
           </div>
         </Show>
+        <Show
+          when={
+            props.selectedItem() &&
+            props.selectedItem().id === props.item.id &&
+            props.itemDetails()
+          }
+        >
+          <div class="list-item-body">
+            <span>Bed: {props.itemDetails().bed}</span>
+            <span>Bath: {props.itemDetails().bath}</span>
+            <div>bla</div>
+          </div>
+        </Show>
       </span>
-      <Show
-        when={
-          props.selectedItem() &&
-          props.selectedItem().id === props.item.id &&
-          props.itemDetails()
-        }
-      >
-        <div class="list-item-body">
-          <span>Bed: {props.itemDetails().bed}</span>
-          <span>Bath: {props.itemDetails().bath}</span>
-          <div>bla</div>
-        </div>
-      </Show>
     </div>
   );
 }
