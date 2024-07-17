@@ -150,7 +150,6 @@ export default function SearchBar(props: any) {
         <input
           class="button-style highlighted"
           ref={inputRef}
-          value={inputValue()}
           onInput={getInput}
           onFocus={() => setIsInputFocused(true)}
           onBlur={() => setIsInputFocused(false)}

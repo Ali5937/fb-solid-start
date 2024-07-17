@@ -111,20 +111,6 @@ export default function Navbar(props: any) {
         <div class="logo-text">Flat Bunny</div>
       </div>
       <div class="nav-parent">
-        {/* <button
-          aria-label="message-button"
-          class={`message-nav nav-button ${
-            openDropdownNumber() === 3 && isDropdownOpen() ? "highlighted" : ""
-          }`}
-          onMouseDown={() => setDropdown(3)}
-        >
-          <IconMessage />
-          <Suspense>
-            <Show when={openDropdownNumber() === 3}>
-              <Message />
-            </Show>
-          </Suspense>
-        </button> */}
         <button
           aria-label="login-button"
           class={`account-nav nav-button ${
