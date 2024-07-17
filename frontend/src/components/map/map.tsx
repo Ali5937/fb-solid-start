@@ -292,6 +292,7 @@ export default function Map(props: any) {
 
   function loadMarkers() {
     const markerCount = markers().data.features.length;
+    markers().data.features.reverse();
     removeMarkers();
     map.addSource("marker-data", {
       type: "geojson",
@@ -310,9 +311,9 @@ export default function Map(props: any) {
                 ["linear"],
                 ["get", "euroPrice"],
                 lowestPrice,
-                mapMarkerColor[1],
-                highestPrice,
                 mapMarkerColor[0],
+                highestPrice,
+                mapMarkerColor[1],
               ]
             : mapMarkerColor[0],
         "circle-stroke-width": 1,
