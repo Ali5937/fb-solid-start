@@ -57,6 +57,7 @@ export default function Navbar(props: any) {
             <Show when={props.openDropdownNumber() === 1}>
               <SearchBar
                 baseUrl={props.baseUrl}
+                setOpenDropdownNumber={props.setOpenDropdownNumber}
                 states={props.states}
                 setStates={props.setStates}
                 selectedState={props.selectedState}

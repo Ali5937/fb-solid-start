@@ -57,19 +57,17 @@ export default function Index() {
   const [searchParams, setSearchParams] = useSearchParams();
   const rentMax = 5000;
   const buyMax = 1000000;
-  let oldSaleType;
-  let oldItemType;
-  let oldRentPrice: [number, number] = [0, currentRentMax()];
-  let oldBuyPrice: [number, number] = [0, currentBuyMax()];
+  let oldUserRegion: string = "";
+  let oldSaleType: string = "";
+  let oldItemType: string = "";
+  let oldRegion: string = "";
+  let oldId: string = "";
   let oldRentPrice: [number, number] = [0, rentMax];
   let oldBuyPrice: [number, number] = [0, buyMax];
   let oldLng: number = 0;
   let oldLat: number = 0;
   let oldZoom: number = 0;
   let initialSelectedId: number = 0;
-
-  let oldRegion;
-  let oldId: string = "";
 
   let currentC = Cookies.get("currentCurrency");
   let splitCurrentCurrency;
@@ -89,6 +87,7 @@ export default function Index() {
   }
 
   const urlParams = { ...useParams() }.index.split("/");
+  // console.log(urlParams.length);
   oldSaleType = urlParams[0];
   oldItemType = urlParams[1];
 

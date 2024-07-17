@@ -151,14 +151,19 @@ button,
   background-color: var(--c1);
   font-size: var(--font-size-m);
   font-weight: bold;
+  overflow: hidden;
   transition: width var(--speed);
   z-index: 15;
 }
 
 .list-switch {
   position: fixed;
-  display: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: calc(var(--standard-size) * 2 + var(--side-margin));
+  padding-left: var(--side-margin);
+  right: var(--side-margin);
   background-color: var(--c2);
   z-index: 20;
 }
