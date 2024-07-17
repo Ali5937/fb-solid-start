@@ -479,7 +479,6 @@ export default function Map(props: any) {
     untrack(setPriceRange);
     untrack(removeMarkers);
     untrack(() => handleSearch(false));
-    untrack(() => setIsMapLoaded(false));
   });
 
   createEffect(() => {
