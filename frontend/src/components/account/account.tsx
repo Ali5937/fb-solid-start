@@ -24,12 +24,7 @@ export default function Account(props: any) {
   }
 
   return (
-    <div
-      class="account"
-      onMouseDown={(event) => {
-        event.stopPropagation();
-      }}
-    >
+    <div class="account">
       <Suspense>
         <Show when={!props.isLoggedIn()}>
           <Login baseUrl={props.baseUrl} setIsLoggedIn={props.setIsLoggedIn} />
