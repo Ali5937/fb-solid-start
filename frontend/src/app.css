@@ -121,6 +121,10 @@ button,
   user-select: none;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .highlighted {
   background-color: var(--c1);
   border-color: var(--c4) !important;

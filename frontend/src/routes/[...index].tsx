@@ -104,17 +104,14 @@ export default function Index() {
     ];
 
   const expires = 365;
-  const [windowWidth, setWindowWidth] = createSignal<number>(
-    isServer ? 0 : window.innerWidth
-  );
+  const [windowWidth, setWindowWidth] = createSignal<number>(0);
 
-  const [windowHeight, setWindowHeight] = createSignal<number>(
-    isServer ? 0 : window.innerHeight
-  );
+  const [windowHeight, setWindowHeight] = createSignal<number>(0);
 
   const [canUseCookies, setCanUseCookies] = createSignal<boolean>(
     Cookies.get("canUseCookies") ? true : false
   );
+
   const [theme, setTheme] = createSignal<string>(
     Cookies.get("theme") || "dark-theme"
   );
@@ -229,7 +226,13 @@ export default function Index() {
   });
 
   onMount(() => {
-    checkIfLoggedIn();
+    if (!isServer) {
+      checkIfLoggedIn();
+      setWindowWidth(1);
+      setWindowHeight(1);
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    }
   });
 
   //Old: http://localhost:3000/#/buy/house/0/1000000/13.3629/47.601/4/
@@ -318,9 +321,18 @@ export default function Index() {
             class={`panel ${
               isPanelOpen() || windowWidth() >= 1024 ? "is-open" : ""
             }`}
+            onMouseDown={() => {
+              setOpenDropdownNumber(0);
+            }}
           >
             <button
-              class={`list-switch`}
+              class={`list-switch ${
+                isPanelOpen() &&
+                !isProfileOpen() &&
+                (windowWidth() === 0 || windowWidth() >= 1024)
+                  ? "hidden"
+                  : ""
+              }`}
               onMouseDown={() => {
                 if (isProfileOpen()) setIsProfileOpen(false);
                 else setIsPanelOpen(!isPanelOpen());
