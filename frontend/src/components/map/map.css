@@ -39,3 +39,12 @@
 .maplibregl-ctrl-attrib-inner > a {
   color: var(--c4) !important;
 }
+
+@media (max-width: 480px) {
+  .maplibregl-ctrl-attrib.maplibregl-compact {
+    margin: 0px;
+  }
+  .maplibregl-ctrl-attrib-inner {
+    font-size: 9px;
+  }
+}
