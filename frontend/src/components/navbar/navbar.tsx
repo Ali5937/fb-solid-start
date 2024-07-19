@@ -58,11 +58,25 @@ export default function Navbar(props: any) {
               <SearchBar
                 baseUrl={props.baseUrl}
                 setOpenDropdownNumber={props.setOpenDropdownNumber}
+                saleType={props.saleType}
+                itemType={props.itemType}
+                setMoveMapCoordinates={props.setMoveMapCoordinates}
+                markers={props.markers}
+                setMarkers={props.setMarkers}
+                rentPriceRange={props.rentPriceRange}
+                buyPriceRange={props.buyPriceRange}
+                lowestPrice={props.lowestPrice}
+                setLowestPrice={props.setLowestPrice}
+                highestPrice={props.highestPrice}
+                setHighestPrice={props.setHighestPrice}
                 states={props.states}
                 setStates={props.setStates}
                 selectedState={props.selectedState}
                 setSelectedState={props.setSelectedState}
                 defaultState={props.defaultState}
+                propertyItems={props.propertyItems}
+                setPropertyItems={props.setPropertyItems}
+                itemSort={props.itemSort}
                 countries={props.countries}
                 setCountries={props.setCountries}
                 selectedCountry={props.selectedCountry}

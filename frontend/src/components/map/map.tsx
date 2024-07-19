@@ -8,31 +8,24 @@ import {
 import maplibregl from "maplibre-gl";
 import IconPencil from "~/assets/icon-pencil";
 import IconTrash from "~/assets/icon-trash";
+import { SearchItems } from "~/utils/SearchItems";
 import "./mapLibre.css";
 import "./map.css";
 
 let mapContainer: HTMLDivElement;
 let map: maplibregl.Map;
+
 export default function Map(props: any) {
   let draw: any; // type: MapboxGlDraw
   let drawParent: any;
   let pencilButton: any;
   let newPencilButton: any;
   let trashButton: any;
-  let priceRange: string[] = [];
   let oldCoordinates: [number, number] = [0, 0];
   let coordinates: [number, number] = [0, 0];
-  let poly: string = "";
-  let poly2: string = "";
   let isPopupShown = false;
-  let lowestPrice = 0;
-  let highestPrice = 0;
   let mapMarkerColor = ["#FF3333", "#2624B3"];
-  let minMaxLng = [0, 0];
-  let locationLng = 0;
-  let locationLat = 0;
   const [isMapLoaded, setIsMapLoaded] = createSignal(false);
-  const [markers, setMarkers] = createSignal<any>();
 
   let markerImg = document.createElement("div");
   markerImg.setAttribute("class", "map-marker-symbol");
@@ -66,237 +59,18 @@ export default function Map(props: any) {
   function clickTrash() {
     draw?.deleteAll();
     removeMarkers();
-    handleSearch(false);
+    mapSearch();
+    checkIfSelectedItemIsVisibleOnMap();
     if (draw) draw.changeMode("simple_select");
   }
 
-  function checkIfSelectedItemIsVisibleOnMap() {
-    if (!props.selectedItem()) return;
-    // console.time("test");
-    let isVisible = false;
-    props.propertyItems().forEach((pI: any) => {
-      if (props.selectedItem().id === pI.id) isVisible = true;
-    });
-    if (!isVisible) props.setSelectedItem(null);
-    // console.timeEnd("test");
-  }
-
-  async function handleSearch(isMoveMap: boolean) {
-    // console.time("fetchTime");
-    let polygonArray: number[][];
-    if (draw && draw.getAll().features[0]) {
-      polygonArray =
-        //@ts-ignore
-        draw?.getAll()?.features[0]?.geometry.coordinates[0];
-      //@ts-ignore
-      const polygon = (await import("turf-polygon")).default;
-      const intersect = (await import("@turf/intersect")).default;
-      //@ts-ignore
-      const featureCollection = (await import("turf-featurecollection"))
-        .default;
-      const selectedShape = polygon([polygonArray]);
-      const mapBounds = polygon([getMapBounds(true)]);
-
-      const intersection = intersect(
-        featureCollection([selectedShape, mapBounds])
-      );
-      if (intersection) {
-        const overlappingShape = intersection.geometry.coordinates;
-        poly = turnArrayOfBoundsIntoString(overlappingShape[0]);
-      } else {
-        poly = turnArrayOfBoundsIntoString(
-          map.getZoom() >= 6 ? getMapBounds(true) : getMapBounds(false)
-        );
-      }
-      poly2 = "";
-    } else {
-      //Set polygonArray to the visible screen space
-      polygonArray =
-        map.getZoom() >= 6 ? getMapBounds(true) : getMapBounds(false);
-      minMaxLng = [0, 0];
-
-      for (let i = 0; i < polygonArray.length; i++) {
-        if (i === 0) minMaxLng = [polygonArray[i][0], polygonArray[i][0]];
-        if (minMaxLng[0] > polygonArray[i][0])
-          minMaxLng[0] = polygonArray[i][0];
-        if (minMaxLng[1] < polygonArray[i][0])
-          minMaxLng[1] = polygonArray[i][0];
-      }
-
-      const polyWidth = Math.abs(minMaxLng[0] - minMaxLng[1]);
-
-      if (polyWidth > 180) {
-        if (polyWidth > 220) {
-          polygonArray = [];
-          poly = "";
-          poly2 = "";
-        } else {
-          splitPolygon(getMapBounds(true));
-        }
-      } else {
-        poly2 = "";
-        poly = turnArrayOfBoundsIntoString(polygonArray);
-      }
-    }
-
-    setPriceRange();
-
-    let type: number[] = [0];
-    if (props.itemType() === "apartment") type = [1];
-    else if (props.itemType() === "house") type = [2];
-    else if (props.itemType() === "shared" || props.itemType() === "land")
-      type = [3];
-
-    if (props.saleType() === "buy") type[0] += 3;
-
-    if (minMaxLng[0] >= 62)
-      if (minMaxLng[1] < 180) type[0] += 12;
-      else type = [type[0], type[0] + 6, type[0] + 12];
-    else if (minMaxLng[0] >= -32)
-      if (minMaxLng[1] < 62) type[0] += 6;
-      else if (minMaxLng[1] < 180) type = [type[0] + 6, type[0] + 12];
-      else type = [type[0], type[0] + 6, type[0] + 12];
-    else if (minMaxLng[0] >= -180)
-      if (minMaxLng[1] < 62) type = [type[0], type[0] + 6];
-      else if (minMaxLng[1] < 180) type = [type[0], type[0] + 6, type[0] + 12];
-      else type = [type[0], type[0] + 6, type[0] + 12];
-
-    if (isMoveMap) type = [type[0], type[0] + 6, type[0] + 12];
-
-    try {
-      const response = await fetch(
-        `${props.baseUrl}/items?` +
-          new URLSearchParams({
-            type: type.toString(),
-            min: priceRange[0],
-            max: priceRange[1],
-            polygon: isMoveMap ? "" : poly,
-            polygon2: isMoveMap ? "" : poly2,
-            itemSort: props.itemSort(),
-            country: props.selectedCountry(),
-            state: props.selectedState(),
-            city: props.selectedCity(),
-          })
-      );
-
-      const responseData = await response.json();
-      if (responseData.length > 0) {
-        lowestPrice = responseData[0].euro_price;
-        highestPrice = responseData[0].euro_price;
-
-        responseData.forEach((el: any) => {
-          const euroPrice = el.euro_price;
-          if (euroPrice < lowestPrice) lowestPrice = euroPrice;
-          if (euroPrice > highestPrice) highestPrice = euroPrice;
-        });
-
-        // locationLng = responseData[0].lng;
-        // locationLat = responseData[0].lat;
-        // console.log(locationLng, locationLat);
-
-        const sourceObject = {
-          type: "geojson",
-          data: {
-            type: "FeatureCollection",
-            features: responseData.map((marker: any) => ({
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: [marker.lng, marker.lat],
-              },
-              properties: {
-                lng: marker.lng,
-                lat: marker.lat,
-                size: marker.size,
-                originalPrice: marker.original_price,
-                euroPrice: marker.euro_price,
-                currencyCode: marker.currency_code,
-                currencySymbol: marker.currency_symbol,
-                first_picture: marker.first_picture,
-                id: marker.id,
-                createdAt: marker.created_at,
-              },
-            })),
-          },
-        };
-
-        setMarkers(sourceObject);
-        props.setPropertyItems(responseData);
-      }
-
-      checkIfSelectedItemIsVisibleOnMap();
-    } catch (error) {
-      console.error("Fetch request error:", error);
-    }
-    // console.timeEnd("fetchTime");
-  }
-
-  function getMapBounds(get4Bounds: boolean) {
-    const bounds = map.getBounds();
-    if (get4Bounds) {
-      return [
-        [bounds._ne.lng, bounds._ne.lat],
-        [bounds._sw.lng, bounds._ne.lat],
-        [bounds._sw.lng, bounds._sw.lat],
-        [bounds._ne.lng, bounds._sw.lat],
-        [bounds._ne.lng, bounds._ne.lat],
-      ];
-    } else {
-      const midPointTop = [
-        (bounds._ne.lng + bounds._sw.lng) / 2,
-        bounds._ne.lat,
-      ];
-      const midPointBottom = [
-        (bounds._sw.lng + bounds._ne.lng) / 2,
-        bounds._sw.lat,
-      ];
-      return [
-        [bounds._ne.lng, bounds._ne.lat],
-        midPointTop,
-        [bounds._sw.lng, bounds._ne.lat],
-        [bounds._sw.lng, bounds._sw.lat],
-        midPointBottom,
-        [bounds._ne.lng, bounds._sw.lat],
-        [bounds._ne.lng, bounds._ne.lat],
-      ];
-    }
-  }
-
-  function splitPolygon(polygon: number[][]) {
-    let midX = (polygon[0][0] + polygon[1][0]) / 2;
-    let polygon1 = [
-      [polygon[0][0], polygon[0][1]],
-      [midX, polygon[1][1]],
-      [midX, polygon[2][1]],
-      [polygon[3][0], polygon[3][1]],
-      [polygon[4][0], polygon[4][1]],
-    ];
-    let polygon2 = [
-      [midX, polygon[0][1]],
-      [polygon[1][0], polygon[1][1]],
-      [polygon[2][0], polygon[2][1]],
-      [midX, polygon[3][1]],
-      [midX, polygon[4][1]],
-    ];
-    poly = turnArrayOfBoundsIntoString(polygon1);
-    poly2 = turnArrayOfBoundsIntoString(polygon2);
-  }
-
-  function turnArrayOfBoundsIntoString(arr: any) {
-    let str = "";
-    for (let i = 0; i < arr.length; i++) {
-      str += `${arr[i][0]}_${arr[i][1]}${i < arr.length - 1 ? "," : ""}`;
-    }
-    return str;
-  }
-
   function loadMarkers() {
-    const markerCount = markers().data.features.length;
-    markers().data.features.reverse();
+    const markerCount = props.markers().data.features.length;
+    props.markers().data.features.reverse();
     removeMarkers();
     map.addSource("marker-data", {
       type: "geojson",
-      data: markers().data,
+      data: props.markers().data,
     });
     map.addLayer({
       id: "markers",
@@ -305,14 +79,14 @@ export default function Map(props: any) {
       paint: {
         "circle-radius": 10,
         "circle-color":
-          markerCount > 1 && highestPrice > lowestPrice
+          markerCount > 1 && props.highestPrice() > props.lowestPrice()
             ? [
                 "interpolate",
                 ["linear"],
                 ["get", "euroPrice"],
-                lowestPrice,
+                props.lowestPrice(),
                 mapMarkerColor[0],
-                highestPrice,
+                props.highestPrice(),
                 mapMarkerColor[1],
               ]
             : mapMarkerColor[0],
@@ -324,15 +98,8 @@ export default function Map(props: any) {
   }
 
   function removeMarkers() {
-    if (map.getLayer("markers")) map.removeLayer("markers");
-    if (map.getSource("marker-data")) map.removeSource("marker-data");
-  }
-
-  function setPriceRange() {
-    priceRange =
-      props.saleType() === "rent"
-        ? props.rentPriceRange()
-        : props.buyPriceRange();
+    if (map?.getLayer("markers")) map?.removeLayer("markers");
+    if (map?.getSource("marker-data")) map?.removeSource("marker-data");
   }
 
   async function loadDraw() {
@@ -358,6 +125,44 @@ export default function Map(props: any) {
     });
 
     map.addControl(draw);
+  }
+
+  function checkIfSelectedItemIsVisibleOnMap() {
+    if (!props.selectedItem()) return;
+    // console.time("test");
+    let isVisible = false;
+    props.propertyItems().forEach((pI: any) => {
+      if (props.selectedItem().id === pI.id) isVisible = true;
+    });
+    if (!isVisible) props.setSelectedItem(null);
+    // console.timeEnd("test");
+  }
+
+  async function mapSearch() {
+    const priceRange =
+      props.saleType() === "rent"
+        ? props.rentPriceRange()
+        : props.buyPriceRange();
+    const bounds = map.getBounds();
+    const resultItems = await SearchItems(
+      false,
+      map,
+      draw,
+      bounds,
+      props.saleType(),
+      props.itemType(),
+      props.baseUrl,
+      priceRange,
+      props.itemSort(),
+      props.selectedCountry(),
+      props.selectedState(),
+      props.selectedCity()
+    );
+    props.setLowestPrice(resultItems?.lowestPrice);
+    props.setHighestPrice(resultItems?.highestPrice);
+    props.setMarkers(resultItems?.markers);
+    props.setPropertyItems(resultItems?.propertyItems);
+    checkIfSelectedItemIsVisibleOnMap();
   }
 
   createEffect(() => {
@@ -429,11 +234,11 @@ export default function Map(props: any) {
         zoom.toFixed(1),
       ]);
 
-      handleSearch(false);
+      mapSearch();
     });
 
     map.on("draw.create", async function () {
-      handleSearch(false);
+      mapSearch();
     });
 
     map.on("mouseenter", "markers", function (e: any) {
@@ -476,26 +281,26 @@ export default function Map(props: any) {
     props.itemSort();
     props.rentPriceRange();
     props.buyPriceRange();
-    untrack(setPriceRange);
     untrack(removeMarkers);
-    untrack(() => handleSearch(false));
+    untrack(mapSearch);
   });
 
   createEffect(() => {
-    props.selectedCountry();
-    props.selectedState();
-    props.selectedCity();
-    if (
-      props.selectedCountry() ||
-      props.selectedState() ||
-      props.selectedCity()
-    ) {
-      untrack(() => handleSearch(true));
-    }
+    if (isMapLoaded() && props.markers()) loadMarkers();
   });
 
   createEffect(() => {
-    if (isMapLoaded() && markers()) loadMarkers();
+    if (props.moveMapCoordinates())
+      untrack(() => {
+        const m = props.moveMapCoordinates();
+        map.fitBounds(
+          [
+            [m.lng1, m.lat1],
+            [m.lng2, m.lat2],
+          ],
+          { padding: { top: 40, bottom: 100, left: 40, right: 40 } }
+        );
+      });
   });
 
   createEffect(() => {

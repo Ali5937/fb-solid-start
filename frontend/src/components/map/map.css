@@ -1,5 +1,6 @@
 .map-parent {
   position: relative;
+  height: calc(100vh - (var(--side-margin) * 2 + var(--standard-size)));
   cursor: default;
   flex: 1;
 }

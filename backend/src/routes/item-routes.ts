@@ -107,7 +107,7 @@ export default function (app: any) {
             AND euro_price <= COALESCE(NULLIF($4, '')::numeric, 1e10)
             AND COALESCE(country = $6 OR $6 IS NULL)
             AND COALESCE(state = $7 OR $7 IS NULL)
-            AND COALESCE(city = $8 OR $8 IS NULL)
+            AND COALESCE($8::text IS NULL OR city = $8::text)
             ORDER BY
             CASE
               WHEN $5 = 'new' THEN created_at

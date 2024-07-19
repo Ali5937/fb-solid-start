@@ -17,11 +17,11 @@ import { isServer } from "solid-js/web";
 import Cookies from "js-cookie";
 import List from "~/components/list/list";
 import Navbar from "~/components/navbar/navbar";
-import GetItemType from "~/utils/GetItemType";
 import GetInitialMapArea from "~/utils/GetInitialMapArea";
 import { clientOnly } from "@solidjs/start";
 import { getRequestEvent } from "solid-js/web";
 import { isbot } from "isbot";
+import { GetItemType } from "~/utils/SearchItems";
 import IconArrow from "~/assets/icon-arrow";
 
 const Account = lazy(() => import("~/components/account/account"));
@@ -38,7 +38,7 @@ const getData = async (
   itemSort: string
 ) => {
   "use server";
-  const type = GetItemType(saleType, itemType, polygon, polygon2);
+  const type = GetItemType(null, saleType, itemType);
   const response = await fetch(
     `${baseUrl}/items?` +
       new URLSearchParams({
@@ -64,9 +64,9 @@ export default function Index() {
   let oldId: string = "";
   let oldRentPrice: [number, number] = [0, rentMax];
   let oldBuyPrice: [number, number] = [0, buyMax];
-  let oldLng: number = 0;
-  let oldLat: number = 0;
-  let oldZoom: number = 0;
+  let oldLng: number = 13.362;
+  let oldLat: number = 47.601;
+  let oldZoom: number = 3.9;
   let initialSelectedId: number = 0;
 
   let currentC = Cookies.get("currentCurrency");
@@ -125,9 +125,20 @@ export default function Index() {
     createSignal<[number, number]>(oldRentPrice);
   const [buyPriceRange, setBuyPriceRange] =
     createSignal<[number, number]>(oldBuyPrice);
-  const [mapLocation, setMapLocation] = createSignal<[number, number, number]>(
-    oldLng ? [oldLng, oldLat, oldZoom] : [13.362, 47.601, 3.9]
-  );
+  const [lowestPrice, setLowestPrice] = createSignal<number>();
+  const [highestPrice, setHighestPrice] = createSignal<number>();
+  const [moveMapCoordinates, setMoveMapCoordinates] = createSignal<{
+    lng1: number;
+    lat1: number;
+    lng2: number;
+    lat2: number;
+  }>();
+  const [markers, setMarkers] = createSignal<any>();
+  const [mapLocation, setMapLocation] = createSignal<[number, number, number]>([
+    oldLng,
+    oldLat,
+    oldZoom,
+  ]);
   const [isPanelOpen, setIsPanelOpen] = createSignal<boolean>(true);
   const [displayUnits, setDisplayUnits] = createSignal(
     Cookies.get("displayUnits") || "m"
@@ -268,18 +279,28 @@ export default function Index() {
           setSaleType={setSaleType}
           itemType={itemType}
           setItemType={setItemType}
+          setMoveMapCoordinates={setMoveMapCoordinates}
+          markers={markers}
+          setMarkers={setMarkers}
           rentMax={rentMax}
           buyMax={buyMax}
           rentPriceRange={rentPriceRange}
           setRentPriceRange={setRentPriceRange}
           buyPriceRange={buyPriceRange}
           setBuyPriceRange={setBuyPriceRange}
+          lowestPrice={lowestPrice}
+          setLowestPrice={setLowestPrice}
+          highestPrice={highestPrice}
+          setHighestPrice={setHighestPrice}
           currencyData={currencyData}
           setCurrencyData={setCurrencyData}
           currentCurrency={currentCurrency}
           setCurrentCurrency={setCurrentCurrency}
           displayUnits={displayUnits}
           setDisplayUnits={setDisplayUnits}
+          propertyItems={propertyItems}
+          setPropertyItems={setPropertyItems}
+          itemSort={itemSort}
           countries={countries}
           setCountries={setCountries}
           selectedCountry={selectedCountry}
@@ -299,10 +320,18 @@ export default function Index() {
             itemType={itemType}
             rentPriceRange={rentPriceRange}
             buyPriceRange={buyPriceRange}
+            lowestPrice={lowestPrice}
+            setLowestPrice={setLowestPrice}
+            highestPrice={highestPrice}
+            setHighestPrice={setHighestPrice}
+            moveMapCoordinates={moveMapCoordinates}
+            setMoveMapCoordinates={setMoveMapCoordinates}
             mapLocation={mapLocation}
             setMapLocation={setMapLocation}
             currentCurrency={currentCurrency}
             displayUnits={displayUnits}
+            markers={markers}
+            setMarkers={setMarkers}
             propertyItems={propertyItems}
             setPropertyItems={setPropertyItems}
             itemSort={itemSort}

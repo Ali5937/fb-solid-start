@@ -1,5 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from "solid-js";
 import XIcon from "../../assets/icon-x-border";
+import { SearchItems } from "~/utils/SearchItems";
 
 export default function SearchBar(props: any) {
   let inputRef: HTMLInputElement | undefined;
@@ -59,12 +60,10 @@ export default function SearchBar(props: any) {
     props.setCountries(resCountries);
   }
 
-  async function searchCountry(country: string, isClickCity: boolean) {
+  async function searchCountry(country: string) {
     props.setSelectedCountry(country || "");
-    if (!isClickCity) {
-      props.setSelectedState("");
-      props.setSelectedCity("");
-    }
+    props.setSelectedState("");
+    props.setSelectedCity("");
     const res = await fetch(
       `${props.baseUrl}/get-results-by-country?` +
         new URLSearchParams({
@@ -74,23 +73,74 @@ export default function SearchBar(props: any) {
     const resStates: string[] = [props.defaultState, ...res.data];
     props.setStates(resStates);
     searchImmediately = true;
-    getInput();
+    if (inputRef) inputRef.value = "";
+    await getInput();
+    await getSearchItems();
   }
 
-  function searchState(state: string) {
+  async function searchState(state: string) {
     props.setSelectedState(state || "");
     props.setSelectedCity("");
     searchImmediately = true;
-    getInput();
+    if (inputRef) inputRef.value = "";
+    await getInput();
+    await getSearchItems();
   }
 
   async function clickCity(res: any) {
-    await searchCountry(res.country_name, true);
-    props.setSelectedCountry(res.country_name || "");
-    props.setSelectedState(res.state_name || "");
-    props.setSelectedCity(res.city_name || "");
-    inputRef?.blur();
-    setInputValue(res.city_name);
+    props.setSelectedCountry(res.country_name);
+    props.setSelectedState(res.state_name);
+    props.setSelectedCity(res.city_name);
+    await getSearchItems();
+  }
+
+  async function getSearchItems() {
+    const priceRange =
+      props.saleType() === "rent"
+        ? props.rentPriceRange()
+        : props.buyPriceRange();
+    const resultItems = await SearchItems(
+      true,
+      null,
+      null,
+      null,
+      props.saleType(),
+      props.itemType(),
+      props.baseUrl,
+      priceRange,
+      props.itemSort(),
+      props.selectedCountry(),
+      props.selectedState(),
+      props.selectedCity()
+    );
+
+    props.setLowestPrice(resultItems?.lowestPrice);
+    props.setHighestPrice(resultItems?.highestPrice);
+    props.setMarkers(resultItems?.markers);
+    props.setPropertyItems(resultItems?.propertyItems);
+
+    const lowHighLngLat = getLowestHighestLngLat(props.propertyItems());
+
+    props.setMoveMapCoordinates({
+      lng1: lowHighLngLat.lngLow,
+      lat1: lowHighLngLat.latLow,
+      lng2: lowHighLngLat.lngHigh,
+      lat2: lowHighLngLat.latHigh,
+    });
+  }
+
+  function getLowestHighestLngLat(arr: any) {
+    let lngLow = arr[0].lng;
+    let lngHigh = arr[0].lng;
+    let latLow = arr[0].lat;
+    let latHigh = arr[0].lat;
+    for (let i = 0; i < arr.length; i++) {
+      if (lngLow > arr[i].lng) lngLow = arr[i].lng;
+      if (lngHigh < arr[i].lng) lngHigh = arr[i].lng;
+      if (latLow > arr[i].lat) latLow = arr[i].lat;
+      if (latHigh < arr[i].lat) latHigh = arr[i].lat;
+    }
+    return { lngLow, latLow, lngHigh, latHigh };
   }
 
   onMount(() => {
@@ -107,9 +157,7 @@ export default function SearchBar(props: any) {
       <div>
         <div class="search-element select-country">
           <div class="title">Country</div>
-          <select
-            onChange={(e) => searchCountry(e.currentTarget?.value, false)}
-          >
+          <select onChange={(e) => searchCountry(e.currentTarget?.value)}>
             <option value="" selected disabled hidden>
               {props.selectedCountry() || props.defaultCountry}
             </option>

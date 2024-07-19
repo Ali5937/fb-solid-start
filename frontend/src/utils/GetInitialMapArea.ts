@@ -1,4 +1,4 @@
-import turnArrayOfBoundsIntoString from "./TurnArrayOfBoundsIntoString";
+import { turnArrayOfBoundsIntoString } from "./SearchItems";
 
 function getStandardMapWidth(x: number) {
   const A = 263.671875;
