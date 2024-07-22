@@ -15,6 +15,10 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+app.onError(({ code, error }: any) => {
+  console.log(error);
+  return { status: error.status, message: error.message };
+});
 itemRoutes(app);
 userRoutes(app);
 searchRoutes(app);
