@@ -33,7 +33,6 @@ async function getEmail(client: any, email: string) {
     text: queryText,
     values: parameterValues,
   });
-
   if (result.rows.length > 0) return true;
   else return false;
 }
@@ -49,9 +48,9 @@ export default function (app: any) {
       return { auth, params };
     })
     .get("/api/user/email/:emailAddress", async ({ params }: any) => {
-      const client = await pool.connect();
-      const doesEmailExist = await getEmail(client, params.emailAddress);
       try {
+        const client = await pool.connect();
+        const doesEmailExist = await getEmail(client, params.emailAddress);
         if (doesEmailExist) {
           // check if user exists
           return { status: 200, message: "User found" };
@@ -59,22 +58,9 @@ export default function (app: any) {
           return { status: 204, message: "User not found" };
         }
       } catch (error: any) {
-        // console.error(error.message);
-        return { status: "error", message: error.message };
+        throw { status: 500, message: error.message };
       }
     })
-
-    // .post(
-    //   "/api/test",
-    //   async ({ body, jwt, cookie: { auth }, params }: { body: any; jwt: any; cookie: { auth: any }; params: any }) => {
-    //     auth.set({
-    //       value: await jwt.sign(params),
-    //       httpOnly: true,
-    //       maxAge: 7 * 86400,
-    //       path: "/",
-    //     });
-    //   }
-    // )
 
     // if user does not exist already
     .post(
@@ -192,9 +178,8 @@ export default function (app: any) {
             path: "/",
           });
 
-          return { status: "success" };
+          return { status: "success", userId: userId };
         } catch (error: any) {
-          console.error(error.message);
           return { status: "error", message: error.message };
         } finally {
           client.release();
@@ -211,7 +196,7 @@ export default function (app: any) {
         accessToken.remove();
         refreshToken.remove();
         return {
-          status: "success",
+          status: 204,
           message: "Logout successful",
         };
       }

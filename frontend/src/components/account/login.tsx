@@ -12,7 +12,7 @@ export default function Login(props: any) {
     else if (loginType() === 2) sendPostLogin();
   }
 
-  // If email already exists login, otherwise sign up
+  // If email exists already login, otherwise sign up
   async function sendGetEmail() {
     const response = await fetch(`${props.baseUrl}/user/email/${email()}`, {
       method: "GET",
@@ -66,6 +66,7 @@ export default function Login(props: any) {
     }).then((res) => res.json());
     if (result.status === "success") {
       props.setIsLoggedIn(true);
+      props.setUserId(result.userId);
     }
     console.log("login result: ", result.status);
   }

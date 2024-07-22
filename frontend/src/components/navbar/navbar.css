@@ -135,10 +135,6 @@
   line-height: 1.2;
 }
 
-.filter-nav {
-  width: calc(var(--standard-size) * 2);
-}
-
 .filter-container {
   margin-bottom: var(--border-width);
 }
@@ -178,10 +174,6 @@
   font-family: "Chango";
   font-size: 3rem;
   line-height: 1;
-}
-
-.account-nav {
-  width: calc(var(--standard-size) * 2);
 }
 
 .currency-nav {

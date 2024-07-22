@@ -53,5 +53,32 @@ export default function (app: Elysia) {
 
         return { message: "authorized", data: data };
       }
-    );
+    )
+    .get("/api/user/items/:page", async ({ params: { page }, userId }: any) => {
+      try {
+        const client = await pool.connect();
+        const offset = page * 5;
+        const queryText = `
+            SELECT * FROM items
+            WHERE user_id = $1
+            LIMIT 5 OFFSET $2;`;
+        const parameterValues = [userId, offset];
+        const result = await client.query({
+          text: queryText,
+          values: parameterValues,
+        });
+        const queryTextCount = `
+            SELECT COUNT(*) FROM items
+            WHERE user_id = $1;`;
+        const parameterValuesCount = [userId];
+        const resultCount = await client.query({
+          text: queryTextCount,
+          values: parameterValuesCount,
+        });
+        const count = Math.floor(resultCount.rows[0].count / 5);
+        return { data: result.rows, count: count };
+      } catch (error: any) {
+        throw { status: 500, message: error.message };
+      }
+    });
 }

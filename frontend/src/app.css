@@ -42,9 +42,10 @@ body {
 
   --standard-size: 60px;
   --side-margin: calc(var(--standard-size) / 5);
-  --font-size-xl: calc(var(--standard-size) / 1.5);
-  --font-size-l: calc(var(--standard-size) / 2);
   --font-size-m: calc(var(--standard-size) / 3);
+  --font-size-l: calc(var(--standard-size) / 2);
+  --font-size-xl: calc(var(--standard-size) / 1.5);
+  --font-size-2xl: calc(var(--standard-size) / 1.2);
   --split-line: 1px solid hsl(210, 4%, 29%);
   --speed: 100ms;
 
@@ -66,7 +67,6 @@ main {
   display: flex;
   flex: 1 1 100%;
   justify-content: end;
-  max-height: calc(100% - var(--standard-size) - (var(--side-margin) * 2));
 }
 
 button,
@@ -145,7 +145,7 @@ button,
 .panel {
   width: 55%;
   max-width: 1024px;
-  height: 100%;
+  height: calc(100vh - var(--standard-size) - (var(--side-margin) * 2));
   padding-left: var(--side-margin);
   background-color: var(--c1);
   font-size: var(--font-size-m);
@@ -170,6 +170,10 @@ button,
 .list-switch svg {
   height: 100%;
   width: 100%;
+}
+
+.button-2x {
+  width: calc(var(--standard-size) * 2);
 }
 
 .panel:not(.is-open) .list-switch svg {

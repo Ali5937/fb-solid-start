@@ -104,23 +104,20 @@ export default function Index() {
 
   const expires = 365;
   const [windowWidth, setWindowWidth] = createSignal<number>(0);
-
   const [windowHeight, setWindowHeight] = createSignal<number>(0);
-
   const [canUseCookies, setCanUseCookies] = createSignal<boolean>(
     Cookies.get("canUseCookies") ? true : false
   );
-
   const [theme, setTheme] = createSignal<string>(
     Cookies.get("theme") || "dark-theme"
   );
-
   const [isLoggedIn, setIsLoggedIn] = createSignal<boolean>(false);
   const [saleType, setSaleType] = createSignal<string>(oldSaleType || "rent"); // rent, buy
   const [itemType, setItemType] = createSignal<string>(
     oldItemType || "apartment"
   ); // apartment, house, shared, land
-  const [id, setId] = createSignal<string>(oldId.toString() || "id");
+  const [itemId, setItemId] = createSignal<string>(oldId.toString() || "id");
+  // const [userId, setUserId] = createSignal<string>();
   const [rentPriceRange, setRentPriceRange] =
     createSignal<[number, number]>(oldRentPrice);
   const [buyPriceRange, setBuyPriceRange] =
@@ -140,6 +137,7 @@ export default function Index() {
     oldZoom,
   ]);
   const [isPanelOpen, setIsPanelOpen] = createSignal<boolean>(true);
+  const [accountPage, setAccountPage] = createSignal<string>("account");
   const [displayUnits, setDisplayUnits] = createSignal(
     Cookies.get("displayUnits") || "m"
   );
@@ -152,7 +150,6 @@ export default function Index() {
   const [highlightedItemLngLat, setHighlightedItemLngLat] = createSignal("");
   const [openDropdownNumber, setOpenDropdownNumber] = createSignal<number>(0);
   const [isProfileOpen, setIsProfileOpen] = createSignal<boolean>(false);
-
   const defaultCountry = "All Countries";
   const defaultState = "All States";
   const [countries, setCountries] = createSignal<string[]>([""]);
@@ -212,6 +209,22 @@ export default function Index() {
     else setIsLoggedIn(false);
   }
 
+  function clickListSwitch() {
+    if (isProfileOpen()) {
+      if (accountPage() === "account") {
+        setIsProfileOpen(false);
+      } else if (accountPage() === "items" || accountPage() === "messages") {
+        setAccountPage("account");
+      } else if (accountPage() === "addItem") {
+        setAccountPage("items");
+      } else if (accountPage() === "addImages") {
+        setAccountPage("addItem");
+      }
+    } else {
+      setIsPanelOpen(!isPanelOpen());
+    }
+  }
+
   createEffect(() => {
     const newUrl = `/${saleType()}/${itemType()}${
       !selectedCountry() && !selectedState() && !selectedCity()
@@ -219,7 +232,7 @@ export default function Index() {
         : `/${selectedCountry() || "Country"}-${
             selectedState() || "AllStates"
           }-${selectedCity() || "AllCities"}`
-    }${id() === "id" ? "" : `/${id()}`}`;
+    }${itemId() === "id" ? "" : `/${itemId()}`}`;
 
     const navigate = useNavigate();
     navigate(newUrl, { replace: true });
@@ -355,18 +368,18 @@ export default function Index() {
           >
             <button
               class={`list-switch ${
-                isPanelOpen() &&
                 !isProfileOpen() &&
                 (windowWidth() === 0 || windowWidth() >= 1024)
                   ? "hidden"
                   : ""
               }`}
-              onMouseDown={() => {
-                if (isProfileOpen()) setIsProfileOpen(false);
-                else setIsPanelOpen(!isPanelOpen());
-              }}
+              onMouseDown={clickListSwitch}
             >
-              {isPanelOpen() && !isProfileOpen() ? "Map" : "List"}
+              {isPanelOpen() && !isProfileOpen()
+                ? "Map"
+                : isPanelOpen() && accountPage() !== "account"
+                ? "Back"
+                : "List"}
               <IconArrow />
             </button>
             <Suspense>
@@ -398,6 +411,10 @@ export default function Index() {
                   baseUrl={baseUrl}
                   isLoggedIn={isLoggedIn}
                   setIsLoggedIn={setIsLoggedIn}
+                  accountPage={accountPage}
+                  setAccountPage={setAccountPage}
+                  windowWidth={windowWidth}
+                  windowHeight={windowHeight}
                 />
               </Show>
             </Suspense>

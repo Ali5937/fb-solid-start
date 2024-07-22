@@ -1,9 +1,208 @@
-import { Suspense, Show, lazy } from "solid-js";
+import {
+  Suspense,
+  Show,
+  lazy,
+  createSignal,
+  For,
+  onCleanup,
+  createEffect,
+  untrack,
+} from "solid-js";
+import IconArrow from "~/assets/icon-arrow";
 import "./account.css";
+import IconRotate from "~/assets/icon-rotate";
 const Login = lazy(() => import("./login"));
 
 export default function Account(props: any) {
+  const [currentItems, setCurrentItems] = createSignal([]);
+  const [itemPage, setItemPage] = createSignal<number>(1);
+  const [itemPageCount, setItemPageCount] = createSignal<number>(0);
+  const [selectedImage, setSelectedImage] = createSignal<string | null>(null);
+  const [scaledImages, setScaledImages] = createSignal<(string | string[])[]>(
+    []
+  );
+  const [cropperInstance, setCropperInstance] = createSignal<Cropper | null>(
+    null
+  );
+  const [cropper, setCropper] = createSignal<Cropper>();
+  let imageRef: HTMLImageElement | undefined;
+
+  async function clickItemArrow(add: number) {
+    if (
+      (add === -1 && itemPage() > 1) ||
+      (add === 1 && itemPage() < itemPageCount())
+    ) {
+      await getItems();
+      setItemPage(itemPage() + add);
+    }
+  }
+
+  async function getItems() {
+    props.setAccountPage("items");
+    const result = await fetch(`${props.baseUrl}/user/items/${itemPage()}`, {
+      method: "GET",
+      credentials: "include",
+    }).then((res) => res.json());
+    setCurrentItems(result.data);
+    setItemPageCount(result.count);
+  }
+
+  function addItem() {
+    props.setAccountPage("addItem");
+  }
+
+  async function initializeCroppr(dataUrl: string) {
+    if (!imageRef) return;
+    setSelectedImage(dataUrl);
+    if (cropper()) (cropper() as Cropper).destroy();
+    const Cropper = (await import("cropperjs")).default;
+    await import("cropperjs/dist/cropper.css");
+    setCropper(
+      new Cropper(imageRef, {
+        aspectRatio: NaN,
+        viewMode: 2,
+        autoCropArea: 1,
+        responsive: true,
+        background: false,
+      })
+    );
+    setCropperInstance(cropper() as Cropper);
+  }
+
+  function getCroppedDataUrl() {
+    setScaledImages((images) =>
+      images.map((img) => {
+        const dataUrl = typeof img === "string" ? img : img[1];
+        const originalDataUrl = typeof img === "string" ? img : img[0];
+        const currentSelectedImage = selectedImage();
+        if (
+          cropper() &&
+          currentSelectedImage &&
+          currentSelectedImage === dataUrl
+        ) {
+          const croppedDataUrl = (cropper() as Cropper)
+            .getCroppedCanvas()
+            .toDataURL("image/jpeg");
+          initializeCroppr(croppedDataUrl);
+          return [originalDataUrl, croppedDataUrl];
+        } else {
+          return img;
+        }
+      })
+    );
+  }
+
+  function undoCrop() {
+    setScaledImages((images) =>
+      images.map((img) => {
+        if (Array.isArray(img) && img[1] === selectedImage()) {
+          initializeCroppr(img[0]);
+          return img[0];
+        }
+        return img;
+      })
+    );
+  }
+
+  function rotateImage() {
+    if (cropper()) {
+      cropper()?.rotate(90);
+      const imgData = cropper()?.getContainerData();
+      const width = imgData?.width as number;
+      const height = imgData?.height as number;
+      if (width > height) {
+        cropper()?.setCanvasData({
+          height: imgData?.height,
+        });
+      } else {
+        cropper()?.setCanvasData({
+          width: imgData?.width,
+        });
+      }
+      cropper()?.setCropBoxData({
+        width: imgData?.width,
+        height: imgData?.height,
+      });
+    }
+  }
+
+  async function handleImageCropping(event: Event) {
+    const maxImageSize = 1200;
+    const imageQuality = 0.8;
+    const target = event.target as HTMLInputElement;
+    const files = target.files ? target.files : null;
+    if (files) {
+      const scaledImagesPromises = Array.from(files).map((file: File) => {
+        return new Promise<void>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const dataUrl = reader.result?.toString();
+            if (dataUrl) {
+              resizeDataUrl(dataUrl, maxImageSize, imageQuality)
+                .then((scaledDataUrl: string) => {
+                  setScaledImages([...scaledImages(), scaledDataUrl]);
+                })
+                .catch((error) => {
+                  console.error("Error scaling image:", error);
+                  reject(error);
+                });
+            } else {
+              reject(new Error("Failed to read file"));
+            }
+          };
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(file);
+        });
+      });
+
+      try {
+        await Promise.all(scaledImagesPromises);
+        console.log("All images processed and scaled successfully");
+      } catch (error) {
+        console.error("Error processing images:", error);
+      }
+    }
+  }
+
+  function resizeDataUrl(
+    dataUrl: string,
+    maxSize: number,
+    imageQuality: number
+  ): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxSize) {
+            height = Math.round((height * maxSize) / width);
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = Math.round((width * maxSize) / height);
+            height = maxSize;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", imageQuality));
+        } else {
+          reject(new Error("Failed to get 2D context"));
+        }
+      };
+      img.onerror = (error) => reject(error);
+      img.src = dataUrl; // Trigger onload event
+    });
+  }
+
   async function getMessages() {
+    props.setAccountPage("messages");
     const result = await fetch(`${props.baseUrl}/messages`, {
       method: "GET",
       credentials: "include",
@@ -15,30 +214,153 @@ export default function Account(props: any) {
     const result = await fetch(`${props.baseUrl}/user/logout`, {
       method: "POST",
       credentials: "include",
-    });
-    const resultData = await result.json();
-    if (resultData.status === "success") {
+    }).then((res) => res.json());
+    if (result.status === 204) {
       props.setIsLoggedIn(false);
     }
-    console.log("logout result: ", resultData);
+    console.log("logout result: ", result);
   }
+
+  createEffect(() => {
+    if (props.accountPage() === "addImages") untrack(getCroppedDataUrl);
+  });
+
+  onCleanup(() => {
+    if (cropperInstance()) {
+      cropperInstance()?.destroy();
+    }
+  });
 
   return (
     <div class="account">
       <Suspense>
         <Show when={!props.isLoggedIn()}>
-          <Login baseUrl={props.baseUrl} setIsLoggedIn={props.setIsLoggedIn} />
+          <Login
+            baseUrl={props.baseUrl}
+            setIsLoggedIn={props.setIsLoggedIn}
+            setUserId={props.setUserId}
+          />
         </Show>
       </Suspense>
       <Suspense>
-        <Show when={props.isLoggedIn()}>
+        <Show when={props.isLoggedIn() && props.accountPage() === "account"}>
           <h2>Account</h2>
           <div class="account-list">
             <div class="separation"></div>
-            <button onClick={getMessages}>Messages</button>
+            <button onMouseDown={getItems}>Items</button>
             <div class="separation"></div>
-            <button onClick={logout}>Logout</button>
+            <button onMouseDown={getMessages}>Messages</button>
             <div class="separation"></div>
+            <button onMouseDown={logout}>Logout</button>
+            <div class="separation"></div>
+          </div>
+        </Show>
+        <Show when={props.accountPage() === "items"}>
+          <h2>Your Items</h2>
+          <div class="account-list">
+            <div class="separation"></div>
+            <div class="new-item-parent">
+              <button onMouseDown={addItem}>+ New Item</button>
+            </div>
+            <div class="account-list item-page">
+              <Show when={itemPageCount() > 0}>
+                <div class="item-page-parent">
+                  <Show when={itemPage() > 1}>
+                    <div class="item-arrow backwards">
+                      <button onMouseDown={() => clickItemArrow(-1)}>
+                        <IconArrow />
+                      </button>
+                    </div>
+                  </Show>
+                  <div class="item-page-number">
+                    {itemPage()}/{itemPageCount()}
+                  </div>
+                  <Show when={itemPage() < itemPageCount()}>
+                    <div class="item-arrow">
+                      <button onMouseDown={() => clickItemArrow(1)}>
+                        <IconArrow />
+                      </button>
+                    </div>
+                  </Show>
+                </div>
+              </Show>
+              <For each={currentItems()}>
+                {(item: any) => (
+                  <div>
+                    <div>
+                      {JSON.stringify(item.city)}
+                      {JSON.stringify(item.euro_price)}
+                    </div>
+                    <div class="separation"></div>
+                  </div>
+                )}
+              </For>
+            </div>
+          </div>
+        </Show>
+        <Show when={props.accountPage() === "addItem"}>
+          <h2>Add New Item</h2>
+          <div class="account-list">
+            <div class="item-form">
+              {/* <label htmlFor=""></label> */}
+              <button onMouseDown={() => props.setAccountPage("addImages")}>
+                Add Images
+              </button>
+            </div>
+          </div>
+        </Show>
+        <Show when={props.accountPage() === "addImages"}>
+          <h2>Upload Images</h2>
+          <div class="upload-parent">
+            <div class="uploaded-images-list">
+              <For each={scaledImages()}>
+                {(img: string | string[]) => {
+                  const dataUrl = typeof img === "string" ? img : img[1];
+                  return (
+                    <div
+                      class={`button-style ${
+                        selectedImage() === dataUrl ? "highlighted" : ""
+                      }`}
+                      onMouseDown={() => initializeCroppr(dataUrl)}
+                    >
+                      <img src={dataUrl} />
+                    </div>
+                  );
+                }}
+              </For>
+            </div>
+            <div class="account-list crop-parent">
+              <label class="button-style button-2x" for="image-upload">
+                Upload
+              </label>
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                hidden
+                onChange={handleImageCropping}
+              />
+              <div class="crop-container">
+                <img
+                  class="crop-image"
+                  ref={imageRef}
+                  src={selectedImage() as string}
+                  alt=""
+                />
+              </div>
+              <Show when={cropper()}>
+                <div class="crop-tools">
+                  <button onMouseDown={rotateImage}>
+                    <IconRotate />
+                  </button>
+                  <button class="wide-button" onMouseDown={undoCrop}>
+                    Undo
+                  </button>
+                  <button onMouseDown={getCroppedDataUrl}>Ok</button>
+                </div>
+              </Show>
+            </div>
           </div>
         </Show>
       </Suspense>

@@ -90,7 +90,7 @@ export default function Navbar(props: any) {
         </button>
         <button
           aria-label="filter-button"
-          class={`filter-nav nav-button ${
+          class={`filter-nav button-2x nav-button ${
             props.openDropdownNumber() === 2 && isDropdownOpen()
               ? "highlighted"
               : ""
@@ -128,7 +128,7 @@ export default function Navbar(props: any) {
       <div class="nav-parent">
         <button
           aria-label="login-button"
-          class={`account-nav nav-button ${
+          class={`account-nav button-2x nav-button ${
             props.isProfileOpen() ? "highlighted" : ""
           }`}
           onMouseDown={() => {
