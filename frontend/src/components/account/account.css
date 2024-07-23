@@ -3,8 +3,6 @@
   flex-direction: column;
   height: 100%;
   margin-right: var(--side-margin);
-  /* overflow-x: hidden; */
-  /* overflow-y: scroll; */
 }
 
 .account-list {
@@ -170,13 +168,6 @@
   background-color: var(--c4);
   opacity: 0.3;
   border: 1px solid black;
-}
-
-.separation {
-  width: 100%;
-  margin: var(--side-margin) 0;
-  border-bottom: calc(var(--border-width) / 2) solid;
-  border-color: var(--c3);
 }
 
 .login-type {

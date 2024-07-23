@@ -46,7 +46,6 @@ body {
   --font-size-l: calc(var(--standard-size) / 2);
   --font-size-xl: calc(var(--standard-size) / 1.5);
   --font-size-2xl: calc(var(--standard-size) / 1.2);
-  --split-line: 1px solid hsl(210, 4%, 29%);
   --speed: 100ms;
 
   --border-width: calc(var(--standard-size) / 10);
@@ -129,8 +128,11 @@ button,
   border-color: var(--c4) !important;
 }
 
-.split-line {
-  border: var(--split-line);
+.separation {
+  width: 100%;
+  margin: var(--side-margin) 0;
+  border-bottom: calc(var(--border-width) / 2) solid;
+  border-color: var(--c3);
 }
 
 .is-clicked .arrow-icon {
