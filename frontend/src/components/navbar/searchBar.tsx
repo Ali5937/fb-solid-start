@@ -91,6 +91,7 @@ export default function SearchBar(props: any) {
     props.setSelectedCountry(res.country_name);
     props.setSelectedState(res.state_name);
     props.setSelectedCity(res.city_name);
+    props.setOpenDropdownNumber(0);
     await getSearchItems();
   }
 
@@ -176,6 +177,7 @@ export default function SearchBar(props: any) {
             (props.states().length > 1 || props.selectedCity() !== "")
           }
         >
+          <div class="separation"></div>
           <div class="search-element select-state">
             <div class="title">State</div>
             <select onChange={(e) => searchState(e.currentTarget?.value)}>
@@ -193,6 +195,7 @@ export default function SearchBar(props: any) {
           </div>
         </Show>
       </div>
+      <div class="separation"></div>
       <div class="search-element">
         <div class="title">Search Cities</div>
         <input
