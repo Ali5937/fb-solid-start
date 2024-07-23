@@ -158,11 +158,19 @@ export default function Map(props: any) {
       props.selectedState(),
       props.selectedCity()
     );
-    props.setLowestPrice(resultItems?.lowestPrice);
-    props.setHighestPrice(resultItems?.highestPrice);
-    props.setMarkers(resultItems?.markers);
-    props.setPropertyItems(resultItems?.propertyItems);
-    checkIfSelectedItemIsVisibleOnMap();
+
+    if (resultItems?.propertyItems) {
+      props.setLowestPrice(resultItems?.lowestPrice);
+      props.setHighestPrice(resultItems?.highestPrice);
+      props.setMarkers(resultItems?.markers);
+      props.setPropertyItems(resultItems?.propertyItems);
+      checkIfSelectedItemIsVisibleOnMap();
+    } else {
+      if (draw.getAll().features.length > 0) {
+        clickTrash();
+        mapSearch();
+      }
+    }
   }
 
   createEffect(() => {
