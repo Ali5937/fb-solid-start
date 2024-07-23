@@ -1,5 +1,4 @@
-import { Show, createSignal } from "solid-js";
-import IconArrow from "~/assets/icon-arrow";
+import { For, Show, Suspense, createEffect, createSignal } from "solid-js";
 
 export default function Currency(props: any) {
   let selection = 1;
@@ -15,18 +14,17 @@ export default function Currency(props: any) {
     }
   }
 
-  const [showOtherCurrencies, setShowOtherCurrencies] = createSignal(false);
   const [currencySelection, setCurrencySelection] = createSignal(selection);
 
   function changeCurrency(value: any) {
     props.setCurrentCurrency(value);
-    setCurrencySelection(0);
   }
 
   async function getCurrencies() {
-    const currencyFile = await fetch(`${props.baseUrl}/currency`);
-    const data = await currencyFile.json();
-    props.setCurrencyData(data);
+    const currencies = await fetch(`${props.baseUrl}/currency`).then((res) =>
+      res.json()
+    );
+    props.setCurrencyData(currencies);
   }
 
   if (!props.currencyData()) getCurrencies();
@@ -93,41 +91,38 @@ export default function Currency(props: any) {
           </Show>
         </button>
       </div>
-      <div
-        class="other-currency-dropdown"
-        onMouseDown={() => {
-          setShowOtherCurrencies(!showOtherCurrencies());
-        }}
-      >
-        <button
-          class={`other-currency-dropdown-button ${
-            showOtherCurrencies() ? "is-clicked" : ""
-          }`}
-        >
-          <div>
-            {props.currentCurrency()
-              ? props.currentCurrency()[1]
-              : "Original Currency"}
+      <div class="separation"></div>
+      <Suspense>
+        <Show when={props.currencyData()}>
+          <div class="other-currencies">
+            <label for="other-currencies-list">Other Currencies</label>
+            {/* <span>{JSON.stringify(props.currencyData()) || "falsy"}</span> */}
+            <select
+              class="button-style"
+              id="other-currencies-list"
+              onChange={(e) => {
+                const val = e.currentTarget?.value;
+                if (val === "") {
+                  changeCurrency(null);
+                  setCurrencySelection(1);
+                } else {
+                  changeCurrency(val.split(","));
+                  setCurrencySelection(0);
+                }
+              }}
+            >
+              <option value="" onClick={() => setCurrencySelection(1)}>
+                Choose Currency
+              </option>
+              {Object.keys(props.currencyData()).map((key) => {
+                const currency = props.currencyData()[key];
+                return <option value={currency}>{currency[1]}</option>;
+              })}
+            </select>
           </div>
-          <IconArrow />
-        </button>
-        <div class="other-currency-list">
-          <Show when={showOtherCurrencies()}>
-            {Object.keys(props.currencyData()).map((key) => {
-              const value = props.currencyData()[key];
-              return (
-                <div
-                  onMouseDown={() => {
-                    changeCurrency(value);
-                  }}
-                >
-                  {value[1]}
-                </div>
-              );
-            })}
-          </Show>
-        </div>
-      </div>
+        </Show>
+      </Suspense>
+      <div class="separation"></div>
       <div class="unit-label">Units</div>
       <div class="units">
         <button

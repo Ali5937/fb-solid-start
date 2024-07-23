@@ -167,6 +167,7 @@ export default function Navbar(props: any) {
                 setCurrencyData={props.setCurrencyData}
                 displayUnits={props.displayUnits}
                 setDisplayUnits={props.setDisplayUnits}
+                setOpenDropdownNumber={props.setOpenDropdownNumber}
               />
             </Show>
           </Suspense>
