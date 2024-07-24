@@ -306,7 +306,7 @@ export default function Map(props: any) {
             [m.lng1, m.lat1],
             [m.lng2, m.lat2],
           ],
-          { padding: { top: 40, bottom: 100, left: 40, right: 40 } }
+          { padding: { top: 40, bottom: 100, left: 80, right: 40 } }
         );
       });
   });
