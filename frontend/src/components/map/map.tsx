@@ -197,19 +197,20 @@ export default function Map(props: any) {
       const euroPrice = e.features[0].properties.euroPrice;
       const originalPrice = Number(e.features[0].properties.originalPrice);
       const currencySymbol = props.currentCurrency()
-        ? props.currentCurrency()[3]
+        ? props.currentCurrency()[2]
         : e.features[0].properties.currencySymbol;
       const size =
         e.features[0].properties.size *
-        (props.displayUnits() === "f" ? 10.76 : 1);
+        (props.displayUnits() === "ft" ? 10.76 : 1);
       const sizeSymbol =
-        props.displayUnits() === "f" ? `ft<sup>2</sup>` : `m<sup>2</sup>`;
-      const cityName = e.features[0].properties.city;
+        props.displayUnits() === "ft" ? `ft<sup>2</sup>` : `m<sup>2</sup>`;
       coordinates = e.features[0].geometry.coordinates.slice();
       if (oldCoordinates[0] === coordinates[0] && isPopupShown) return;
       isPopupShown = true;
       oldCoordinates = coordinates;
-      const firstPicture = e.features[0].properties.first_picture;
+      // const firstPicture = e.features[0].properties.first_picture;
+      const firstPicture =
+        "https://images.unsplash.com/photo-1598228723793-52759bba239c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTd8fGhvdXNlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60";
       popup
         .setLngLat(coordinates)
         .setHTML(
@@ -220,13 +221,12 @@ export default function Map(props: any) {
 								<div class="price">${`${
                   props.currentCurrency()
                     ? Math.round(
-                        euroPrice * props.currentCurrency()[4]
+                        euroPrice * props.currentCurrency()[3]
                       ).toLocaleString()
                     : originalPrice.toLocaleString()
                 } ${currencySymbol}`}</div>
 								<div class="size">${`${Math.round(size)} ${sizeSymbol}`}</div>
 							</div>
-							<div class="city">${cityName ?? ""}</div>
 						</div>
 					</div>`
         )

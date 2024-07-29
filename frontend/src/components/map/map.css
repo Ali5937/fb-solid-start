@@ -31,6 +31,36 @@
   cursor: url("../../assets/icon-pencil.svg") 0 120, auto !important;
 }
 
+.popup {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: calc(var(--standard-size) * 2);
+  height: calc(var(--standard-size) * 2);
+  background-color: var(--c1);
+  line-height: 1;
+}
+
+.maplibregl-popup-content {
+  background-color: var(--c1);
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--c1) !important;
+}
+
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--c1) !important;
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--c1) !important;
+}
+
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--c1) !important;
+}
+
 .maplibregl-ctrl {
   background-color: var(--c1) !important;
 }
