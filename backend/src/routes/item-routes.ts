@@ -138,7 +138,9 @@ export default function (app: any) {
             values: parameterValues,
           });
           const data = result.rows;
-          // console.log(data);
+          if (data.length === 0) {
+            console.log("log data: ", data);
+          }
 
           const bufferData = Buffer.from(JSON.stringify(data));
           const gzipData = Bun.gzipSync(bufferData);

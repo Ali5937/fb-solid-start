@@ -1,7 +1,7 @@
 import { For, Show, Suspense, createEffect, createSignal } from "solid-js";
 
 export default function Currency(props: any) {
-  let selection = 1;
+  let selection = props.isAddItem ? 0 : 1;
   if (props.currentCurrency()) {
     if (props.currentCurrency()[0] === "USD") {
       selection = 2;
@@ -37,17 +37,19 @@ export default function Currency(props: any) {
       }}
     >
       <div class="currency-button-parent">
-        <button
-          class={`currency-button ${
-            currencySelection() === 1 ? "highlighted" : ""
-          }`}
-          onMouseDown={() => {
-            changeCurrency(null);
-            setCurrencySelection(1);
-          }}
-        >
-          <sup>$</sup>⁄<sub>€</sub>
-        </button>
+        <Show when={!props.isAddItem}>
+          <button
+            class={`currency-button ${
+              currencySelection() === 1 ? "highlighted" : ""
+            }`}
+            onMouseDown={() => {
+              changeCurrency(null);
+              setCurrencySelection(1);
+            }}
+          >
+            <sup>$</sup>⁄<sub>€</sub>
+          </button>
+        </Show>
         <button
           class={`currency-button ${
             currencySelection() === 2 ? "highlighted" : ""
@@ -96,7 +98,6 @@ export default function Currency(props: any) {
         <Show when={props.currencyData()}>
           <div class="other-currencies">
             <label for="other-currencies-list">Other Currencies</label>
-            {/* <span>{JSON.stringify(props.currencyData()) || "falsy"}</span> */}
             <select
               class="button-style"
               id="other-currencies-list"

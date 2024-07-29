@@ -166,7 +166,7 @@ export default function Map(props: any) {
       props.setPropertyItems(resultItems?.propertyItems);
       checkIfSelectedItemIsVisibleOnMap();
     } else {
-      if (draw.getAll().features.length > 0) {
+      if (draw?.getAll().features.length > 0) {
         clickTrash();
         mapSearch();
       }
@@ -328,6 +328,10 @@ export default function Map(props: any) {
         marker.addTo(map);
       }
     }
+  });
+
+  createEffect(() => {
+    if (!props.propertyItems()) removeMarkers();
   });
 
   onMount(() => marker.remove());

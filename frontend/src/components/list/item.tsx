@@ -96,7 +96,7 @@ function Item(props: any) {
         }}
       />
       <span
-        class="description"
+        class="description unselectable"
         onMouseDown={(event) => {
           if (props.selectedItem() && props.selectedItem().id === props.item.id)
             event.stopPropagation();

@@ -1,3 +1,15 @@
+.panel .dropdown-element-left,
+.panel .dropdown-element-right {
+  position: relative;
+  width: 100%;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  margin-top: var(--side-margin);
+  font-size: var(--font-size-m);
+}
+
 .account {
   display: flex;
   flex-direction: column;
@@ -5,7 +17,7 @@
   margin-right: var(--side-margin);
 }
 
-.account-list {
+.item-form {
   display: flex;
   flex-direction: column;
   gap: var(--side-margin);
@@ -13,7 +25,7 @@
 
 .account h2 {
   font-size: var(--font-size-xl);
-  margin-bottom: var(--side-margin);
+  margin: var(--border-width);
 }
 
 .login {
@@ -28,6 +40,11 @@
 .account button,
 .login button {
   width: calc(var(--standard-size) * 3);
+}
+
+.account-list {
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .item-page-parent {

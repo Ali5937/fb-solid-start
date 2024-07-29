@@ -57,6 +57,7 @@ export default function Navbar(props: any) {
             <Show when={props.openDropdownNumber() === 1}>
               <SearchBar
                 baseUrl={props.baseUrl}
+                isAll={false}
                 setOpenDropdownNumber={props.setOpenDropdownNumber}
                 saleType={props.saleType}
                 itemType={props.itemType}
@@ -161,13 +162,13 @@ export default function Navbar(props: any) {
             <Show when={props.openDropdownNumber() === 5}>
               <Currency
                 baseUrl={props.baseUrl}
+                isAddItem={false}
                 currentCurrency={props.currentCurrency}
                 setCurrentCurrency={props.setCurrentCurrency}
                 currencyData={props.currencyData}
                 setCurrencyData={props.setCurrencyData}
                 displayUnits={props.displayUnits}
                 setDisplayUnits={props.setDisplayUnits}
-                setOpenDropdownNumber={props.setOpenDropdownNumber}
               />
             </Show>
           </Suspense>

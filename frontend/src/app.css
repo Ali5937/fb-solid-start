@@ -198,6 +198,47 @@ button,
   right: var(--side-margin);
 }
 
+.search-element input,
+.search-element select {
+  width: 100%;
+  margin-top: var(--side-margin);
+}
+
+.search-element select {
+  height: var(--standard-size);
+  padding-left: var(--border-width);
+  border: var(--border-width) solid;
+  border-color: var(--c3) var(--c3b) var(--c3b) var(--c3);
+  background-color: var(--c1);
+  font-size: var(--font-size-m);
+}
+
+.search-element option {
+  max-height: 100px;
+}
+
+.search-result-parent {
+  background-color: var(--c2);
+  width: 100%;
+  height: auto;
+  left: 0;
+  right: 0;
+  text-align: start;
+  font-size: var(--font-size-m);
+  font-weight: normal;
+}
+
+.search-result-parent .search-result:hover {
+  cursor: pointer;
+  background-color: var(--c1);
+}
+
+.search-result-parent > div {
+  position: absolute;
+  width: calc(100% - var(--side-margin) * 2);
+  background-color: var(--c2);
+}
+
 @media (max-width: 1024px) {
   .panel {
     position: fixed;

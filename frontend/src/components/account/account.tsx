@@ -11,7 +11,9 @@ import {
 import IconArrow from "~/assets/icon-arrow";
 import "./account.css";
 import IconRotate from "~/assets/icon-rotate";
+import SearchBar from "../navbar/searchBar";
 const Login = lazy(() => import("./login"));
+const Currency = lazy(() => import("../navbar/currency"));
 
 export default function Account(props: any) {
   const [currentItems, setCurrentItems] = createSignal([]);
@@ -26,6 +28,9 @@ export default function Account(props: any) {
   );
   const [cropper, setCropper] = createSignal<Cropper>();
   let imageRef: HTMLImageElement | undefined;
+  const [formData, setFormData] = createSignal();
+  const [itemDisplayUnits, setItemDisplayUnits] = createSignal<string>();
+  const [itemCurrentCurrency, setItemCurrentCurrency] = createSignal<string>();
 
   async function clickItemArrow(add: number) {
     if (
@@ -201,6 +206,28 @@ export default function Account(props: any) {
     });
   }
 
+  function handleFormChange(e: any) {
+    const { name, value } = e.target;
+    setFormData((prevData: any) => ({ ...prevData, [name]: value }));
+  }
+
+  async function handleFormSubmit(e: any) {
+    e.preventDefault();
+    try {
+      const result = await fetch(`${props.baseUrl}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData()),
+      }).then((res) => res.json());
+      console.log(result);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
   async function getMessages() {
     props.setAccountPage("messages");
     const result = await fetch(`${props.baseUrl}/messages`, {
@@ -302,10 +329,66 @@ export default function Account(props: any) {
           <h2>Add New Item</h2>
           <div class="account-list">
             <div class="item-form">
-              {/* <label htmlFor=""></label> */}
-              <button onMouseDown={() => props.setAccountPage("addImages")}>
+              <form onSubmit={handleFormSubmit}>
+                <SearchBar
+                  baseUrl={props.baseUrl}
+                  isAll={true}
+                  setOpenDropdownNumber={props.setOpenDropdownNumber}
+                  saleType={props.saleType}
+                  itemType={props.itemType}
+                  setMoveMapCoordinates={props.setMoveMapCoordinates}
+                  markers={props.markers}
+                  setMarkers={props.setMarkers}
+                  rentPriceRange={props.rentPriceRange}
+                  buyPriceRange={props.buyPriceRange}
+                  lowestPrice={props.lowestPrice}
+                  setLowestPrice={props.setLowestPrice}
+                  highestPrice={props.highestPrice}
+                  setHighestPrice={props.setHighestPrice}
+                  states={props.states}
+                  setStates={props.setStates}
+                  selectedState={props.selectedState}
+                  setSelectedState={props.setSelectedState}
+                  defaultState={props.defaultState}
+                  propertyItems={props.propertyItems}
+                  setPropertyItems={props.setPropertyItems}
+                  itemSort={props.itemSort}
+                  countries={props.countries}
+                  setCountries={props.setCountries}
+                  selectedCountry={props.selectedCountry}
+                  setSelectedCountry={props.setSelectedCountry}
+                  defaultCountry={props.defaultCountry}
+                  selectedCity={props.selectedCity}
+                  setSelectedCity={props.setSelectedCity}
+                />
+              </form>
+              <div class="separation"></div>
+              <label for="add-images-button">Add Images</label>
+              <button
+                id="add-images-button"
+                onMouseDown={() => props.setAccountPage("addImages")}
+              >
                 Add Images
               </button>
+              <div class="separation"></div>
+              <label for=""></label>
+              <Currency
+                baseUrl={props.baseUrl}
+                isAddItem={true}
+                currentCurrency={itemCurrentCurrency}
+                setCurrentCurrency={setItemCurrentCurrency}
+                currencyData={props.currencyData}
+                setCurrencyData={props.setCurrencyData}
+                displayUnits={itemDisplayUnits}
+                setDisplayUnits={setItemDisplayUnits}
+              />
+              <div class="separation"></div>
+              <label for=""></label>
+              <input id="" type="" value="0" min="0" max="" />
+              <div class="separation"></div>
+              {/* <label for=""></label>
+              <input id="" type="number" value="0" min="0" max="" />
+              <div class="separation"></div> */}
             </div>
           </div>
         </Show>

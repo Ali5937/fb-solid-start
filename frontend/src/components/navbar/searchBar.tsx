@@ -1,6 +1,7 @@
 import { For, Show, createEffect, createSignal, onMount } from "solid-js";
 import XIcon from "../../assets/icon-x-border";
 import { SearchItems } from "~/utils/SearchItems";
+import { LngLat } from "maplibre-gl";
 
 export default function SearchBar(props: any) {
   let inputRef: HTMLInputElement | undefined;
@@ -31,9 +32,7 @@ export default function SearchBar(props: any) {
           inputValue: inputValue(),
           stateName: props.selectedState(),
           countryName: props.selectedCountry(),
-          country: props.selectedCountry(),
-          state: props.selectedState(),
-          city: props.selectedCity(),
+          isAll: props.isAll,
         })
     ).then((res) => res.json());
     setSearchResults(response.data);
@@ -53,9 +52,9 @@ export default function SearchBar(props: any) {
 
   async function getCountries() {
     if (props.countries().length > 1) return;
-    const res = await fetch(`${props.baseUrl}/get-countries?`).then((res) =>
-      res.json()
-    );
+    const res = await fetch(
+      `${props.baseUrl}/get-countries${props.isAll ? "/all" : ""}`
+    ).then((res) => res.json());
     const resCountries: string[] = [props.defaultCountry, ...res.data];
     props.setCountries(resCountries);
   }
@@ -68,6 +67,7 @@ export default function SearchBar(props: any) {
       `${props.baseUrl}/get-results-by-country?` +
         new URLSearchParams({
           country: props.selectedCountry(),
+          isAll: props.isAll,
         })
     ).then((res) => res.json());
     const resStates: string[] = [props.defaultState, ...res.data];
@@ -88,14 +88,16 @@ export default function SearchBar(props: any) {
   }
 
   async function clickCity(res: any) {
+    searchCountry(res.country_name);
     props.setSelectedCountry(res.country_name);
     props.setSelectedState(res.state_name);
     props.setSelectedCity(res.city_name);
     props.setOpenDropdownNumber(0);
-    await getSearchItems();
+    setInputValue(res.city_name);
+    await getSearchItems(res.lng, res.lat);
   }
 
-  async function getSearchItems() {
+  async function getSearchItems(cityLng?: number, cityLat?: number) {
     const priceRange =
       props.saleType() === "rent"
         ? props.rentPriceRange()
@@ -120,14 +122,22 @@ export default function SearchBar(props: any) {
     props.setMarkers(resultItems?.markers);
     props.setPropertyItems(resultItems?.propertyItems);
 
-    const lowHighLngLat = getLowestHighestLngLat(props.propertyItems());
-
-    props.setMoveMapCoordinates({
-      lng1: lowHighLngLat.lngLow,
-      lat1: lowHighLngLat.latLow,
-      lng2: lowHighLngLat.lngHigh,
-      lat2: lowHighLngLat.latHigh,
-    });
+    if (props.propertyItems()) {
+      const lowHighLngLat = getLowestHighestLngLat(props.propertyItems());
+      props.setMoveMapCoordinates({
+        lng1: lowHighLngLat.lngLow,
+        lat1: lowHighLngLat.latLow,
+        lng2: lowHighLngLat.lngHigh,
+        lat2: lowHighLngLat.latHigh,
+      });
+    } else if (cityLng && cityLat) {
+      props.setMoveMapCoordinates({
+        lng1: cityLng - 0.02,
+        lat1: cityLat - 0.02,
+        lng2: cityLng + 0.02,
+        lat2: cityLat + 0.02,
+      });
+    }
   }
 
   function getLowestHighestLngLat(arr: any) {
@@ -141,7 +151,16 @@ export default function SearchBar(props: any) {
       if (latLow > arr[i].lat) latLow = arr[i].lat;
       if (latHigh < arr[i].lat) latHigh = arr[i].lat;
     }
-    return { lngLow, latLow, lngHigh, latHigh };
+    if (lngLow === lngHigh && latLow === latHigh) {
+      return {
+        lngLow: lngLow - 0.01,
+        latLow: latLow - 0.01,
+        lngHigh: lngHigh + 0.01,
+        latHigh: latHigh + 0.01,
+      };
+    } else {
+      return { lngLow, latLow, lngHigh, latHigh };
+    }
   }
 
   onMount(() => {
@@ -205,6 +224,7 @@ export default function SearchBar(props: any) {
           onFocus={() => setIsInputFocused(true)}
           onBlur={() => setIsInputFocused(false)}
           placeholder="Search..."
+          value={inputValue()}
         />
       </div>
       <Show when={isInputFocused() && searchResults().length > 0}>

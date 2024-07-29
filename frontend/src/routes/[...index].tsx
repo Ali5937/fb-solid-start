@@ -152,6 +152,8 @@ export default function Index() {
   const [isProfileOpen, setIsProfileOpen] = createSignal<boolean>(false);
   const defaultCountry = "All Countries";
   const defaultState = "All States";
+  const selectCountry = "Select Country";
+  const selectState = "Select State";
   const [countries, setCountries] = createSignal<string[]>([""]);
   const [states, setStates] = createSignal([]);
   const [selectedCountry, setSelectedCountry] = createSignal<string>("");
@@ -415,6 +417,35 @@ export default function Index() {
                   setAccountPage={setAccountPage}
                   windowWidth={windowWidth}
                   windowHeight={windowHeight}
+                  setOpenDropdownNumber={setOpenDropdownNumber}
+                  saleType={saleType}
+                  itemType={itemType}
+                  setMoveMapCoordinates={setMoveMapCoordinates}
+                  markers={markers}
+                  setMarkers={setMarkers}
+                  rentPriceRange={rentPriceRange}
+                  buyPriceRange={buyPriceRange}
+                  lowestPrice={lowestPrice}
+                  setLowestPrice={setLowestPrice}
+                  highestPrice={highestPrice}
+                  setHighestPrice={setHighestPrice}
+                  states={states}
+                  setStates={setStates}
+                  selectedState={selectedState}
+                  setSelectedState={setSelectedState}
+                  defaultState={selectState}
+                  propertyItems={propertyItems}
+                  setPropertyItems={setPropertyItems}
+                  itemSort={itemSort}
+                  countries={countries}
+                  setCountries={setCountries}
+                  selectedCountry={selectedCountry}
+                  setSelectedCountry={setSelectedCountry}
+                  defaultCountry={selectCountry}
+                  selectedCity={selectedCity}
+                  setSelectedCity={setSelectedCity}
+                  currencyData={currencyData}
+                  setCurrencyData={setCurrencyData}
                 />
               </Show>
             </Suspense>
