@@ -298,6 +298,11 @@ export default function Map(props: any) {
   });
 
   createEffect(() => {
+    props.theme();
+    setIsMapLoaded(false);
+  });
+
+  createEffect(() => {
     if (props.moveMapCoordinates())
       untrack(() => {
         const m = props.moveMapCoordinates();
