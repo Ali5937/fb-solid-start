@@ -36,15 +36,11 @@ export default function (app: any) {
         isAll: string;
       };
     }) => {
-      console.time("search");
+      // console.time("search");
       const all = isAll === "false" ? false : true;
       const country = countryName || null;
       const state = stateName || null;
       const client = await pool.connect();
-
-      console.log("country: ", country);
-      console.log("state: ", state);
-      console.log("inputValue: ", inputValue);
 
       try {
         let queryText;
@@ -124,7 +120,7 @@ export default function (app: any) {
           resArray.push([row.city_name, row.state_name, row.country_name]);
         });
 
-        console.timeEnd("search");
+        // console.timeEnd("search");
         return { status: "success", data: result.rows };
       } catch (error: any) {
         console.error(error.message);
@@ -139,7 +135,7 @@ export default function (app: any) {
     getCachedCountries("getCountries", async () => {
       const client = await pool.connect();
       try {
-        console.time("get-countries");
+        // console.time("get-countries");
         const queryText = `
             SELECT DISTINCT c.country_name
             FROM countries c
@@ -155,7 +151,7 @@ export default function (app: any) {
           resArray.push(row.country_name);
         });
 
-        console.timeEnd("get-countries");
+        // console.timeEnd("get-countries");
         return { status: "success", data: resArray };
       } catch (error: any) {
         console.error(error.message);
@@ -170,7 +166,7 @@ export default function (app: any) {
     getCachedCountries("getCountriesAll", async () => {
       const client = await pool.connect();
       try {
-        console.time("get-countries/all");
+        // console.time("get-countries/all");
         const queryText = `
             SELECT country_name
             FROM countries
@@ -185,7 +181,7 @@ export default function (app: any) {
           resArray.push(row.country_name);
         });
 
-        console.timeEnd("get-countries/all");
+        // console.timeEnd("get-countries/all");
         return { status: "success", data: resArray };
       } catch (error: any) {
         console.error(error.message);
@@ -206,8 +202,7 @@ export default function (app: any) {
       const all = isAll === "false" ? false : true;
       const client = await pool.connect();
       try {
-        console.time("get-results-by-country");
-        console.log("is all: ", isAll);
+        // console.time("get-results-by-country");
         let queryText;
         if (all) {
           queryText = `
@@ -234,7 +229,7 @@ export default function (app: any) {
           resArray.push(row.state_name);
         });
 
-        console.timeEnd("get-results-by-country");
+        // console.timeEnd("get-results-by-country");
         return { status: "success", data: resArray };
       } catch (error: any) {
         console.error(error.message);

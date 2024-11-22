@@ -1,5 +1,7 @@
 .panel .dropdown-element-left,
 .panel .dropdown-element-right {
+  display: flex;
+  flex-direction: column;
   position: relative;
   width: 100%;
   top: 0px;
@@ -8,6 +10,11 @@
   left: 0px;
   margin-top: var(--side-margin);
   font-size: var(--font-size-m);
+}
+
+.panel label {
+  display: flex;
+  align-items: center;
 }
 
 .account {
@@ -20,7 +27,12 @@
 .item-form {
   display: flex;
   flex-direction: column;
-  gap: var(--side-margin);
+  align-items: center;
+  gap: var(--standard-size);
+}
+
+.item-form * {
+  max-width: 100%;
 }
 
 .account h2 {
@@ -42,7 +54,12 @@
   width: calc(var(--standard-size) * 3);
 }
 
+button.currency-button {
+  width: calc(var(--standard-size) * 2);
+}
+
 .account-list {
+  margin-top: var(--standard-size);
   overflow-x: hidden;
   overflow-y: scroll;
 }
@@ -80,6 +97,101 @@
 .new-item-parent {
   display: flex;
   width: 100%;
+}
+
+.item-form label {
+  font-size: var(--font-size-m);
+}
+
+label.input-price {
+  display: flex;
+  gap: var(--side-margin);
+}
+
+label.input-price input {
+  width: calc(var(--standard-size) * 4);
+}
+
+.form-currency {
+  display: flex;
+  gap: var(--side-margin);
+}
+
+.form-all-currencies-parent,
+.account-list .all-currencies {
+  height: var(--standard-size);
+}
+
+.form-all-currencies-parent {
+  position: relative;
+}
+
+.form-currency-code {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--side-margin);
+  top: 0;
+  margin: var(--border-width);
+  padding: var(--side-margin);
+  width: 100%;
+  line-height: 1;
+  height: calc(var(--standard-size) - (var(--border-width) * 2));
+  pointer-events: none;
+}
+
+.arrow-icon {
+  align-self: flex-start;
+}
+
+.form-currency-code svg {
+  height: calc(var(--standard-size) / 5);
+  rotate: 90deg;
+}
+
+.form-currency-text {
+  display: flex;
+  align-items: center;
+}
+
+.account-list .all-currencies {
+  display: flex;
+  justify-content: center;
+}
+
+.account-list .all-currencies select {
+  width: calc(var(--standard-size) * 2) !important;
+  color: var(--c1);
+}
+
+.account-list .filter-container button {
+  width: calc(var(--standard-size) * 2.5);
+}
+
+.panel .filter-container {
+  margin: 0px;
+}
+
+.panel .filter-container button {
+  margin: 0 var(--side-margin);
+}
+
+#form-display-units {
+  width: calc(var(--standard-size) * 1.5) !important;
+}
+
+.form-size {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-size input {
+  width: auto;
+}
+
+.form-size label div:nth-child(1) {
+  margin-right: var(--side-margin);
 }
 
 .upload-parent {
@@ -195,4 +307,21 @@
 .login-password-parent {
   display: flex;
   flex-direction: column;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--standard-size) / 2);
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+}
+
+.pagination button,
+.pagination .placeholder {
+  width: var(--standard-size);
+}
+
+.pagination button:nth-child(1) svg {
+  rotate: 180deg;
 }

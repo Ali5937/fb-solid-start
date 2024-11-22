@@ -111,6 +111,8 @@ export default function SearchBar(props: any) {
       props.itemType(),
       props.baseUrl,
       priceRange,
+      props.rentMax,
+      props.buyMax,
       props.itemSort(),
       props.selectedCountry(),
       props.selectedState(),

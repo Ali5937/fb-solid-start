@@ -6,7 +6,9 @@ export async function SearchItems(
   saleType: string,
   itemType: string,
   baseUrl: string,
-  priceRange: [number, number],
+  priceRange: [number, number | null],
+  rentMaxPrice: number,
+  buyMaxPrice: number,
   itemSort: string,
   selectedCountry: string,
   selectedState: string,
@@ -16,6 +18,14 @@ export async function SearchItems(
   let minMaxLng: number[] | null = null;
   let poly: string;
   let poly2: string;
+  let maxPrice: number;
+
+  if (saleType === "rent") maxPrice = rentMaxPrice;
+  else maxPrice = buyMaxPrice;
+
+  if (priceRange[1] && priceRange[1] >= maxPrice) {
+    priceRange[1] = 0;
+  }
 
   if (bounds) {
     if (draw && draw.getAll().features[0]) {
@@ -91,7 +101,7 @@ export async function SearchItems(
         new URLSearchParams({
           type: type.toString(),
           min: priceRange[0].toString(),
-          max: priceRange[1].toString(),
+          max: priceRange[1] ? priceRange[1].toString() : "",
           polygon: isMoveMap ? "" : poly,
           polygon2: isMoveMap ? "" : poly2,
           itemSort: itemSort,

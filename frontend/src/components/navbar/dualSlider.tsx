@@ -8,39 +8,11 @@ export default function DualSlider(props: any) {
   let sliderInstance: any = null;
 
   let oldSliderValues: [number, number] = [0, maxValue()];
-
-  createEffect(() => {
-    if (props.saleType() === "rent") {
-      setMaxValue(props.rentMax);
-    } else if (props.saleType() === "buy") {
-      setMaxValue(props.buyMax);
-    }
-
-    if (sliderInstance) {
-      sliderInstance.updateOptions({
-        range: {
-          min: 0,
-          max: maxValue(),
-        },
-      });
-    }
-  });
-
-  createEffect(() => {
-    if (props.saleType() === "rent") {
-      oldSliderValues = props.rentPriceRange();
-    } else if (props.saleType() === "buy") {
-      oldSliderValues = props.buyPriceRange();
-    }
-
-    setSliderValues(oldSliderValues);
-    if (sliderInstance) {
-      sliderInstance.set([
-        logLikeScale(oldSliderValues[0]),
-        logLikeScale(oldSliderValues[1]),
-      ]);
-    }
-  });
+  if (props.saleType() === "rent") {
+    oldSliderValues = props.rentPriceRange();
+  } else if (props.saleType() === "buy") {
+    oldSliderValues = props.buyPriceRange();
+  }
 
   const [sliderValues, setSliderValues] = createSignal<[number, number]>([
     oldSliderValues[0] || 0,
@@ -51,6 +23,14 @@ export default function DualSlider(props: any) {
     const scaledValue = Math.pow(value / maxValue(), exponent) * maxValue();
     return scaledValue;
   };
+
+  setSliderValues(oldSliderValues);
+  if (sliderInstance) {
+    sliderInstance.set([
+      logLikeScale(oldSliderValues[0]),
+      logLikeScale(oldSliderValues[1]),
+    ]);
+  }
 
   const inverseLogLikeScale = (value: number) => {
     const scaledValue = Math.pow(value / maxValue(), 1 / exponent) * maxValue();
@@ -93,6 +73,27 @@ export default function DualSlider(props: any) {
       });
     }
   };
+
+  createEffect(() => {
+    if (props.saleType() === "rent") {
+      setMaxValue(props.rentMax);
+    } else if (props.saleType() === "buy") {
+      setMaxValue(props.buyMax);
+    }
+
+    if (sliderInstance) {
+      sliderInstance.updateOptions({
+        range: {
+          min: 0,
+          max: maxValue(),
+        },
+      });
+    }
+  });
+
+  createEffect(() => {
+    // console.log(props.rentPriceRange());
+  });
 
   return (
     <div class="slider-parent">

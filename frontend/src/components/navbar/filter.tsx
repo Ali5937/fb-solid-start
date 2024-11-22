@@ -1,5 +1,5 @@
-import { Show, lazy } from "solid-js";
 import DualSlider from "./dualSlider";
+import FilterType from "./filterType";
 
 export default function Filter(props: any) {
   return (
@@ -9,63 +9,13 @@ export default function Filter(props: any) {
         event.stopPropagation();
       }}
     >
-      <div class="filter-container">
-        <button
-          class={props.saleType() === "rent" ? "highlighted" : ""}
-          onMouseDown={() => {
-            props.setSaleType("rent");
-            if (props.itemType() === "land") {
-              props.setItemType("apartment");
-            }
-          }}
-        >
-          Rent
-        </button>
-        <button
-          class={props.saleType() === "buy" ? "highlighted" : ""}
-          onMouseDown={() => {
-            props.setSaleType("buy");
-            if (props.itemType() === "shared") {
-              props.setItemType("house");
-            }
-          }}
-        >
-          Buy
-        </button>
-      </div>
-      <div class="nav-line"></div>
-      <div class="filter-container">
-        <button
-          class={props.itemType() === "apartment" ? "highlighted" : ""}
-          onMouseDown={() => props.setItemType("apartment")}
-        >
-          Apartment
-        </button>
-        <button
-          class={props.itemType() === "house" ? "highlighted" : ""}
-          onMouseDown={() => props.setItemType("house")}
-        >
-          House
-        </button>
-        <Show when={props.saleType() === "rent"}>
-          <button
-            class={
-              props.itemType() === "shared" ? "highlighted" : "shared-button"
-            }
-            onMouseDown={() => props.setItemType("shared")}
-          >
-            Shared
-          </button>
-        </Show>
-        <Show when={props.saleType() === "buy"}>
-          <button
-            class={props.itemType() === "land" ? "highlighted" : ""}
-            onMouseDown={() => props.setItemType("land")}
-          >
-            Land
-          </button>
-        </Show>
-      </div>
+      <FilterType
+        saleType={props.saleType}
+        setSaleType={props.setSaleType}
+        itemType={props.itemType}
+        setItemType={props.setItemType}
+      />
+      <div class="separation"></div>
       <div class="slider-container">
         <DualSlider
           rentMax={props.rentMax}

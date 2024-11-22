@@ -57,6 +57,7 @@ export default function Index() {
   const [searchParams, setSearchParams] = useSearchParams();
   const rentMax = 5000;
   const buyMax = 1000000;
+  const delimiter = ",";
   let oldUserRegion: string = "";
   let oldSaleType: string = "";
   let oldItemType: string = "";
@@ -74,7 +75,7 @@ export default function Index() {
   let finalCurrentCurrency;
 
   if (currentC && currentC != "null") {
-    splitCurrentCurrency = currentC.split(",");
+    splitCurrentCurrency = currentC.split(delimiter);
 
     finalCurrentCurrency = [
       splitCurrentCurrency[0],
@@ -87,20 +88,29 @@ export default function Index() {
   }
 
   const urlParams = { ...useParams() }.index.split("/");
-  // console.log(urlParams.length);
   oldSaleType = urlParams[0];
   oldItemType = urlParams[1];
 
-  if (oldSaleType === "buy")
-    oldRentPrice = [
-      Number(urlParams[2]) || oldRentPrice[0],
-      Number(urlParams[3]) || oldRentPrice[1],
-    ];
-  else
-    oldBuyPrice = [
-      Number(urlParams[2]) || oldBuyPrice[0],
-      Number(urlParams[3]) || oldBuyPrice[1],
-    ];
+  if (oldSaleType === "buy") {
+    const rentPriceRangeCookie =
+      Cookies.get("rentPriceRange")?.split(delimiter);
+    if (
+      rentPriceRangeCookie &&
+      rentPriceRangeCookie[0] &&
+      rentPriceRangeCookie[1]
+    )
+      oldRentPrice = [
+        Number(rentPriceRangeCookie[0]) || oldRentPrice[0],
+        Number(rentPriceRangeCookie[1]) || oldRentPrice[1],
+      ];
+  } else {
+    const buyPriceRangeCookie = Cookies.get("buyPriceRange")?.split(delimiter);
+    if (buyPriceRangeCookie && buyPriceRangeCookie[0] && buyPriceRangeCookie[1])
+      oldBuyPrice = [
+        Number(buyPriceRangeCookie[0]) || oldBuyPrice[0],
+        Number(buyPriceRangeCookie[1]) || oldBuyPrice[1],
+      ];
+  }
 
   const expires = 365;
   const [windowWidth, setWindowWidth] = createSignal<number>(0);
@@ -227,6 +237,13 @@ export default function Index() {
     }
   }
 
+  async function getCurrencies() {
+    const currencies = await fetch(`${baseUrl}/currency`).then((res) =>
+      res.json()
+    );
+    setCurrencyData(currencies);
+  }
+
   createEffect(() => {
     const newUrl = `/${saleType()}/${itemType()}${
       !selectedCountry() && !selectedState() && !selectedCity()
@@ -257,7 +274,15 @@ export default function Index() {
       setWindowHeight(1);
       setWindowWidth(window.innerWidth);
       setWindowHeight(window.innerHeight);
+      getCurrencies();
     }
+  });
+
+  createEffect(() => {
+    Cookies.set("rentPriceRange", rentPriceRange().join(delimiter));
+  });
+  createEffect(() => {
+    Cookies.set("buyPriceRange", buyPriceRange().join(delimiter));
   });
 
   //Old: http://localhost:3000/#/buy/house/0/1000000/13.3629/47.601/4/
@@ -347,6 +372,8 @@ export default function Index() {
             displayUnits={displayUnits}
             markers={markers}
             setMarkers={setMarkers}
+            rentMax={rentMax}
+            buyMax={buyMax}
             propertyItems={propertyItems}
             setPropertyItems={setPropertyItems}
             itemSort={itemSort}
@@ -429,6 +456,7 @@ export default function Index() {
                   setLowestPrice={setLowestPrice}
                   highestPrice={highestPrice}
                   setHighestPrice={setHighestPrice}
+                  displayUnits={displayUnits}
                   states={states}
                   setStates={setStates}
                   selectedState={selectedState}
@@ -444,6 +472,7 @@ export default function Index() {
                   defaultCountry={selectCountry}
                   selectedCity={selectedCity}
                   setSelectedCity={setSelectedCity}
+                  currentCurrency={currentCurrency}
                   currencyData={currencyData}
                   setCurrencyData={setCurrencyData}
                 />

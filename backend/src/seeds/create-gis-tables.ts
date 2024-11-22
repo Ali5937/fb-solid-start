@@ -71,8 +71,6 @@ const insertDataBatch = async (dataBatch: City[]) => {
     const countryArray = Array.from(countrySet);
     const stateCountryArray = Array.from(stateCountrySet);
 
-    console.log("insert countries");
-
     for (const country of countryArray) {
       const insertQuery = `
         INSERT INTO countries (country_name)
@@ -95,8 +93,6 @@ const insertDataBatch = async (dataBatch: City[]) => {
       const values = [state, country];
       await client.query(insertQuery, values);
     }
-
-    console.log("insert cities");
 
     let num = 0;
     for (const data of dataBatch) {

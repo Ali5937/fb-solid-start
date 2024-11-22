@@ -1,37 +1,9 @@
 import { For, Show, Suspense, createEffect, createSignal } from "solid-js";
+import AllCurrencies from "./allCurrencies";
 
 export default function Currency(props: any) {
-  let selection = props.isAddItem ? 0 : 1;
-  if (props.currentCurrency()) {
-    if (props.currentCurrency()[0] === "USD") {
-      selection = 2;
-    } else if (props.currentCurrency()[0] === "EUR") {
-      selection = 3;
-    } else if (props.currentCurrency()[0] === "GBP") {
-      selection = 4;
-    } else {
-      selection = 0;
-    }
-  }
-
-  const [currencySelection, setCurrencySelection] = createSignal(selection);
-
-  function changeCurrency(value: any) {
-    props.setCurrentCurrency(value);
-  }
-
-  async function getCurrencies() {
-    const currencies = await fetch(`${props.baseUrl}/currency`).then((res) =>
-      res.json()
-    );
-    props.setCurrencyData(currencies);
-  }
-
-  if (!props.currencyData()) getCurrencies();
-
   return (
     <div
-      class="dropdown-element-right button-style"
       onMouseDown={(event) => {
         event.stopPropagation();
       }}
@@ -40,11 +12,10 @@ export default function Currency(props: any) {
         <Show when={!props.isAddItem}>
           <button
             class={`currency-button ${
-              currencySelection() === 1 ? "highlighted" : ""
+              !props.currentCurrency() ? "highlighted" : ""
             }`}
             onMouseDown={() => {
-              changeCurrency(null);
-              setCurrencySelection(1);
+              props.setCurrentCurrency(null);
             }}
           >
             <sup>$</sup>⁄<sub>€</sub>
@@ -52,42 +23,45 @@ export default function Currency(props: any) {
         </Show>
         <button
           class={`currency-button ${
-            currencySelection() === 2 ? "highlighted" : ""
+            props.currentCurrency() && props.currentCurrency()[0] === "USD"
+              ? "highlighted"
+              : ""
           }`}
           onMouseDown={() => {
-            changeCurrency(props.currencyData().USD);
-            setCurrencySelection(2);
+            props.setCurrentCurrency(props.currencyData().USD);
           }}
         >
-          ${" "}
+          $
           <Show when={props.currencyData()}>
             <div class="currency-code">{props.currencyData().USD[0]}</div>
           </Show>
         </button>
         <button
           class={`currency-button ${
-            currencySelection() === 3 ? "highlighted" : ""
+            props.currentCurrency() && props.currentCurrency()[0] === "EUR"
+              ? "highlighted"
+              : ""
           }`}
           onMouseDown={() => {
-            changeCurrency(props.currencyData().EUR);
-            setCurrencySelection(3);
+            props.setCurrentCurrency(props.currencyData().EUR);
           }}
         >
-          €{" "}
+          €
           <Show when={props.currencyData()}>
             <div class="currency-code">{props.currencyData().EUR[0]}</div>
           </Show>
         </button>
         <button
           class={`currency-button ${
-            currencySelection() === 4 ? "highlighted" : ""
+            props.currentCurrency() && props.currentCurrency()[0] === "GBP"
+              ? "highlighted"
+              : ""
           }`}
           onMouseDown={() => {
-            changeCurrency(props.currencyData().GBP);
-            setCurrencySelection(4);
+            props.setCurrentCurrency(props.currencyData().GBP);
           }}
         >
-          £{" "}
+          £
           <Show when={props.currencyData()}>
             <div class="currency-code">{props.currencyData().GBP[0]}</div>
           </Show>
@@ -96,53 +70,14 @@ export default function Currency(props: any) {
       <div class="separation"></div>
       <Suspense>
         <Show when={props.currencyData()}>
-          <div class="other-currencies">
-            <label for="other-currencies-list">Other Currencies</label>
-            <select
-              class="button-style"
-              id="other-currencies-list"
-              onChange={(e) => {
-                const val = e.currentTarget?.value;
-                if (val === "") {
-                  changeCurrency(null);
-                  setCurrencySelection(1);
-                } else {
-                  changeCurrency(val.split(","));
-                  setCurrencySelection(0);
-                }
-              }}
-            >
-              <option value="" onClick={() => setCurrencySelection(1)}>
-                Choose Currency
-              </option>
-              {Object.keys(props.currencyData()).map((key) => {
-                const currency = props.currencyData()[key];
-                return <option value={currency}>{currency[1]}</option>;
-              })}
-            </select>
-          </div>
+          <AllCurrencies
+            currencyText={"Other Currencies"}
+            currentCurrency={props.currentCurrency}
+            setCurrentCurrency={props.setCurrentCurrency}
+            currencyData={props.currencyData}
+          />
         </Show>
       </Suspense>
-      <div class="separation"></div>
-      <div class="unit-label">Units</div>
-      <div class="units">
-        <button
-          class={props.displayUnits() === "m" ? "highlighted" : ""}
-          onMouseDown={() => {
-            props.setDisplayUnits("m");
-          }}
-        >
-          Meter
-        </button>
-        <button
-          class={props.displayUnits() === "ft" ? "highlighted" : ""}
-          onMouseDown={() => {
-            props.setDisplayUnits("ft");
-          }}
-        >
-          Feet
-        </button>
-      </div>
     </div>
   );
 }

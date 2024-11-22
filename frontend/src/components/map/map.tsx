@@ -153,6 +153,8 @@ export default function Map(props: any) {
       props.itemType(),
       props.baseUrl,
       priceRange,
+      props.rentMax,
+      props.buyMax,
       props.itemSort(),
       props.selectedCountry(),
       props.selectedState(),

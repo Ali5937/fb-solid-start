@@ -94,7 +94,7 @@ export default function Login(props: any) {
           />
         </div>
       </Show>
-      <button onClick={sendRequest}>OK</button>
+      <button onMouseDown={sendRequest}>OK</button>
     </div>
   );
 }

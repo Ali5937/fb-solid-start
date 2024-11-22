@@ -9,11 +9,14 @@ import {
   untrack,
 } from "solid-js";
 import IconArrow from "~/assets/icon-arrow";
+import Cookies from "js-cookie";
 import "./account.css";
 import IconRotate from "~/assets/icon-rotate";
-import SearchBar from "../navbar/searchBar";
+import Pagination from "./pagination";
+const SearchBar = lazy(() => import("../navbar/searchBar"));
 const Login = lazy(() => import("./login"));
-const Currency = lazy(() => import("../navbar/currency"));
+const FilterType = lazy(() => import("../navbar/filterType"));
+const AllCurrencies = lazy(() => import("../navbar/allCurrencies"));
 
 export default function Account(props: any) {
   const [currentItems, setCurrentItems] = createSignal([]);
@@ -29,8 +32,21 @@ export default function Account(props: any) {
   const [cropper, setCropper] = createSignal<Cropper>();
   let imageRef: HTMLImageElement | undefined;
   const [formData, setFormData] = createSignal();
-  const [itemDisplayUnits, setItemDisplayUnits] = createSignal<string>();
-  const [itemCurrentCurrency, setItemCurrentCurrency] = createSignal<string>();
+  const [itemSaleType, setItemSaleType] = createSignal<string>("");
+  const [itemItemType, setItemItemType] = createSignal<string>("");
+  const [itemDisplayUnits, setItemDisplayUnits] = createSignal<string>(
+    props.displayUnits() || "m"
+  );
+  const [itemCurrentCurrency, setItemCurrentCurrency] = createSignal<string[]>(
+    props.currentCurrency() || []
+  );
+  const totalNumber = 10;
+  const [openFormNumber, setOpenFormNumber] = createSignal<number>(1);
+
+  // createEffect(() => {
+  //   itemCurrentCurrency();
+  //   Cookies.set("itemCurrentCurrency", itemCurrentCurrency()?.toString());
+  // });
 
   async function clickItemArrow(add: number) {
     if (
@@ -327,68 +343,155 @@ export default function Account(props: any) {
         </Show>
         <Show when={props.accountPage() === "addItem"}>
           <h2>Add New Item</h2>
+          <div class="separation"></div>
           <div class="account-list">
             <div class="item-form">
-              <form onSubmit={handleFormSubmit}>
-                <SearchBar
-                  baseUrl={props.baseUrl}
-                  isAll={true}
-                  setOpenDropdownNumber={props.setOpenDropdownNumber}
-                  saleType={props.saleType}
-                  itemType={props.itemType}
-                  setMoveMapCoordinates={props.setMoveMapCoordinates}
-                  markers={props.markers}
-                  setMarkers={props.setMarkers}
-                  rentPriceRange={props.rentPriceRange}
-                  buyPriceRange={props.buyPriceRange}
-                  lowestPrice={props.lowestPrice}
-                  setLowestPrice={props.setLowestPrice}
-                  highestPrice={props.highestPrice}
-                  setHighestPrice={props.setHighestPrice}
-                  states={props.states}
-                  setStates={props.setStates}
-                  selectedState={props.selectedState}
-                  setSelectedState={props.setSelectedState}
-                  defaultState={props.defaultState}
-                  propertyItems={props.propertyItems}
-                  setPropertyItems={props.setPropertyItems}
-                  itemSort={props.itemSort}
-                  countries={props.countries}
-                  setCountries={props.setCountries}
-                  selectedCountry={props.selectedCountry}
-                  setSelectedCountry={props.setSelectedCountry}
-                  defaultCountry={props.defaultCountry}
-                  selectedCity={props.selectedCity}
-                  setSelectedCity={props.setSelectedCity}
-                />
-              </form>
-              <div class="separation"></div>
-              <label for="add-images-button">Add Images</label>
-              <button
-                id="add-images-button"
-                onMouseDown={() => props.setAccountPage("addImages")}
-              >
-                Add Images
-              </button>
-              <div class="separation"></div>
-              <label for=""></label>
-              <Currency
-                baseUrl={props.baseUrl}
-                isAddItem={true}
-                currentCurrency={itemCurrentCurrency}
-                setCurrentCurrency={setItemCurrentCurrency}
-                currencyData={props.currencyData}
-                setCurrencyData={props.setCurrencyData}
-                displayUnits={itemDisplayUnits}
-                setDisplayUnits={setItemDisplayUnits}
+              <Suspense>
+                <Show when={openFormNumber() === 1}>
+                  <SearchBar
+                    baseUrl={props.baseUrl}
+                    isAll={true}
+                    setOpenDropdownNumber={props.setOpenDropdownNumber}
+                    saleType={props.saleType}
+                    itemType={props.itemType}
+                    setMoveMapCoordinates={props.setMoveMapCoordinates}
+                    markers={props.markers}
+                    setMarkers={props.setMarkers}
+                    rentPriceRange={props.rentPriceRange}
+                    buyPriceRange={props.buyPriceRange}
+                    lowestPrice={props.lowestPrice}
+                    setLowestPrice={props.setLowestPrice}
+                    highestPrice={props.highestPrice}
+                    setHighestPrice={props.setHighestPrice}
+                    states={props.states}
+                    setStates={props.setStates}
+                    selectedState={props.selectedState}
+                    setSelectedState={props.setSelectedState}
+                    defaultState={props.defaultState}
+                    propertyItems={props.propertyItems}
+                    setPropertyItems={props.setPropertyItems}
+                    itemSort={props.itemSort}
+                    countries={props.countries}
+                    setCountries={props.setCountries}
+                    selectedCountry={props.selectedCountry}
+                    setSelectedCountry={props.setSelectedCountry}
+                    defaultCountry={props.defaultCountry}
+                    selectedCity={props.selectedCity}
+                    setSelectedCity={props.setSelectedCity}
+                  />
+                </Show>
+                <Show when={openFormNumber() === 2}>
+                  <FilterType
+                    saleType={itemSaleType}
+                    setSaleType={setItemSaleType}
+                    itemType={itemItemType}
+                    setItemType={setItemItemType}
+                  />
+                </Show>
+                <Show when={openFormNumber() === 3}>
+                  <button
+                    id="add-images-button"
+                    onMouseDown={() => props.setAccountPage("addImages")}
+                  >
+                    Add Images
+                  </button>
+                </Show>
+                <Show when={openFormNumber() === 4}>
+                  <label for="input-price" class="input-price">
+                    <div>Price:</div>
+                    <div class="form-all-currencies-parent">
+                      <AllCurrencies
+                        currencyText={""}
+                        currentCurrency={itemCurrentCurrency}
+                        setCurrentCurrency={setItemCurrentCurrency}
+                        currencyData={props.currencyData}
+                      />
+                      <div class="form-currency-code">
+                        <div>
+                          <div>{itemCurrentCurrency()[0]}</div>
+                        </div>
+                        <IconArrow />
+                      </div>
+                    </div>
+                    <div class="form-currency">
+                      <input
+                        id="input-price"
+                        class="number-input"
+                        type="number"
+                        value="0"
+                        min="0"
+                        max={
+                          props.saleType() === "rent" ? "50000" : "1000000000"
+                        }
+                      />
+                    </div>
+                    <div class="form-error-message"></div>
+                  </label>
+                </Show>
+                <Show when={openFormNumber() === 5}>
+                  <label for="input-size">
+                    <div>Living Area:</div>
+                    <div class="form-currency">
+                      <div class="form-currency-text">
+                        <select
+                          id="form-display-units"
+                          class="button-style"
+                          onChange={(e) =>
+                            setItemDisplayUnits(e.currentTarget?.value)
+                          }
+                        >
+                          <option value="m">m²</option>
+                          <option value="ft">ft²</option>
+                        </select>
+                      </div>
+                      <input
+                        id="input-size"
+                        class="number-input"
+                        type="number"
+                        value="0"
+                        min="0"
+                        max={
+                          props.saleType() === "rent" ? "50000" : "1000000000"
+                        }
+                      />
+                    </div>
+                    <div class="form-error-message"></div>
+                  </label>
+                </Show>
+                <Show when={openFormNumber() === 6}>
+                  <label for="input-plot">
+                    <div>Plot Size:</div>
+                    <div class="form-currency">
+                      <div class="form-currency-text">
+                        <span>
+                          {itemDisplayUnits()}
+                          <sup>2</sup>
+                        </span>
+                      </div>
+                      <input
+                        id="input-plot"
+                        class="number-input"
+                        type="number"
+                        value="0"
+                        min="0"
+                        max={
+                          props.saleType() === "rent" ? "50000" : "1000000000"
+                        }
+                      />
+                    </div>
+                    <div class="form-error-message"></div>
+                  </label>
+                </Show>
+                {/* <label for="input-">
+                <input id="input-" type="number" value="0" min="0" max="" />
+                </label>
+                <div class="separation"></div> */}
+              </Suspense>
+              <Pagination
+                totalNumber={totalNumber}
+                currentNumber={openFormNumber}
+                setCurrentNumber={setOpenFormNumber}
               />
-              <div class="separation"></div>
-              <label for=""></label>
-              <input id="" type="" value="0" min="0" max="" />
-              <div class="separation"></div>
-              {/* <label for=""></label>
-              <input id="" type="number" value="0" min="0" max="" />
-              <div class="separation"></div> */}
             </div>
           </div>
         </Show>

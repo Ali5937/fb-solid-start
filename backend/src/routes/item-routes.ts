@@ -56,7 +56,7 @@ export default function (app: any) {
           polygon?: string;
           polygon2?: string;
           min: number;
-          max: number;
+          max: number | string;
           itemSort: string;
           country: string;
           state: string;
@@ -126,8 +126,8 @@ export default function (app: any) {
           const parameterValues = [
             finalPolygon || "",
             finalType,
-            min,
-            max,
+            min || null,
+            max || null,
             itemSort,
             country || null,
             state || null,
@@ -138,9 +138,6 @@ export default function (app: any) {
             values: parameterValues,
           });
           const data = result.rows;
-          if (data.length === 0) {
-            console.log("log data: ", data);
-          }
 
           const bufferData = Buffer.from(JSON.stringify(data));
           const gzipData = Bun.gzipSync(bufferData);

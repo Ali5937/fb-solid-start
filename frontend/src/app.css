@@ -84,12 +84,18 @@ button:hover {
 input {
   width: calc(var(--standard-size) * 9);
   height: var(--standard-size);
+  padding: var(--side-margin);
   color: var(--c4);
   background-color: var(--c1);
-  border: var(--border-width) solid;
+  border: calc(var(--border-width) / 2) solid !important;
   border-color: var(--c3);
-  padding: var(--side-margin);
+  font-size: var(--font-size-l);
+  font-weight: normal;
   outline: none;
+}
+
+select {
+  background-color: var(--c1) !important;
 }
 
 input:focus {

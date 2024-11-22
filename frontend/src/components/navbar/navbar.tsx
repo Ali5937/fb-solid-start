@@ -7,6 +7,7 @@ import "./navbar.css";
 const SearchBar = lazy(() => import("./searchBar"));
 const Filter = lazy(() => import("./filter"));
 const Currency = lazy(() => import("./currency"));
+const Units = lazy(() => import("./units"));
 const Options = lazy(() => import("./options"));
 
 export default function Navbar(props: any) {
@@ -64,6 +65,8 @@ export default function Navbar(props: any) {
                 setMoveMapCoordinates={props.setMoveMapCoordinates}
                 markers={props.markers}
                 setMarkers={props.setMarkers}
+                rentMax={props.rentMax}
+                buyMax={props.buyMax}
                 rentPriceRange={props.rentPriceRange}
                 buyPriceRange={props.buyPriceRange}
                 lowestPrice={props.lowestPrice}
@@ -135,6 +138,7 @@ export default function Navbar(props: any) {
           onMouseDown={() => {
             props.setIsProfileOpen(!props.isProfileOpen());
             props.setIsPanelOpen(!props.isPanelOpen());
+            setDropdown(0);
           }}
         >
           <div class="nav-button-element">Login</div>
@@ -160,16 +164,23 @@ export default function Navbar(props: any) {
           )}
           <Suspense>
             <Show when={props.openDropdownNumber() === 5}>
-              <Currency
-                baseUrl={props.baseUrl}
-                isAddItem={false}
-                currentCurrency={props.currentCurrency}
-                setCurrentCurrency={props.setCurrentCurrency}
-                currencyData={props.currencyData}
-                setCurrencyData={props.setCurrencyData}
-                displayUnits={props.displayUnits}
-                setDisplayUnits={props.setDisplayUnits}
-              />
+              <div class="dropdown-element-right button-style">
+                <Currency
+                  baseUrl={props.baseUrl}
+                  isAddItem={false}
+                  currentCurrency={props.currentCurrency}
+                  setCurrentCurrency={props.setCurrentCurrency}
+                  currencyData={props.currencyData}
+                  setCurrencyData={props.setCurrencyData}
+                  displayUnits={props.displayUnits}
+                  setDisplayUnits={props.setDisplayUnits}
+                />
+                <div class="separation"></div>
+                <Units
+                  displayUnits={props.displayUnits}
+                  setDisplayUnits={props.setDisplayUnits}
+                />
+              </div>
             </Show>
           </Suspense>
         </button>
