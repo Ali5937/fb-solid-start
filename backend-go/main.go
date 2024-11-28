@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,14 +10,13 @@ import (
 	"github.com/Ali5937/fb-solid-start/backend-go/db"
 	"github.com/Ali5937/fb-solid-start/backend-go/routes"
 	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 func main() {
 	envErr := godotenv.Load()
-	fmt.Println("next comes POSTGRESQL_USER")
-	fmt.Println(os.Getenv("POSTGRESQL_USER"))
 	if envErr != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -30,8 +28,15 @@ func main() {
 	defer pgDB.Close()
 
 	r := chi.NewRouter()
+	corsHeaders := handlers.AllowedOrigins([]string{"http://localhost:3000"})
+	corsMethods := handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"})
+	corsHeadersAllowed := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
+	corsCredentials := handlers.AllowCredentials()
+
+	r.Use(handlers.CORS(corsHeaders, corsMethods, corsHeadersAllowed, corsCredentials))
+
 	r.Route("/api", func(api chi.Router) {
-		routes.Items(api, pgDB)
+		routes.ItemRoutes(api, pgDB)
 	})
 
 	port := os.Getenv("PORT")

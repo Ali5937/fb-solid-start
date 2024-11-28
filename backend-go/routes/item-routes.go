@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func Items(r chi.Router, db *sql.DB) {
+func ItemRoutes(r chi.Router, db *sql.DB) {
 	r.Get("/items", func(w http.ResponseWriter, r *http.Request) {
 		handlers.GetItemsHandler(w, r, db)
 	})

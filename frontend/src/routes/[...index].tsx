@@ -26,8 +26,7 @@ import IconArrow from "~/assets/icon-arrow";
 
 const Account = lazy(() => import("~/components/account/account"));
 const Map = clientOnly(() => import("../components/map/map"));
-// const baseUrl = "http://localhost:5000/api";
-const baseUrl = "http://localhost:5001/api";
+const baseUrl = "http://localhost:5000/api";
 
 const getData = async (
   saleType: string,

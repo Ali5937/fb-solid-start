@@ -13,16 +13,15 @@ func InitDB() (*sql.DB, error) {
 	dbName := os.Getenv("POSTGRESQL_DATABASE")
 	dbHost := os.Getenv("POSTGRESQL_HOST")
 	sslMode := os.Getenv("POSTGRESQL_SSLMODE")
-	fmt.Println(dbUser, dbName, dbHost)
 
 	if dbUser == "" || dbPassword == "" || dbName == "" || dbHost == "" {
-		return nil, fmt.Errorf("missing one or more database environment variables")
+		return nil, fmt.Errorf("missing database environment variable/s")
 	}
 
 	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", dbUser, dbPassword, dbHost, dbName, sslMode)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		return nil, fmt.Errorf("error opening database: %w", err)
+		return nil, fmt.Errorf("opening database connection: %v", err)
 	}
 
 	db.SetMaxIdleConns(10)
@@ -30,7 +29,7 @@ func InitDB() (*sql.DB, error) {
 	db.SetConnMaxLifetime(30 * time.Minute)
 
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("error connecting to the database: %w", err)
+		return nil, fmt.Errorf("connecting to the database: %v", err)
 	}
 
 	return db, nil
