@@ -179,7 +179,8 @@ export default function Map(props: any) {
     const mapLocation = untrack(() => props.mapLocation());
     map = new maplibregl.Map({
       container: mapContainer,
-      style: `https://tiles.stadiamaps.com/styles/${
+      // Use "tiles-eu" for GDPR compliance
+      style: `https://tiles-eu.stadiamaps.com/styles/${
         props.theme() === "dark-theme" ? "alidade_smooth_dark" : "osm_bright"
       }.json`,
       center: [mapLocation[0], mapLocation[1]],
