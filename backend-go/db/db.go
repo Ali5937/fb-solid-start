@@ -3,23 +3,13 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"os"
 	"time"
+
+	"github.com/Ali5937/fb-solid-start/backend-go/config"
 )
 
 func InitDB() (*sql.DB, error) {
-	dbUser := os.Getenv("POSTGRESQL_USER")
-	dbPassword := os.Getenv("POSTGRESQL_PASSWORD")
-	dbName := os.Getenv("POSTGRESQL_DATABASE")
-	dbHost := os.Getenv("POSTGRESQL_HOST")
-	sslMode := os.Getenv("POSTGRESQL_SSLMODE")
-
-	if dbUser == "" || dbPassword == "" || dbName == "" || dbHost == "" {
-		return nil, fmt.Errorf("missing database environment variable/s")
-	}
-
-	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", dbUser, dbPassword, dbHost, dbName, sslMode)
-	db, err := sql.Open("postgres", connStr)
+	db, err := sql.Open(config.Postgres, config.ConnStr)
 	if err != nil {
 		return nil, fmt.Errorf("opening database connection: %v", err)
 	}
