@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Ali5937/fb-solid-start/backend-go/db"
+	"github.com/Ali5937/fb-solid-start/backend-go/pgdb"
 	"github.com/Ali5937/fb-solid-start/backend-go/routes"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/handlers"
@@ -21,7 +21,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	pgDB, err := db.InitDB()
+	pgDB, err := pgdb.InitDB()
 	if err != nil {
 		log.Fatalf("Error initializing database: %v", err)
 	}
@@ -39,10 +39,7 @@ func main() {
 		routes.ItemRoutes(api, pgDB)
 	})
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "5001"
-	}
+	port := "5001"
 
 	log.Printf("Server is running on port %+v", port)
 	server := &http.Server{

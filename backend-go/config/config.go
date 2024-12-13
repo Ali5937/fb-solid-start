@@ -18,6 +18,25 @@ var (
 	Postgres        string
 	ConnStr         string
 	ConnStrPostgres string
+	CurrencyApi     string
+)
+
+const (
+	RentApartment int16 = 1
+	RentHouse     int16 = 2
+	RentShared    int16 = 3
+	BuyApartment  int16 = 4
+	BuyHouse      int16 = 5
+	BuyLand       int16 = 6
+)
+
+const (
+	NoHeating       int16 = 0
+	YesHeating      int16 = 1
+	OvenHeating     int16 = 2
+	HeatpumpHeating int16 = 3
+	BoilerHeating   int16 = 4
+	Air             int16 = 5
 )
 
 func init() {
@@ -43,6 +62,7 @@ func init() {
 	DBHost = os.Getenv("POSTGRESQL_HOST")
 	SSLMode = os.Getenv("POSTGRESQL_SSLMODE")
 	Postgres = "postgres"
+	CurrencyApi = os.Getenv("CURRENCY_EXCHANGE_API")
 
 	if DBUser == "" || DBPassword == "" || DBName == "" || DBHost == "" || SSLMode == "" {
 		log.Fatalf("Error missing database environment variable/s")
@@ -50,4 +70,5 @@ func init() {
 
 	ConnStr = fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", DBUser, DBPassword, DBHost, DBName, SSLMode)
 	ConnStrPostgres = fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", DBUser, DBPassword, DBHost, Postgres, SSLMode)
+
 }

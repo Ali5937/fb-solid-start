@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Ali5937/fb-solid-start/backend-go/models"
 	"github.com/lib/pq"
 )
 
@@ -27,24 +28,6 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	state := queryParams.Get("state")
 	city := queryParams.Get("city")
 
-	type Item struct {
-		Lat            float64 `json:"lat"`
-		Lng            float64 `json:"lng"`
-		Type           int16   `json:"type"`
-		EuroPrice      int64   `json:"euro_price"`
-		CreatedAt      string  `json:"created_at"`
-		OriginalPrice  int64   `json:"original_price"`
-		Size           int16   `json:"size"`
-		CurrencyCode   string  `json:"currency_code"`
-		CurrencyName   string  `json:"currency_name"`
-		CurrencySymbol string  `json:"currency_symbol"`
-		FirstPicture   int64   `json:"first_picture"`
-		Id             int64   `json:"id"`
-		City           string  `json:"city"`
-		State          string  `json:"state"`
-		Country        string  `json:"country"`
-	}
-
 	finalPolygon := getFinalPolygon(polygon, polygon2)
 	var finalType []int = parseStringArray(_type)
 
@@ -54,7 +37,7 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var queryText = `
 		SELECT ST_Y(ST_TRANSFORM(coordinates::geometry, 4326)) AS lat,
 		ST_X(ST_TRANSFORM(coordinates::geometry, 4326)) AS lng,
-		type, euro_price, created_at, original_price,
+		type, euro_price, updated_at, original_price,
 		size, currency_code, currency_name, currency_symbol, first_picture, id, city, state, country
 		FROM items
 		WHERE`
@@ -112,7 +95,7 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var orderString = " ORDER BY euro_price ASC" //itemsort == low
 
 	if itemSort == "new" {
-		orderString = " ORDER BY created_at DESC"
+		orderString = " ORDER BY updated_at DESC"
 	} else if itemSort == "high" {
 		orderString = " ORDER BY euro_price DESC"
 	}
@@ -120,6 +103,11 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	queryText += orderString
 
 	queryText += " LIMIT 500;"
+
+	debugExplain := false //EXPLAIN ANALYZE
+	if debugExplain {
+		queryText = "EXPLAIN ANALYZE " + queryText
+	}
 
 	rows, err := db.Query(queryText, args...)
 
@@ -129,10 +117,25 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 	defer rows.Close()
 
-	var items []Item
+	if debugExplain {
+		var explainOutput []string
+		for rows.Next() {
+			var row string
+			if err := rows.Scan(&row); err != nil {
+				fmt.Printf("Error scanning explain row: %v\n", err)
+				return
+			}
+			explainOutput = append(explainOutput, row)
+		}
+
+		fmt.Printf("ExplainOutput: \n%v\n", explainOutput)
+		return
+	}
+
+	var items []models.GetItem
 
 	for rows.Next() {
-		var item Item
+		var item models.GetItem
 
 		err := rows.Scan(&item.Lat, &item.Lng, &item.Type, &item.EuroPrice, &item.CreatedAt, &item.OriginalPrice,
 			&item.Size, &item.CurrencyCode, &item.CurrencyName, &item.CurrencySymbol, &item.FirstPicture,
