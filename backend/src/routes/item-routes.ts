@@ -97,7 +97,7 @@ export default function (app: any) {
           const queryText = `
           SELECT ST_Y(ST_TRANSFORM(coordinates::geometry, 4326)) AS lat,
           ST_X(ST_TRANSFORM(coordinates::geometry, 4326)) AS lng,
-          type, euro_price, created_at, original_price,
+          type, euro_price, original_price,
           size, currency_code, currency_name, currency_symbol, first_picture, created_at, id, city, state, country
           FROM items
           WHERE 

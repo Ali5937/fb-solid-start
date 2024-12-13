@@ -97,7 +97,7 @@ export async function SearchItems(
 
   try {
     const response = await fetch(
-      `${baseUrl}/items?` +
+      `${"http://localhost:5001/api"}/items?` +
         new URLSearchParams({
           type: type.toString(),
           min: priceRange[0].toString(),
