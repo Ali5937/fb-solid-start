@@ -202,13 +202,26 @@ export default function Index() {
   }
 
   createEffect(() => {
-    const newUrl = `/${saleType()}/${itemType()}${
-      !selectedCountry() && !selectedState() && !selectedCity()
-        ? ""
-        : `/${selectedCountry() || "Country"}-${
-            selectedState() || "AllStates"
-          }-${selectedCity() || "AllCities"}`
-    }${itemId() === "id" ? "" : `/${itemId()}`}`;
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+
+    if (selectedCountry()) {
+      params.set("country", selectedCountry());
+      if (selectedState()) {
+        params.set("state", selectedState());
+        if (selectedCity()) {
+          params.set("city", selectedCity());
+        }
+      }
+    }
+    if (itemId()) {
+      params.set("id", itemId());
+    }
+
+    let newUrl = `/${saleType()}/${itemType()}`;
+    if (params.size > 0) {
+      newUrl += `/?${params.toString()}`;
+    }
 
     const navigate = useNavigate();
     navigate(newUrl, { replace: true });
