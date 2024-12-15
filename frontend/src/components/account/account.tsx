@@ -13,6 +13,7 @@ import Cookies from "js-cookie";
 import "./account.css";
 import IconRotate from "~/assets/icon-rotate";
 import Pagination from "./pagination";
+import { currentCurrency } from "~/utils/store";
 const SearchBar = lazy(() => import("../navbar/searchBar"));
 const Login = lazy(() => import("./login"));
 const FilterType = lazy(() => import("../navbar/filterType"));
@@ -37,16 +38,11 @@ export default function Account(props: any) {
   const [itemDisplayUnits, setItemDisplayUnits] = createSignal<string>(
     props.displayUnits() || "m"
   );
-  const [itemCurrentCurrency, setItemCurrentCurrency] = createSignal<string[]>(
-    props.currentCurrency() || []
-  );
+  const [itemCurrentCurrency, setItemCurrentCurrency] = createSignal<
+    (string | number)[]
+  >(currentCurrency() || []);
   const totalNumber = 10;
   const [openFormNumber, setOpenFormNumber] = createSignal<number>(1);
-
-  // createEffect(() => {
-  //   itemCurrentCurrency();
-  //   Cookies.set("itemCurrentCurrency", itemCurrentCurrency()?.toString());
-  // });
 
   async function clickItemArrow(add: number) {
     if (
@@ -352,13 +348,9 @@ export default function Account(props: any) {
                     baseUrl={props.baseUrl}
                     isAll={true}
                     setOpenDropdownNumber={props.setOpenDropdownNumber}
-                    saleType={props.saleType}
-                    itemType={props.itemType}
                     setMoveMapCoordinates={props.setMoveMapCoordinates}
                     markers={props.markers}
                     setMarkers={props.setMarkers}
-                    rentPriceRange={props.rentPriceRange}
-                    buyPriceRange={props.buyPriceRange}
                     lowestPrice={props.lowestPrice}
                     setLowestPrice={props.setLowestPrice}
                     highestPrice={props.highestPrice}
@@ -402,8 +394,6 @@ export default function Account(props: any) {
                     <div class="form-all-currencies-parent">
                       <AllCurrencies
                         currencyText={""}
-                        currentCurrency={itemCurrentCurrency}
-                        setCurrentCurrency={setItemCurrentCurrency}
                         currencyData={props.currencyData}
                       />
                       <div class="form-currency-code">

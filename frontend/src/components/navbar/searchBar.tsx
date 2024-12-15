@@ -2,6 +2,14 @@ import { For, Show, createEffect, createSignal, onMount } from "solid-js";
 import XIcon from "../../assets/icon-x-border";
 import { SearchItems } from "~/utils/SearchItems";
 import { LngLat } from "maplibre-gl";
+import {
+  rentPriceRange,
+  buyPriceRange,
+  rentMax,
+  buyMax,
+  saleType,
+  itemType,
+} from "~/utils/store";
 
 export default function SearchBar(props: any) {
   let inputRef: HTMLInputElement | undefined;
@@ -99,20 +107,18 @@ export default function SearchBar(props: any) {
 
   async function getSearchItems(cityLng?: number, cityLat?: number) {
     const priceRange =
-      props.saleType() === "rent"
-        ? props.rentPriceRange()
-        : props.buyPriceRange();
+      saleType() === "rent" ? rentPriceRange() : buyPriceRange();
     const resultItems = await SearchItems(
       true,
       null,
       null,
       null,
-      props.saleType(),
-      props.itemType(),
+      saleType(),
+      itemType(),
       props.baseUrl,
       priceRange,
-      props.rentMax,
-      props.buyMax,
+      rentMax,
+      buyMax,
       props.itemSort(),
       props.selectedCountry(),
       props.selectedState(),

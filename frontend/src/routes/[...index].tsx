@@ -1,5 +1,6 @@
 import {
   createAsync,
+  useLocation,
   useNavigate,
   useParams,
   useSearchParams,
@@ -13,6 +14,15 @@ import {
   lazy,
   onMount,
 } from "solid-js";
+import {
+  rentPriceRange,
+  buyPriceRange,
+  delimiter,
+  saleType,
+  itemType,
+  setSaleType,
+  setItemType,
+} from "~/utils/store";
 import { isServer } from "solid-js/web";
 import Cookies from "js-cookie";
 import List from "~/components/list/list";
@@ -54,63 +64,17 @@ const getData = async (
 };
 
 export default function Index() {
+  const urlParams = { ...useParams() }.index.split("/");
+  setSaleType(urlParams[0]);
+  setItemType(urlParams[1]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const rentMax = 5000;
-  const buyMax = 1000000;
-  const delimiter = ",";
   let oldUserRegion: string = "";
-  let oldSaleType: string = "";
-  let oldItemType: string = "";
   let oldRegion: string = "";
   let oldId: string = "";
-  let oldRentPrice: [number, number] = [0, rentMax];
-  let oldBuyPrice: [number, number] = [0, buyMax];
   let oldLng: number = 13.362;
   let oldLat: number = 47.601;
   let oldZoom: number = 3.9;
   let initialSelectedId: number = 0;
-
-  let currentC = Cookies.get("currentCurrency");
-  let splitCurrentCurrency;
-  let finalCurrentCurrency;
-
-  if (currentC && currentC != "null") {
-    splitCurrentCurrency = currentC.split(delimiter);
-
-    finalCurrentCurrency = [
-      splitCurrentCurrency[0],
-      splitCurrentCurrency[1],
-      splitCurrentCurrency[splitCurrentCurrency.length - 2],
-      Number(splitCurrentCurrency[splitCurrentCurrency.length - 1]),
-    ];
-  } else {
-    finalCurrentCurrency = ["EUR", "Euro", "€", 1];
-  }
-
-  const urlParams = { ...useParams() }.index.split("/");
-  oldSaleType = urlParams[0];
-  oldItemType = urlParams[1];
-
-  if (oldSaleType === "buy") {
-    const rentPriceRangeCookie =
-      Cookies.get("rentPriceRange")?.split(delimiter);
-    if (
-      rentPriceRangeCookie &&
-      rentPriceRangeCookie[0] &&
-      rentPriceRangeCookie[1]
-    )
-      oldRentPrice = [
-        Number(rentPriceRangeCookie[0]) || oldRentPrice[0],
-        Number(rentPriceRangeCookie[1]) || oldRentPrice[1],
-      ];
-  } else {
-    const buyPriceRangeCookie = Cookies.get("buyPriceRange")?.split(delimiter);
-    if (buyPriceRangeCookie && buyPriceRangeCookie[0] && buyPriceRangeCookie[1])
-      oldBuyPrice = [
-        Number(buyPriceRangeCookie[0]) || oldBuyPrice[0],
-        Number(buyPriceRangeCookie[1]) || oldBuyPrice[1],
-      ];
-  }
 
   const expires = 365;
   const [windowWidth, setWindowWidth] = createSignal<number>(0);
@@ -122,16 +86,10 @@ export default function Index() {
     Cookies.get("theme") || "dark-theme"
   );
   const [isLoggedIn, setIsLoggedIn] = createSignal<boolean>(false);
-  const [saleType, setSaleType] = createSignal<string>(oldSaleType || "rent"); // rent, buy
-  const [itemType, setItemType] = createSignal<string>(
-    oldItemType || "apartment"
-  ); // apartment, house, shared, land
-  const [itemId, setItemId] = createSignal<string>(oldId.toString() || "id");
+
+  const [itemId, setItemId] = createSignal<string>(oldId.toString() || "");
   // const [userId, setUserId] = createSignal<string>();
-  const [rentPriceRange, setRentPriceRange] =
-    createSignal<[number, number]>(oldRentPrice);
-  const [buyPriceRange, setBuyPriceRange] =
-    createSignal<[number, number]>(oldBuyPrice);
+
   const [lowestPrice, setLowestPrice] = createSignal<number>();
   const [highestPrice, setHighestPrice] = createSignal<number>();
   const [moveMapCoordinates, setMoveMapCoordinates] = createSignal<{
@@ -152,8 +110,7 @@ export default function Index() {
     Cookies.get("displayUnits") || "m"
   );
   const [currencyData, setCurrencyData] = createSignal(null);
-  const [currentCurrency, setCurrentCurrency] =
-    createSignal(finalCurrentCurrency);
+
   const [propertyItems, setPropertyItems] = createSignal(null);
   const [itemSort, setItemSort] = createSignal("low");
   const [selectedItem, setSelectedItem] = createSignal(null);
@@ -315,27 +272,15 @@ export default function Index() {
           setIsProfileOpen={setIsProfileOpen}
           isPanelOpen={setIsPanelOpen}
           setIsPanelOpen={setIsPanelOpen}
-          saleType={saleType}
-          setSaleType={setSaleType}
-          itemType={itemType}
-          setItemType={setItemType}
           setMoveMapCoordinates={setMoveMapCoordinates}
           markers={markers}
           setMarkers={setMarkers}
-          rentMax={rentMax}
-          buyMax={buyMax}
-          rentPriceRange={rentPriceRange}
-          setRentPriceRange={setRentPriceRange}
-          buyPriceRange={buyPriceRange}
-          setBuyPriceRange={setBuyPriceRange}
           lowestPrice={lowestPrice}
           setLowestPrice={setLowestPrice}
           highestPrice={highestPrice}
           setHighestPrice={setHighestPrice}
           currencyData={currencyData}
           setCurrencyData={setCurrencyData}
-          currentCurrency={currentCurrency}
-          setCurrentCurrency={setCurrentCurrency}
           displayUnits={displayUnits}
           setDisplayUnits={setDisplayUnits}
           propertyItems={propertyItems}
@@ -356,10 +301,6 @@ export default function Index() {
           <Map
             baseUrl={baseUrl}
             theme={theme}
-            saleType={saleType}
-            itemType={itemType}
-            rentPriceRange={rentPriceRange}
-            buyPriceRange={buyPriceRange}
             lowestPrice={lowestPrice}
             setLowestPrice={setLowestPrice}
             highestPrice={highestPrice}
@@ -368,12 +309,9 @@ export default function Index() {
             setMoveMapCoordinates={setMoveMapCoordinates}
             mapLocation={mapLocation}
             setMapLocation={setMapLocation}
-            currentCurrency={currentCurrency}
             displayUnits={displayUnits}
             markers={markers}
             setMarkers={setMarkers}
-            rentMax={rentMax}
-            buyMax={buyMax}
             propertyItems={propertyItems}
             setPropertyItems={setPropertyItems}
             itemSort={itemSort}
@@ -423,7 +361,6 @@ export default function Index() {
                   propertyItems={propertyItems}
                   setPropertyItems={setPropertyItems}
                   currencyData={currencyData}
-                  currentCurrency={currentCurrency}
                   displayUnits={displayUnits}
                   itemSort={itemSort}
                   setItemSort={setItemSort}
@@ -445,13 +382,9 @@ export default function Index() {
                   windowWidth={windowWidth}
                   windowHeight={windowHeight}
                   setOpenDropdownNumber={setOpenDropdownNumber}
-                  saleType={saleType}
-                  itemType={itemType}
                   setMoveMapCoordinates={setMoveMapCoordinates}
                   markers={markers}
                   setMarkers={setMarkers}
-                  rentPriceRange={rentPriceRange}
-                  buyPriceRange={buyPriceRange}
                   lowestPrice={lowestPrice}
                   setLowestPrice={setLowestPrice}
                   highestPrice={highestPrice}
@@ -472,7 +405,6 @@ export default function Index() {
                   defaultCountry={selectCountry}
                   selectedCity={selectedCity}
                   setSelectedCity={setSelectedCity}
-                  currentCurrency={currentCurrency}
                   currencyData={currencyData}
                   setCurrencyData={setCurrencyData}
                 />

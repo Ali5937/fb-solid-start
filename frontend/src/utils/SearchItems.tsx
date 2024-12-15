@@ -113,8 +113,8 @@ export async function SearchItems(
 
     const responseData = await response.json();
     if (responseData.length > 0) {
-      let lowestPrice = responseData[0].euro_price;
-      let highestPrice = responseData[0].euro_price;
+      let lowestPrice = responseData[0].EuroPrice;
+      let highestPrice = responseData[0].EuroPrice;
 
       responseData.forEach((el: any) => {
         const euroPrice = el.euro_price;
@@ -130,19 +130,19 @@ export async function SearchItems(
             type: "Feature",
             geometry: {
               type: "Point",
-              coordinates: [marker.lng, marker.lat],
+              coordinates: [marker.Lng, marker.Lat],
             },
             properties: {
-              lng: marker.lng,
-              lat: marker.lat,
-              size: marker.size,
-              originalPrice: marker.original_price,
-              euroPrice: marker.euro_price,
-              currencyCode: marker.currency_code,
-              currencySymbol: marker.currency_symbol,
-              first_picture: marker.first_picture,
-              id: marker.id,
-              createdAt: marker.created_at,
+              lng: marker.Lng,
+              lat: marker.Lat,
+              size: marker.Size,
+              originalPrice: marker.OriginalPrice,
+              euroPrice: marker.EuroPrice,
+              currencyCode: marker.CurrencyCode,
+              currencySymbol: marker.CurrencySymbol,
+              first_picture: marker.FirstPicture,
+              id: marker.Id,
+              createdAt: marker.CreatedAt,
             },
           })),
         },

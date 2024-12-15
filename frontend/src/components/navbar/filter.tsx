@@ -9,24 +9,10 @@ export default function Filter(props: any) {
         event.stopPropagation();
       }}
     >
-      <FilterType
-        saleType={props.saleType}
-        setSaleType={props.setSaleType}
-        itemType={props.itemType}
-        setItemType={props.setItemType}
-      />
+      <FilterType />
       <div class="separation"></div>
       <div class="slider-container">
-        <DualSlider
-          rentMax={props.rentMax}
-          buyMax={props.buyMax}
-          saleType={props.saleType}
-          rentPriceRange={props.rentPriceRange}
-          setRentPriceRange={props.setRentPriceRange}
-          buyPriceRange={props.buyPriceRange}
-          setBuyPriceRange={props.setBuyPriceRange}
-          currentCurrency={props.currentCurrency}
-        />
+        <DualSlider />
       </div>
     </div>
   );

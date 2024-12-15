@@ -1,17 +1,34 @@
-import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import {
+  createEffect,
+  createSignal,
+  onCleanup,
+  onMount,
+  untrack,
+} from "solid-js";
+import {
+  rentPriceRange,
+  setRentPriceRange,
+  buyPriceRange,
+  setBuyPriceRange,
+  rentMax,
+  buyMax,
+  saleType,
+  currentCurrency,
+} from "~/utils/store";
 import noUiSlider from "nouislider";
 import "./dualSlider.css";
 
 export default function DualSlider(props: any) {
   const [maxValue, setMaxValue] = createSignal<number>(0);
+  updateMaxValue();
   const exponent = 0.5;
   let sliderInstance: any = null;
 
   let oldSliderValues: [number, number] = [0, maxValue()];
-  if (props.saleType() === "rent") {
-    oldSliderValues = props.rentPriceRange();
-  } else if (props.saleType() === "buy") {
-    oldSliderValues = props.buyPriceRange();
+  if (saleType() === "rent") {
+    oldSliderValues = rentPriceRange();
+  } else if (saleType() === "buy") {
+    oldSliderValues = buyPriceRange();
   }
 
   const [sliderValues, setSliderValues] = createSignal<[number, number]>([
@@ -24,11 +41,10 @@ export default function DualSlider(props: any) {
     return scaledValue;
   };
 
-  setSliderValues(oldSliderValues);
   if (sliderInstance) {
     sliderInstance.set([
-      logLikeScale(oldSliderValues[0]),
-      logLikeScale(oldSliderValues[1]),
+      logLikeScale(sliderValues()[0]),
+      logLikeScale(sliderValues()[1]),
     ]);
   }
 
@@ -44,7 +60,7 @@ export default function DualSlider(props: any) {
           start: sliderValues().map((value) => logLikeScale(value)),
           range: {
             min: 0,
-            max: maxValue(),
+            max: maxValue() - 1,
           },
           step: 1,
           connect: true,
@@ -52,16 +68,16 @@ export default function DualSlider(props: any) {
 
         sliderInstance.on("update", (values: any) => {
           const newValues = values.map((value: any) =>
-            Math.round(inverseLogLikeScale(parseFloat(value)))
+            inverseLogLikeScale(parseFloat(value))
           ) as [number, number];
           setSliderValues(newValues);
         });
 
         sliderInstance.on("change", () => {
-          if (props.saleType() === "buy") {
-            props.setBuyPriceRange(sliderValues());
-          } else if (props.saleType() === "rent") {
-            props.setRentPriceRange(sliderValues());
+          if (saleType() === "buy") {
+            setBuyPriceRange(sliderValues());
+          } else if (saleType() === "rent") {
+            setRentPriceRange(sliderValues());
           }
         });
       });
@@ -75,25 +91,59 @@ export default function DualSlider(props: any) {
   };
 
   createEffect(() => {
-    if (props.saleType() === "rent") {
-      setMaxValue(props.rentMax);
-    } else if (props.saleType() === "buy") {
-      setMaxValue(props.buyMax);
-    }
-
+    updateMaxValue();
     if (sliderInstance) {
       sliderInstance.updateOptions({
         range: {
           min: 0,
-          max: maxValue(),
+          max: maxValue() - 1,
         },
+      });
+      untrack(() => {
+        if (saleType() === "rent") {
+          setSliderValues(rentPriceRange());
+        } else if (saleType() === "buy") {
+          setSliderValues(buyPriceRange());
+        }
+        sliderInstance.set([
+          logLikeScale(sliderValues()[0]),
+          logLikeScale(sliderValues()[1]),
+        ]);
       });
     }
   });
 
   createEffect(() => {
-    // console.log(props.rentPriceRange());
+    if (sliderInstance) {
+      if (saleType() === "rent") {
+        setSliderValues([
+          rentPriceRange()[0],
+          rentPriceRange()[1] <= rentPriceRange()[0]
+            ? maxValue()
+            : rentPriceRange()[1],
+        ]);
+      } else if (saleType() === "buy") {
+        setSliderValues([
+          buyPriceRange()[0],
+          buyPriceRange()[1] <= buyPriceRange()[0]
+            ? maxValue()
+            : buyPriceRange()[1],
+        ]);
+        sliderInstance.set([
+          logLikeScale(sliderValues()[0]),
+          logLikeScale(sliderValues()[1]),
+        ]);
+      }
+    }
   });
+
+  function updateMaxValue() {
+    if (saleType() === "rent") {
+      setMaxValue(rentMax);
+    } else if (saleType() === "buy") {
+      setMaxValue(buyMax);
+    }
+  }
 
   return (
     <div class="slider-parent">
@@ -101,15 +151,13 @@ export default function DualSlider(props: any) {
       <div class="price-slider-label">
         Price:{" "}
         {Math.round(
-          sliderValues()[0] * props.currentCurrency()[3]
+          sliderValues()[0] * Number(currentCurrency()?.[3])
         ).toLocaleString()}{" "}
         -{" "}
         {Math.round(
-          sliderValues()[1] * props.currentCurrency()[3]
+          sliderValues()[1] * Number(currentCurrency()?.[3])
         ).toLocaleString()}{" "}
-        <span>
-          {props.currentCurrency() ? props.currentCurrency()[2] : "€"}
-        </span>
+        <span>{currentCurrency()?.[2] ?? "€"}</span>
       </div>
     </div>
   );

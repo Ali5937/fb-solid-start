@@ -1,61 +1,60 @@
 import { Show } from "solid-js";
+import { itemType, saleType, setItemType, setSaleType } from "~/utils/store";
 
 export default function FilterType(props: any) {
   return (
     <>
       <div class="filter-container">
         <button
-          class={props.saleType() === "rent" ? "highlighted" : ""}
+          class={saleType() === "rent" ? "highlighted" : ""}
           onMouseDown={() => {
-            props.setSaleType("rent");
-            if (props.itemType() === "land") {
-              props.setItemType("apartment");
+            setSaleType("rent");
+            if (itemType() === "land") {
+              setItemType("apartment");
             }
           }}
         >
           Rent
         </button>
         <button
-          class={props.saleType() === "buy" ? "highlighted" : ""}
+          class={saleType() === "buy" ? "highlighted" : ""}
           onMouseDown={() => {
-            props.setSaleType("buy");
-            if (props.itemType() === "shared") {
-              props.setItemType("house");
+            setSaleType("buy");
+            if (itemType() === "shared") {
+              setItemType("house");
             }
           }}
         >
           Buy
         </button>
       </div>
-      <Show when={props.saleType() !== ""}>
+      <Show when={saleType() !== ""}>
         <div class="separation"></div>
         <div class="filter-container">
           <button
-            class={props.itemType() === "apartment" ? "highlighted" : ""}
-            onMouseDown={() => props.setItemType("apartment")}
+            class={itemType() === "apartment" ? "highlighted" : ""}
+            onMouseDown={() => setItemType("apartment")}
           >
             Apartment
           </button>
           <button
-            class={props.itemType() === "house" ? "highlighted" : ""}
-            onMouseDown={() => props.setItemType("house")}
+            class={itemType() === "house" ? "highlighted" : ""}
+            onMouseDown={() => setItemType("house")}
           >
             House
           </button>
-          <Show when={props.saleType() === "rent"}>
+          <Show when={saleType() === "rent"}>
             <button
-              class={
-                props.itemType() === "shared" ? "highlighted" : "shared-button"
-              }
-              onMouseDown={() => props.setItemType("shared")}
+              class={itemType() === "shared" ? "highlighted" : "shared-button"}
+              onMouseDown={() => setItemType("shared")}
             >
               Shared
             </button>
           </Show>
-          <Show when={props.saleType() === "buy"}>
+          <Show when={saleType() === "buy"}>
             <button
-              class={props.itemType() === "land" ? "highlighted" : ""}
-              onMouseDown={() => props.setItemType("land")}
+              class={itemType() === "land" ? "highlighted" : ""}
+              onMouseDown={() => setItemType("land")}
             >
               Land
             </button>

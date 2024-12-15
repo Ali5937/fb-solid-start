@@ -1,6 +1,7 @@
 import { createSignal, Show } from "solid-js";
 import ArrowIconBorder from "../../assets/icon-arrow-border";
 import XIcon from "../../assets/icon-x-border";
+import { currentCurrency } from "~/utils/store";
 
 function Item(props: any) {
   let itemRef: any;
@@ -28,20 +29,20 @@ function Item(props: any) {
       ref={itemRef}
       class={`list-item`}
       id={
-        props.selectedItem() && props.selectedItem().id === props.item.id
+        props.selectedItem() && props.selectedItem().Id === props.item.Id
           ? props.isFocused()
             ? "focused-list-item"
             : "selected-list-item"
           : ""
       }
       onMouseDown={() => {
-        if (props.selectedItem() && props.selectedItem().id === props.item.id) {
+        if (props.selectedItem() && props.selectedItem().Id === props.item.Id) {
           props.setIsFocused(true);
         }
         props.setSelectedItem(props.item);
       }}
       onMouseEnter={() => {
-        props.setHighlightedItemLngLat([props.item.lng, props.item.lat]);
+        props.setHighlightedItemLngLat([props.item.Lng, props.item.Lat]);
       }}
       onMouseLeave={() => {
         props.setHighlightedItemLngLat(null);
@@ -51,7 +52,7 @@ function Item(props: any) {
         <Show
           when={
             props.selectedItem() &&
-            props.selectedItem().id === props.item.id &&
+            props.selectedItem().Id === props.item.Id &&
             props.isFocused()
           }
         >
@@ -88,7 +89,7 @@ function Item(props: any) {
         onMouseDown={() => {
           if (
             props.selectedItem() &&
-            props.selectedItem().id === props.item.id
+            props.selectedItem().Id === props.item.Id
           ) {
             props.setIsFocused(true);
           }
@@ -98,42 +99,40 @@ function Item(props: any) {
       <span
         class="description unselectable"
         onMouseDown={(event) => {
-          if (props.selectedItem() && props.selectedItem().id === props.item.id)
+          if (props.selectedItem() && props.selectedItem().Id === props.item.Id)
             event.stopPropagation();
         }}
       >
-        <div>{props.item.city}</div>
+        <div>{props.item.City}</div>
         <div>
           {Math.round(
-            props.currentCurrency()
-              ? props.item.euro_price * props.currentCurrency()[3]
-              : props.item.original_price
+            currentCurrency()
+              ? props.item.EuroPrice * Number(currentCurrency()?.[3])
+              : props.item.OriginalPrice
           ).toLocaleString()}{" "}
-          {props.currentCurrency()
-            ? props.currentCurrency()[2]
-            : props.item.currency_symbol}{" "}
+          {currentCurrency()?.[2] ?? props.item.CurrencySymbol}{" "}
         </div>
         <Show when={props.displayUnits() === "m"}>
           <div>
-            {props.item.size} m<sup>2</sup>
+            {props.item.Size} m<sup>2</sup>
           </div>
         </Show>
         <Show when={props.displayUnits() === "ft"}>
           <div>
-            {Math.round(props.item.size * 10.76) + " ft"}
+            {Math.round(props.item.Size * 10.76) + " ft"}
             <sup>2</sup>
           </div>
         </Show>
         <Show
           when={
             props.selectedItem() &&
-            props.selectedItem().id === props.item.id &&
+            props.selectedItem().Id === props.item.Id &&
             props.itemDetails()
           }
         >
           <div class="list-item-body">
-            <span>Bed: {props.itemDetails().bed}</span>
-            <span>Bath: {props.itemDetails().bath}</span>
+            <span>Bed: {props.itemDetails().Bed}</span>
+            <span>Bath: {props.itemDetails().Bath}</span>
             <div>bla</div>
           </div>
         </Show>

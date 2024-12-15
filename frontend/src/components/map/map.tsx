@@ -5,6 +5,15 @@ import {
   onMount,
   untrack,
 } from "solid-js";
+import {
+  rentPriceRange,
+  buyPriceRange,
+  rentMax,
+  buyMax,
+  saleType,
+  itemType,
+  currentCurrency,
+} from "~/utils/store";
 import maplibregl from "maplibre-gl";
 import IconPencil from "~/assets/icon-pencil";
 import IconTrash from "~/assets/icon-trash";
@@ -140,21 +149,19 @@ export default function Map(props: any) {
 
   async function mapSearch() {
     const priceRange =
-      props.saleType() === "rent"
-        ? props.rentPriceRange()
-        : props.buyPriceRange();
+      saleType() === "rent" ? rentPriceRange() : buyPriceRange();
     const bounds = map.getBounds();
     const resultItems = await SearchItems(
       false,
       map,
       draw,
       bounds,
-      props.saleType(),
-      props.itemType(),
+      saleType(),
+      itemType(),
       props.baseUrl,
       priceRange,
-      props.rentMax,
-      props.buyMax,
+      rentMax,
+      buyMax,
       props.itemSort(),
       props.selectedCountry(),
       props.selectedState(),
@@ -199,8 +206,8 @@ export default function Map(props: any) {
     function showPopUp(e: any) {
       const euroPrice = e.features[0].properties.euroPrice;
       const originalPrice = Number(e.features[0].properties.originalPrice);
-      const currencySymbol = props.currentCurrency()
-        ? props.currentCurrency()[2]
+      const currencySymbol = currentCurrency()
+        ? currentCurrency()?.[2]
         : e.features[0].properties.currencySymbol;
       const size =
         e.features[0].properties.size *
@@ -222,9 +229,9 @@ export default function Map(props: any) {
 						<div class="popup-text">
 							<div class="top">
 								<div class="price">${`${
-                  props.currentCurrency()
+                  currentCurrency()
                     ? Math.round(
-                        euroPrice * props.currentCurrency()[3]
+                        euroPrice * Number(currentCurrency()?.[3])
                       ).toLocaleString()
                     : originalPrice.toLocaleString()
                 } ${currencySymbol}`}</div>
@@ -287,11 +294,11 @@ export default function Map(props: any) {
 
   createEffect(() => {
     props.theme();
-    props.saleType();
-    props.itemType();
+    saleType();
+    itemType();
     props.itemSort();
-    props.rentPriceRange();
-    props.buyPriceRange();
+    rentPriceRange();
+    buyPriceRange();
     untrack(removeMarkers);
     untrack(mapSearch);
   });
@@ -330,8 +337,8 @@ export default function Map(props: any) {
     } else {
       if (props.selectedItem()) {
         marker.setLngLat({
-          lng: props.selectedItem().lng,
-          lat: props.selectedItem().lat,
+          lng: props.selectedItem().Lng,
+          lat: props.selectedItem().Lat,
         });
         marker.addTo(map);
       }

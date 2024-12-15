@@ -3,6 +3,7 @@ import { isServer } from "solid-js/web";
 import IconLogo from "../../assets/icon-logo";
 import IconOptions from "../../assets/icon-options";
 import "./navbar.css";
+import { currentCurrency, saleType } from "~/utils/store";
 
 const SearchBar = lazy(() => import("./searchBar"));
 const Filter = lazy(() => import("./filter"));
@@ -60,15 +61,9 @@ export default function Navbar(props: any) {
                 baseUrl={props.baseUrl}
                 isAll={false}
                 setOpenDropdownNumber={props.setOpenDropdownNumber}
-                saleType={props.saleType}
-                itemType={props.itemType}
                 setMoveMapCoordinates={props.setMoveMapCoordinates}
                 markers={props.markers}
                 setMarkers={props.setMarkers}
-                rentMax={props.rentMax}
-                buyMax={props.buyMax}
-                rentPriceRange={props.rentPriceRange}
-                buyPriceRange={props.buyPriceRange}
                 lowestPrice={props.lowestPrice}
                 setLowestPrice={props.setLowestPrice}
                 highestPrice={props.highestPrice}
@@ -102,23 +97,11 @@ export default function Navbar(props: any) {
           onMouseDown={() => setDropdown(2)}
         >
           <div class="nav-button-element">
-            {props.saleType()[0].toUpperCase() + props.saleType().slice(1)}
+            {saleType()[0]?.toUpperCase() + saleType().slice(1)}
           </div>
           <Suspense>
             <Show when={props.openDropdownNumber() === 2}>
-              <Filter
-                rentMax={props.rentMax}
-                buyMax={props.buyMax}
-                saleType={props.saleType}
-                setSaleType={props.setSaleType}
-                itemType={props.itemType}
-                setItemType={props.setItemType}
-                rentPriceRange={props.rentPriceRange}
-                setRentPriceRange={props.setRentPriceRange}
-                buyPriceRange={props.buyPriceRange}
-                setBuyPriceRange={props.setBuyPriceRange}
-                currentCurrency={props.currentCurrency}
-              />
+              <Filter />
             </Show>
           </Suspense>
         </button>
@@ -152,10 +135,10 @@ export default function Navbar(props: any) {
           }`}
           onMouseDown={() => setDropdown(5)}
         >
-          {props.currentCurrency() ? (
+          {currentCurrency() ? (
             <div class="currency-text">
-              <div>{props.currentCurrency()[2]}</div>
-              <div>{props.currentCurrency()[0]}</div>
+              <div>{currentCurrency()?.[2]}</div>
+              <div>{currentCurrency()?.[0]}</div>
             </div>
           ) : (
             <div class="currency-symbols">
@@ -168,8 +151,6 @@ export default function Navbar(props: any) {
                 <Currency
                   baseUrl={props.baseUrl}
                   isAddItem={false}
-                  currentCurrency={props.currentCurrency}
-                  setCurrentCurrency={props.setCurrentCurrency}
                   currencyData={props.currencyData}
                   setCurrencyData={props.setCurrencyData}
                   displayUnits={props.displayUnits}

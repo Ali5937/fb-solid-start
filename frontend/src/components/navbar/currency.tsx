@@ -1,5 +1,6 @@
 import { For, Show, Suspense, createEffect, createSignal } from "solid-js";
 import AllCurrencies from "./allCurrencies";
+import { currentCurrency, setCurrentCurrency } from "~/utils/store";
 
 export default function Currency(props: any) {
   return (
@@ -11,11 +12,9 @@ export default function Currency(props: any) {
       <div class="currency-button-parent">
         <Show when={!props.isAddItem}>
           <button
-            class={`currency-button ${
-              !props.currentCurrency() ? "highlighted" : ""
-            }`}
+            class={`currency-button ${!currentCurrency() ? "highlighted" : ""}`}
             onMouseDown={() => {
-              props.setCurrentCurrency(null);
+              setCurrentCurrency(null);
             }}
           >
             <sup>$</sup>⁄<sub>€</sub>
@@ -23,12 +22,10 @@ export default function Currency(props: any) {
         </Show>
         <button
           class={`currency-button ${
-            props.currentCurrency() && props.currentCurrency()[0] === "USD"
-              ? "highlighted"
-              : ""
+            currentCurrency()?.[0] === "USD" ? "highlighted" : ""
           }`}
           onMouseDown={() => {
-            props.setCurrentCurrency(props.currencyData().USD);
+            setCurrentCurrency(props.currencyData().USD);
           }}
         >
           $
@@ -38,12 +35,10 @@ export default function Currency(props: any) {
         </button>
         <button
           class={`currency-button ${
-            props.currentCurrency() && props.currentCurrency()[0] === "EUR"
-              ? "highlighted"
-              : ""
+            currentCurrency()?.[0] === "EUR" ? "highlighted" : ""
           }`}
           onMouseDown={() => {
-            props.setCurrentCurrency(props.currencyData().EUR);
+            setCurrentCurrency(props.currencyData().EUR);
           }}
         >
           €
@@ -53,12 +48,10 @@ export default function Currency(props: any) {
         </button>
         <button
           class={`currency-button ${
-            props.currentCurrency() && props.currentCurrency()[0] === "GBP"
-              ? "highlighted"
-              : ""
+            currentCurrency()?.[0] === "GBP" ? "highlighted" : ""
           }`}
           onMouseDown={() => {
-            props.setCurrentCurrency(props.currencyData().GBP);
+            setCurrentCurrency(props.currencyData().GBP);
           }}
         >
           £
@@ -72,8 +65,6 @@ export default function Currency(props: any) {
         <Show when={props.currencyData()}>
           <AllCurrencies
             currencyText={"Other Currencies"}
-            currentCurrency={props.currentCurrency}
-            setCurrentCurrency={props.setCurrentCurrency}
             currencyData={props.currencyData}
           />
         </Show>

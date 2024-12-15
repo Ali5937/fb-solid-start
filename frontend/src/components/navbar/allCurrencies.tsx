@@ -1,3 +1,5 @@
+import { currentCurrency, setCurrentCurrency } from "~/utils/store";
+
 export default function allCurrencies(props: any) {
   return (
     <div class="all-currencies">
@@ -5,13 +7,13 @@ export default function allCurrencies(props: any) {
       <select
         class="button-style"
         id="all-currencies-list"
-        value={props.currentCurrency() || ""}
+        value={currentCurrency() || ""}
         onChange={(e) => {
           const val = e.currentTarget?.value;
           if (val === "") {
-            props.setCurrentCurrency(null);
+            setCurrentCurrency(null);
           } else {
-            props.setCurrentCurrency(val.split(","));
+            setCurrentCurrency(val.split(","));
           }
         }}
       >
