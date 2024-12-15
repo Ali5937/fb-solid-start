@@ -82,7 +82,6 @@ export default function List(props: any) {
               selectedItem={props.selectedItem}
               setSelectedItem={props.setSelectedItem}
               setHighlightedItemLngLat={props.setHighlightedItemLngLat}
-              currencyData={props.currencyData}
               displayUnits={props.displayUnits}
               isFocused={isFocused}
               setIsFocused={setIsFocused}

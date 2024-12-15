@@ -137,8 +137,8 @@ export default function Navbar(props: any) {
         >
           {currentCurrency() ? (
             <div class="currency-text">
-              <div>{currentCurrency()?.[2]}</div>
-              <div>{currentCurrency()?.[0]}</div>
+              <div>{currentCurrency()?.symbol}</div>
+              <div>{currentCurrency()?.code}</div>
             </div>
           ) : (
             <div class="currency-symbols">
@@ -151,8 +151,6 @@ export default function Navbar(props: any) {
                 <Currency
                   baseUrl={props.baseUrl}
                   isAddItem={false}
-                  currencyData={props.currencyData}
-                  setCurrencyData={props.setCurrencyData}
                   displayUnits={props.displayUnits}
                   setDisplayUnits={props.setDisplayUnits}
                 />

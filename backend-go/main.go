@@ -37,9 +37,10 @@ func main() {
 
 	r.Route("/api", func(api chi.Router) {
 		routes.ItemRoutes(api, pgDB)
+		routes.CurrencyRoutes(api)
 	})
 
-	port := "5001"
+	port := "5000"
 
 	log.Printf("Server is running on port %+v", port)
 	server := &http.Server{

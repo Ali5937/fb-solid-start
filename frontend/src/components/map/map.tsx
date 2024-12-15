@@ -23,7 +23,6 @@ import "./map.css";
 
 let mapContainer: HTMLDivElement;
 let map: maplibregl.Map;
-
 export default function Map(props: any) {
   let draw: any; // type: MapboxGlDraw
   let drawParent: any;
@@ -181,11 +180,10 @@ export default function Map(props: any) {
       }
     }
   }
-
   createEffect(() => {
     const mapLocation = untrack(() => props.mapLocation());
     map = new maplibregl.Map({
-      container: mapContainer,
+      container: mapContainer!,
       // Use "tiles-eu" for GDPR compliance
       style: `https://tiles-eu.stadiamaps.com/styles/${
         props.theme() === "dark-theme" ? "alidade_smooth_dark" : "osm_bright"
@@ -207,7 +205,7 @@ export default function Map(props: any) {
       const euroPrice = e.features[0].properties.euroPrice;
       const originalPrice = Number(e.features[0].properties.originalPrice);
       const currencySymbol = currentCurrency()
-        ? currentCurrency()?.[2]
+        ? currentCurrency()?.symbol
         : e.features[0].properties.currencySymbol;
       const size =
         e.features[0].properties.size *
@@ -231,7 +229,7 @@ export default function Map(props: any) {
 								<div class="price">${`${
                   currentCurrency()
                     ? Math.round(
-                        euroPrice * Number(currentCurrency()?.[3])
+                        euroPrice * Number(currentCurrency()?.exchangeRate)
                       ).toLocaleString()
                     : originalPrice.toLocaleString()
                 } ${currencySymbol}`}</div>
@@ -371,7 +369,7 @@ export default function Map(props: any) {
           <IconTrash />
         </button>
       </div>
-      <div ref={mapContainer} class={`map maplibregl-map`}></div>
+      <div ref={mapContainer!} class={`map maplibregl-map`}></div>
     </div>
   );
 }

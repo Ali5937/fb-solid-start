@@ -1,6 +1,10 @@
 import { For, Show, Suspense, createEffect, createSignal } from "solid-js";
 import AllCurrencies from "./allCurrencies";
-import { currentCurrency, setCurrentCurrency } from "~/utils/store";
+import {
+  currencyData,
+  currentCurrency,
+  setCurrentCurrency,
+} from "~/utils/store";
 
 export default function Currency(props: any) {
   return (
@@ -22,51 +26,48 @@ export default function Currency(props: any) {
         </Show>
         <button
           class={`currency-button ${
-            currentCurrency()?.[0] === "USD" ? "highlighted" : ""
+            currentCurrency()?.code === "USD" ? "highlighted" : ""
           }`}
           onMouseDown={() => {
-            setCurrentCurrency(props.currencyData().USD);
+            setCurrentCurrency(currencyData().USD);
           }}
         >
           $
-          <Show when={props.currencyData()}>
-            <div class="currency-code">{props.currencyData().USD[0]}</div>
+          <Show when={currencyData()}>
+            <div class="currency-code">{currencyData().USD[0]}</div>
           </Show>
         </button>
         <button
           class={`currency-button ${
-            currentCurrency()?.[0] === "EUR" ? "highlighted" : ""
+            currentCurrency()?.code === "EUR" ? "highlighted" : ""
           }`}
           onMouseDown={() => {
-            setCurrentCurrency(props.currencyData().EUR);
+            setCurrentCurrency(currencyData().EUR);
           }}
         >
           €
-          <Show when={props.currencyData()}>
-            <div class="currency-code">{props.currencyData().EUR[0]}</div>
+          <Show when={currencyData()}>
+            <div class="currency-code">{currencyData().EUR[0]}</div>
           </Show>
         </button>
         <button
           class={`currency-button ${
-            currentCurrency()?.[0] === "GBP" ? "highlighted" : ""
+            currentCurrency()?.code === "GBP" ? "highlighted" : ""
           }`}
           onMouseDown={() => {
-            setCurrentCurrency(props.currencyData().GBP);
+            setCurrentCurrency(currencyData().GBP);
           }}
         >
           £
-          <Show when={props.currencyData()}>
-            <div class="currency-code">{props.currencyData().GBP[0]}</div>
+          <Show when={currencyData()}>
+            <div class="currency-code">{currencyData().GBP[0]}</div>
           </Show>
         </button>
       </div>
       <div class="separation"></div>
       <Suspense>
-        <Show when={props.currencyData()}>
-          <AllCurrencies
-            currencyText={"Other Currencies"}
-            currencyData={props.currencyData}
-          />
+        <Show when={currencyData()}>
+          <AllCurrencies currencyText={"Other Currencies"} />
         </Show>
       </Suspense>
     </div>

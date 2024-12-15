@@ -107,10 +107,10 @@ function Item(props: any) {
         <div>
           {Math.round(
             currentCurrency()
-              ? props.item.EuroPrice * Number(currentCurrency()?.[3])
+              ? props.item.EuroPrice * Number(currentCurrency()?.exchangeRate)
               : props.item.OriginalPrice
           ).toLocaleString()}{" "}
-          {currentCurrency()?.[2] ?? props.item.CurrencySymbol}{" "}
+          {currentCurrency()?.exchangeRate ?? props.item.CurrencySymbol}{" "}
         </div>
         <Show when={props.displayUnits() === "m"}>
           <div>

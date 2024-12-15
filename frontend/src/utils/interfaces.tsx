@@ -8,3 +8,10 @@ export interface NewItem {
   firmId: string;
   realtorFeePercentage: number;
 }
+
+export interface Currency {
+  code: string;
+  name: string;
+  symbol: string;
+  exchangeRate: number;
+}

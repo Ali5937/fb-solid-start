@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { GetCurrentCurrency, getPriceRange } from "./setCurrency";
+import { Currency } from "./interfaces";
 
 export const delimiter = ",";
 
@@ -18,6 +19,7 @@ export const [rentPriceRange, setRentPriceRange] = createSignal<
 export const [buyPriceRange, setBuyPriceRange] = createSignal<[number, number]>(
   maxValues.buyPrice
 );
-export const [currentCurrency, setCurrentCurrency] = createSignal<
-  string[] | null
->(GetCurrentCurrency().currentCurrency);
+export const [currencyData, setCurrencyData] = createSignal<any>();
+
+export const [currentCurrency, setCurrentCurrency] =
+  createSignal<Currency | null>(GetCurrentCurrency().currentCurrency);

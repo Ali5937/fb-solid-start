@@ -22,6 +22,7 @@ import {
   itemType,
   setSaleType,
   setItemType,
+  setCurrencyData,
 } from "~/utils/store";
 import { isServer } from "solid-js/web";
 import Cookies from "js-cookie";
@@ -109,8 +110,6 @@ export default function Index() {
   const [displayUnits, setDisplayUnits] = createSignal(
     Cookies.get("displayUnits") || "m"
   );
-  const [currencyData, setCurrencyData] = createSignal(null);
-
   const [propertyItems, setPropertyItems] = createSignal(null);
   const [itemSort, setItemSort] = createSignal("low");
   const [selectedItem, setSelectedItem] = createSignal(null);
@@ -152,7 +151,7 @@ export default function Index() {
             itemType(),
             min.toString(),
             max.toString(),
-            polygonString1,
+            polygonString1, //later
             polygonString2,
             itemSort()
           ),
@@ -195,9 +194,10 @@ export default function Index() {
   }
 
   async function getCurrencies() {
-    const currencies = await fetch(`${baseUrl}/currency`).then((res) =>
+    const currencies = await fetch(`${baseUrl}/currencies`).then((res) =>
       res.json()
     );
+
     setCurrencyData(currencies);
   }
 
@@ -292,8 +292,6 @@ export default function Index() {
           setLowestPrice={setLowestPrice}
           highestPrice={highestPrice}
           setHighestPrice={setHighestPrice}
-          currencyData={currencyData}
-          setCurrencyData={setCurrencyData}
           displayUnits={displayUnits}
           setDisplayUnits={setDisplayUnits}
           propertyItems={propertyItems}
@@ -373,7 +371,6 @@ export default function Index() {
                   setIsPanelOpen={setIsPanelOpen}
                   propertyItems={propertyItems}
                   setPropertyItems={setPropertyItems}
-                  currencyData={currencyData}
                   displayUnits={displayUnits}
                   itemSort={itemSort}
                   setItemSort={setItemSort}
@@ -418,8 +415,6 @@ export default function Index() {
                   defaultCountry={selectCountry}
                   selectedCity={selectedCity}
                   setSelectedCity={setSelectedCity}
-                  currencyData={currencyData}
-                  setCurrencyData={setCurrencyData}
                 />
               </Show>
             </Suspense>

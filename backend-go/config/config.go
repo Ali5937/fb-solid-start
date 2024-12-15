@@ -9,18 +9,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var (
-	DBUser          string
-	DBPassword      string
-	DBName          string
-	DBHost          string
-	SSLMode         string
-	Postgres        string
-	ConnStr         string
-	ConnStrPostgres string
-	CurrencyApi     string
-)
-
 const (
 	RentApartment int16 = 1
 	RentHouse     int16 = 2
@@ -37,6 +25,18 @@ const (
 	HeatpumpHeating int16 = 3
 	BoilerHeating   int16 = 4
 	Air             int16 = 5
+)
+
+var (
+	DBUser          string
+	DBPassword      string
+	DBName          string
+	DBHost          string
+	SSLMode         string
+	Postgres        string
+	ConnStr         string
+	ConnStrPostgres string
+	CurrencyApi     string
 )
 
 func init() {

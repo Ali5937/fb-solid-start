@@ -12,5 +12,4 @@ func ItemRoutes(r chi.Router, db *sql.DB) {
 	r.Get("/items", func(w http.ResponseWriter, r *http.Request) {
 		handlers.GetItemsHandler(w, r, db)
 	})
-
 }

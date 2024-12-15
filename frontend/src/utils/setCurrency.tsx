@@ -1,5 +1,6 @@
 import Cookies from "js-cookie";
 import { delimiter } from "./store";
+import { Currency } from "./interfaces";
 
 export function getPriceRange(rentMax: number, buyMax: number) {
   let oldRentPrice: [number, number] = [0, rentMax];
@@ -29,19 +30,26 @@ export function getPriceRange(rentMax: number, buyMax: number) {
 export function GetCurrentCurrency() {
   let currentC = Cookies.get("currentCurrency");
   let splitCurrentCurrency;
-  let finalCurrentCurrency: string[] | null;
+  let finalCurrentCurrency: Currency | null;
 
   if (currentC && currentC != "null") {
     splitCurrentCurrency = currentC.split(delimiter);
 
-    finalCurrentCurrency = [
-      splitCurrentCurrency[0],
-      splitCurrentCurrency[1],
-      splitCurrentCurrency[splitCurrentCurrency.length - 2],
-      splitCurrentCurrency[splitCurrentCurrency.length - 1],
-    ];
+    finalCurrentCurrency = {
+      code: splitCurrentCurrency[0],
+      name: splitCurrentCurrency[1],
+      symbol: splitCurrentCurrency[splitCurrentCurrency.length - 2],
+      exchangeRate: Number(
+        splitCurrentCurrency[splitCurrentCurrency.length - 1]
+      ),
+    };
   } else {
-    finalCurrentCurrency = ["EUR", "Euro", "€", "1"];
+    finalCurrentCurrency = {
+      code: "EUR",
+      name: "Euro",
+      symbol: "€",
+      exchangeRate: 1,
+    };
   }
   return { currentCurrency: finalCurrentCurrency };
 }

@@ -44,6 +44,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error opening currency-template.json: %v", err)
 	}
+	defer file.Close()
 
 	decoder := json.NewDecoder(file)
 	err = decoder.Decode(&currenciesData)

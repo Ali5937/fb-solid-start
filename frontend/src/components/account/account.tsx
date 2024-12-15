@@ -14,6 +14,7 @@ import "./account.css";
 import IconRotate from "~/assets/icon-rotate";
 import Pagination from "./pagination";
 import { currentCurrency } from "~/utils/store";
+import { Currency } from "~/utils/interfaces";
 const SearchBar = lazy(() => import("../navbar/searchBar"));
 const Login = lazy(() => import("./login"));
 const FilterType = lazy(() => import("../navbar/filterType"));
@@ -38,9 +39,8 @@ export default function Account(props: any) {
   const [itemDisplayUnits, setItemDisplayUnits] = createSignal<string>(
     props.displayUnits() || "m"
   );
-  const [itemCurrentCurrency, setItemCurrentCurrency] = createSignal<
-    (string | number)[]
-  >(currentCurrency() || []);
+  const [itemCurrentCurrency, setItemCurrentCurrency] =
+    createSignal<Currency | null>(currentCurrency());
   const totalNumber = 10;
   const [openFormNumber, setOpenFormNumber] = createSignal<number>(1);
 
@@ -392,13 +392,10 @@ export default function Account(props: any) {
                   <label for="input-price" class="input-price">
                     <div>Price:</div>
                     <div class="form-all-currencies-parent">
-                      <AllCurrencies
-                        currencyText={""}
-                        currencyData={props.currencyData}
-                      />
+                      <AllCurrencies currencyText={""} />
                       <div class="form-currency-code">
                         <div>
-                          <div>{itemCurrentCurrency()[0]}</div>
+                          <div>{itemCurrentCurrency()?.code}</div>
                         </div>
                         <IconArrow />
                       </div>

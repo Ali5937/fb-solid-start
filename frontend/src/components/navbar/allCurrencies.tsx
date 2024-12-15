@@ -1,4 +1,6 @@
-import { currentCurrency, setCurrentCurrency } from "~/utils/store";
+import { CustomLayerInterface } from "maplibre-gl";
+import { Currency } from "~/utils/interfaces";
+import { currencyData, setCurrentCurrency } from "~/utils/store";
 
 export default function allCurrencies(props: any) {
   return (
@@ -7,20 +9,21 @@ export default function allCurrencies(props: any) {
       <select
         class="button-style"
         id="all-currencies-list"
-        value={currentCurrency() || ""}
+        value={""}
         onChange={(e) => {
-          const val = e.currentTarget?.value;
-          if (val === "") {
-            setCurrentCurrency(null);
+          const currCode = e.currentTarget?.value;
+          console.log(currCode.toString());
+          if (currCode && currencyData()) {
+            setCurrentCurrency(currencyData()[currCode]);
           } else {
-            setCurrentCurrency(val.split(","));
+            setCurrentCurrency(null);
           }
         }}
       >
         <option value="">Choose Currency</option>
-        {Object.keys(props.currencyData()).map((key) => {
-          const currency = props.currencyData()[key];
-          return <option value={currency}>{currency[1]}</option>;
+        {Object.keys(currencyData()).map((key) => {
+          const currency = currencyData()[key];
+          return <option value={currency.code}>{currency.name}</option>;
         })}
       </select>
     </div>
