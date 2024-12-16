@@ -10,6 +10,7 @@ import (
 	"github.com/Ali5937/fb-solid-start/backend-go/config"
 	"github.com/Ali5937/fb-solid-start/backend-go/pgdb"
 	"github.com/Ali5937/fb-solid-start/backend-go/routes"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
@@ -35,6 +36,7 @@ func main() {
 	corsCredentials := handlers.AllowCredentials()
 
 	r.Use(handlers.CORS(corsHeaders, corsMethods, corsHeadersAllowed, corsCredentials))
+	r.Use(middleware.Compress(5)) // Do gzipping in Nginx?
 
 	r.Route("/api", func(api chi.Router) {
 		routes.ItemRoutes(api, pgDB)

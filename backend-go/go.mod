@@ -17,4 +17,5 @@ require (
 require (
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/felixge/httpsnoop v1.0.3 // indirect
+	github.com/go-chi/chi v1.5.5
 )
