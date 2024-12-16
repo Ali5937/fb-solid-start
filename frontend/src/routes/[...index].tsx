@@ -23,6 +23,8 @@ import {
   setSaleType,
   setItemType,
   setCurrencyData,
+  saleObj,
+  itemObj,
 } from "~/utils/store";
 import { isServer } from "solid-js/web";
 import Cookies from "js-cookie";
@@ -66,8 +68,14 @@ const getData = async (
 
 export default function Index() {
   const urlParams = { ...useParams() }.index.split("/");
-  setSaleType(urlParams[0]);
-  setItemType(urlParams[1]);
+  if (urlParams.length >= 2) {
+    setSaleType(urlParams[0]);
+    setItemType(urlParams[1]);
+  } else {
+    setSaleType(saleObj.rent);
+    setItemType(itemObj.apartment);
+  }
+
   const [searchParams, setSearchParams] = useSearchParams();
   let oldUserRegion: string = "";
   let oldRegion: string = "";

@@ -10,8 +10,15 @@ const maxValues = getPriceRange(baseRentMax, baseBuyMax);
 export const rentMax = baseRentMax + 2; // + 2 needed because error on slider
 export const buyMax = baseBuyMax + 2;
 
-export const [saleType, setSaleType] = createSignal<string>("rent"); // rent, buy
-export const [itemType, setItemType] = createSignal<string>("apartment"); // apartment, house, shared, land
+export const saleObj = { rent: "rent", buy: "buy" };
+export const itemObj = {
+  apartment: "apartment",
+  house: "house",
+  shared: "shared",
+  land: "land",
+};
+export const [saleType, setSaleType] = createSignal<string>(saleObj.rent); // rent, buy
+export const [itemType, setItemType] = createSignal<string>(itemObj.apartment); // apartment, house, shared, land
 
 export const [rentPriceRange, setRentPriceRange] = createSignal<
   [number, number]
