@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Ali5937/fb-solid-start/backend-go/config"
 	"github.com/Ali5937/fb-solid-start/backend-go/pgdb"
 	"github.com/Ali5937/fb-solid-start/backend-go/routes"
 	"github.com/go-chi/chi/v5"
@@ -40,11 +41,9 @@ func main() {
 		routes.CurrencyRoutes(api)
 	})
 
-	port := "5000"
-
-	log.Printf("Server is running on port %+v", port)
+	log.Printf("Server is running on port %+v", config.Port)
 	server := &http.Server{
-		Addr:    "127.0.0.1:" + port,
+		Addr:    "127.0.0.1:" + config.Port,
 		Handler: r,
 	}
 

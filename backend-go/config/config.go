@@ -28,6 +28,10 @@ const (
 )
 
 var (
+	Port string = "5000"
+)
+
+var (
 	DBUser          string
 	DBPassword      string
 	DBName          string
@@ -70,5 +74,4 @@ func init() {
 
 	ConnStr = fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", DBUser, DBPassword, DBHost, DBName, SSLMode)
 	ConnStrPostgres = fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", DBUser, DBPassword, DBHost, Postgres, SSLMode)
-
 }
