@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,7 +13,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	start := time.Now()
 
 	queryParams := r.URL.Query()
@@ -112,7 +111,7 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	rows, err := db.Query(queryText, args...)
 
 	if err != nil {
-		fmt.Printf("error fetching /items\n%v", err)
+		http.Error(w, "Error fetching items from database", http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
@@ -150,7 +149,6 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	if err := rows.Err(); err != nil {
 		http.Error(w, "Error iterating rows", http.StatusInternalServerError)
-		log.Println("Rows iteration error: ", err)
 		return
 	}
 
@@ -158,7 +156,6 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	if err := json.NewEncoder(w).Encode(items); err != nil {
 		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
-		log.Println("JSON encoding error:", err)
 	}
 
 	elapsed := time.Since(start).Milliseconds()

@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type CacheItem struct {
+	Data      []string
+	ExpiresAt time.Time
+}
+
 type GetItem struct {
 	Id             int64
 	Lng            float64
@@ -90,13 +95,11 @@ type CurrencyResponse struct {
 }
 
 func (c *Currency) UnmarshalJSON(data []byte) error {
-	// Define a temporary map to parse the object
 	var raw map[string]interface{}
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
 
-	// Safely extract fields from the map
 	if code, ok := raw["code"].(string); ok {
 		c.Code = code
 	} else {

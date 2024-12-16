@@ -61,8 +61,9 @@ export default function SearchBar(props: any) {
   async function getCountries() {
     if (props.countries().length > 1) return;
     const res = await fetch(
-      `${props.baseUrl}/get-countries${props.isAll ? "/all" : ""}`
+      `${props.baseUrl}/countries${props.isAll ? "/all" : ""}`
     ).then((res) => res.json());
+    console.log(res);
     const resCountries: string[] = [props.defaultCountry, ...res.data];
     props.setCountries(resCountries);
   }
@@ -78,6 +79,7 @@ export default function SearchBar(props: any) {
           isAll: props.isAll,
         })
     ).then((res) => res.json());
+
     const resStates: string[] = [props.defaultState, ...res.data];
     props.setStates(resStates);
     searchImmediately = true;

@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"github.com/Ali5937/fb-solid-start/backend-go/handlers"
+	handlers "github.com/Ali5937/fb-solid-start/backend-go/handlers/currency"
 	"github.com/go-chi/chi/v5"
 )
 
