@@ -12,7 +12,6 @@ export default function allCurrencies(props: any) {
         value={""}
         onChange={(e) => {
           const currCode = e.currentTarget?.value;
-          console.log(currCode.toString());
           if (currCode && currencyData()) {
             setCurrentCurrency(currencyData()[currCode]);
           } else {

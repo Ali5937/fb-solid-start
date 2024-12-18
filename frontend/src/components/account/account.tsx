@@ -13,7 +13,7 @@ import Cookies from "js-cookie";
 import "./account.css";
 import IconRotate from "~/assets/icon-rotate";
 import Pagination from "./pagination";
-import { currentCurrency } from "~/utils/store";
+import { baseUrl, currentCurrency } from "~/utils/store";
 import { Currency } from "~/utils/interfaces";
 const SearchBar = lazy(() => import("../navbar/searchBar"));
 const Login = lazy(() => import("./login"));
@@ -56,7 +56,7 @@ export default function Account(props: any) {
 
   async function getItems() {
     props.setAccountPage("items");
-    const result = await fetch(`${props.baseUrl}/user/items/${itemPage()}`, {
+    const result = await fetch(`${baseUrl}/user/items/${itemPage()}`, {
       method: "GET",
       credentials: "include",
     }).then((res) => res.json());
@@ -226,7 +226,7 @@ export default function Account(props: any) {
   async function handleFormSubmit(e: any) {
     e.preventDefault();
     try {
-      const result = await fetch(`${props.baseUrl}`, {
+      const result = await fetch(`${baseUrl}`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -242,7 +242,7 @@ export default function Account(props: any) {
 
   async function getMessages() {
     props.setAccountPage("messages");
-    const result = await fetch(`${props.baseUrl}/messages`, {
+    const result = await fetch(`${baseUrl}/messages`, {
       method: "GET",
       credentials: "include",
     }).then((res) => res.json());
@@ -250,7 +250,7 @@ export default function Account(props: any) {
   }
 
   async function logout() {
-    const result = await fetch(`${props.baseUrl}/user/logout`, {
+    const result = await fetch(`${baseUrl}/user/logout`, {
       method: "POST",
       credentials: "include",
     }).then((res) => res.json());
@@ -275,7 +275,6 @@ export default function Account(props: any) {
       <Suspense>
         <Show when={!props.isLoggedIn()}>
           <Login
-            baseUrl={props.baseUrl}
             setIsLoggedIn={props.setIsLoggedIn}
             setUserId={props.setUserId}
           />
@@ -345,7 +344,6 @@ export default function Account(props: any) {
               <Suspense>
                 <Show when={openFormNumber() === 1}>
                   <SearchBar
-                    baseUrl={props.baseUrl}
                     isAll={true}
                     setOpenDropdownNumber={props.setOpenDropdownNumber}
                     setMoveMapCoordinates={props.setMoveMapCoordinates}
@@ -359,7 +357,6 @@ export default function Account(props: any) {
                     setStates={props.setStates}
                     selectedState={props.selectedState}
                     setSelectedState={props.setSelectedState}
-                    defaultState={props.defaultState}
                     propertyItems={props.propertyItems}
                     setPropertyItems={props.setPropertyItems}
                     itemSort={props.itemSort}
@@ -367,7 +364,6 @@ export default function Account(props: any) {
                     setCountries={props.setCountries}
                     selectedCountry={props.selectedCountry}
                     setSelectedCountry={props.setSelectedCountry}
-                    defaultCountry={props.defaultCountry}
                     selectedCity={props.selectedCity}
                     setSelectedCity={props.setSelectedCity}
                   />

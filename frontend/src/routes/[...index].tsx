@@ -25,6 +25,8 @@ import {
   setCurrencyData,
   saleObj,
   itemObj,
+  baseUrl,
+  theme,
 } from "~/utils/store";
 import { isServer } from "solid-js/web";
 import Cookies from "js-cookie";
@@ -39,9 +41,8 @@ import IconArrow from "~/assets/icon-arrow";
 
 const Account = lazy(() => import("~/components/account/account"));
 const Map = clientOnly(() => import("../components/map/map"));
-const baseUrl = "http://localhost:5000/api";
 
-const getData = async (
+const getSSRData = async (
   saleType: string,
   itemType: string,
   min: string,
@@ -52,6 +53,7 @@ const getData = async (
 ) => {
   "use server";
   const type = GetItemType(null, saleType, itemType);
+
   const response = await fetch(
     `${baseUrl}/items?` +
       new URLSearchParams({
@@ -91,9 +93,7 @@ export default function Index() {
   const [canUseCookies, setCanUseCookies] = createSignal<boolean>(
     Cookies.get("canUseCookies") ? true : false
   );
-  const [theme, setTheme] = createSignal<string>(
-    Cookies.get("theme") || "dark-theme"
-  );
+
   const [isLoggedIn, setIsLoggedIn] = createSignal<boolean>(false);
 
   const [itemId, setItemId] = createSignal<string>(oldId.toString() || "");
@@ -124,18 +124,16 @@ export default function Index() {
   const [highlightedItemLngLat, setHighlightedItemLngLat] = createSignal("");
   const [openDropdownNumber, setOpenDropdownNumber] = createSignal<number>(0);
   const [isProfileOpen, setIsProfileOpen] = createSignal<boolean>(false);
-  const defaultCountry = "All Countries";
-  const defaultState = "All States";
-  const selectCountry = "Select Country";
-  const selectState = "Select State";
   const [countries, setCountries] = createSignal<string[]>([""]);
   const [states, setStates] = createSignal([]);
   const [selectedCountry, setSelectedCountry] = createSignal<string>("");
   const [selectedState, setSelectedState] = createSignal<string>("");
   const [selectedCity, setSelectedCity] = createSignal<string>("");
 
-  let polygonString1 = searchParams.poly;
-  let polygonString2 = searchParams.poly2 ?? "";
+  // let polygonString1: string = searchParams.poly;
+  // let polygonString2: string = searchParams.poly2 ?? "";
+  let polygonString1: string = "";
+  let polygonString2: string = "";
 
   if (!polygonString1 || polygonString1 === "undefined") {
     polygonString1 = GetInitialMapArea(
@@ -149,12 +147,14 @@ export default function Index() {
   const max = saleType() === "buy" ? buyPriceRange()[1] : rentPriceRange()[1];
 
   const event = getRequestEvent();
+  // maybe issue (crawler sees slightly different result than user)
   let isCrawler = isbot(event?.request.headers.get("User-Agent"));
+  isCrawler = !isCrawler; //check ssr
   if (isCrawler) {
     setPropertyItems(
       createAsync(
         () =>
-          getData(
+          getSSRData(
             saleType(),
             itemType(),
             min.toString(),
@@ -246,11 +246,9 @@ export default function Index() {
 
   onMount(() => {
     if (!isServer) {
-      checkIfLoggedIn();
-      setWindowWidth(1);
-      setWindowHeight(1);
       setWindowWidth(window.innerWidth);
       setWindowHeight(window.innerHeight);
+      checkIfLoggedIn();
       getCurrencies();
     }
   });
@@ -281,11 +279,6 @@ export default function Index() {
         }`}
       >
         <Navbar
-          baseUrl={baseUrl}
-          defaultCountry={defaultCountry}
-          defaultState={defaultState}
-          theme={theme}
-          setTheme={setTheme}
           openDropdownNumber={openDropdownNumber}
           setOpenDropdownNumber={setOpenDropdownNumber}
           isProfileOpen={isProfileOpen}
@@ -317,8 +310,6 @@ export default function Index() {
         />
         <main>
           <Map
-            baseUrl={baseUrl}
-            theme={theme}
             lowestPrice={lowestPrice}
             setLowestPrice={setLowestPrice}
             highestPrice={highestPrice}
@@ -370,7 +361,6 @@ export default function Index() {
             <Suspense>
               <Show when={!isProfileOpen()}>
                 <List
-                  baseUrl={baseUrl}
                   isCrawler={isCrawler}
                   windowWidth={windowWidth}
                   windowHeight={windowHeight}
@@ -391,7 +381,6 @@ export default function Index() {
             <Suspense>
               <Show when={isProfileOpen()}>
                 <Account
-                  baseUrl={baseUrl}
                   isLoggedIn={isLoggedIn}
                   setIsLoggedIn={setIsLoggedIn}
                   accountPage={accountPage}
@@ -411,7 +400,6 @@ export default function Index() {
                   setStates={setStates}
                   selectedState={selectedState}
                   setSelectedState={setSelectedState}
-                  defaultState={selectState}
                   propertyItems={propertyItems}
                   setPropertyItems={setPropertyItems}
                   itemSort={itemSort}
@@ -419,7 +407,6 @@ export default function Index() {
                   setCountries={setCountries}
                   selectedCountry={selectedCountry}
                   setSelectedCountry={setSelectedCountry}
-                  defaultCountry={selectCountry}
                   selectedCity={selectedCity}
                   setSelectedCity={setSelectedCity}
                 />

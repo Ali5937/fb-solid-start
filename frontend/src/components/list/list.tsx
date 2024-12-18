@@ -2,6 +2,7 @@ import { For, Show, createEffect, createSignal, onMount } from "solid-js";
 import "./list.css";
 import ItemSortButton from "./item-sort-button";
 import Item from "./item";
+import { baseUrl } from "~/utils/store";
 
 export default function List(props: any) {
   let list: any;
@@ -30,7 +31,7 @@ export default function List(props: any) {
   async function getId() {
     if (props.selectedItem()) {
       const response = await fetch(
-        `${props.baseUrl}/item?` +
+        `${baseUrl}/item?` +
           new URLSearchParams({
             id: props.selectedItem().id,
           })

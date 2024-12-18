@@ -1,3 +1,5 @@
+import { itemObj, saleObj } from "./store";
+
 export async function SearchItems(
   isMoveMap: boolean,
   map: any | null,
@@ -117,7 +119,7 @@ export async function SearchItems(
       let highestPrice = responseData[0].EuroPrice;
 
       responseData.forEach((el: any) => {
-        const euroPrice = el.euro_price;
+        const euroPrice = el.EuroPrice;
         if (euroPrice < lowestPrice) lowestPrice = euroPrice;
         if (euroPrice > highestPrice) highestPrice = euroPrice;
       });
@@ -140,7 +142,7 @@ export async function SearchItems(
               euroPrice: marker.EuroPrice,
               currencyCode: marker.CurrencyCode,
               currencySymbol: marker.CurrencySymbol,
-              first_picture: marker.FirstPicture,
+              firstPicture: marker.FirstPicture,
               id: marker.Id,
               createdAt: marker.CreatedAt,
             },
@@ -237,7 +239,7 @@ export function GetItemType(
   return type;
 }
 
-export function turnArrayOfBoundsIntoString(arr: number[][]) {
+export function turnArrayOfBoundsIntoString(arr: number[][]): string {
   let str = "";
   for (let i = 0; i < arr.length; i++) {
     str += `${arr[i][0]}_${arr[i][1]}${i < arr.length - 1 ? "," : ""}`;

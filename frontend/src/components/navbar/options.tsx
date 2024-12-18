@@ -1,13 +1,10 @@
 import IconSun from "~/assets/icon-sun";
 import IconMoon from "~/assets/icon-moon";
 import { Show } from "solid-js";
+import { setTheme, theme, themes } from "~/utils/store";
 export default function Options(props: any) {
   function toggleTheme() {
-    props.setTheme(
-      props.theme() === "dark-theme" ? "light-theme" : "dark-theme"
-    );
-
-    // console.log(props.theme() === "dark-theme" ? "dark-theme" : "light-theme");
+    setTheme(theme() === themes.light ? themes.dark : themes.light);
   }
 
   return (
@@ -20,10 +17,10 @@ export default function Options(props: any) {
       <div class="theme">
         <div>Dark Mode: </div>
         <button class="theme-button" onMouseDown={toggleTheme}>
-          <Show when={props.theme() === "dark-theme"}>
+          <Show when={theme() === themes.dark}>
             <IconSun />
           </Show>
-          <Show when={props.theme() === "light-theme"}>
+          <Show when={theme() === themes.light}>
             <IconMoon />
           </Show>
         </button>

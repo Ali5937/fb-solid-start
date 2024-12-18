@@ -13,6 +13,9 @@ import {
   saleType,
   itemType,
   currentCurrency,
+  baseUrl,
+  theme,
+  themes,
 } from "~/utils/store";
 import maplibregl from "maplibre-gl";
 import IconPencil from "~/assets/icon-pencil";
@@ -99,8 +102,7 @@ export default function Map(props: any) {
               ]
             : mapMarkerColor[0],
         "circle-stroke-width": 1,
-        "circle-stroke-color":
-          props.theme() === "dark-theme" ? "white" : "black",
+        "circle-stroke-color": theme() === themes.dark ? "white" : "black",
       },
     });
   }
@@ -129,7 +131,7 @@ export default function Map(props: any) {
         draw_polygon: FreehandMode,
       }),
       displayControlsDefault: false,
-      styles: getDrawStyle(props.theme()),
+      styles: getDrawStyle(theme()),
     });
 
     map.addControl(draw);
@@ -157,7 +159,7 @@ export default function Map(props: any) {
       bounds,
       saleType(),
       itemType(),
-      props.baseUrl,
+      baseUrl,
       priceRange,
       rentMax,
       buyMax,
@@ -186,7 +188,7 @@ export default function Map(props: any) {
       container: mapContainer!,
       // Use "tiles-eu" for GDPR compliance
       style: `https://tiles-eu.stadiamaps.com/styles/${
-        props.theme() === "dark-theme" ? "alidade_smooth_dark" : "osm_bright"
+        theme() === themes.light ? "osm_bright" : "alidade_smooth_dark"
       }.json`,
       center: [mapLocation[0], mapLocation[1]],
       zoom: mapLocation[2],
@@ -291,7 +293,7 @@ export default function Map(props: any) {
   });
 
   createEffect(() => {
-    props.theme();
+    theme();
     saleType();
     itemType();
     props.itemSort();
@@ -306,7 +308,7 @@ export default function Map(props: any) {
   });
 
   createEffect(() => {
-    props.theme();
+    theme();
     setIsMapLoaded(false);
   });
 

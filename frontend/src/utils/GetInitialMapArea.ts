@@ -25,7 +25,7 @@ export default function GetInitialMapArea(
   lng: number,
   lat: number,
   zoom: number
-) {
+): string {
   let distance = getStandardMapWidth(zoom);
 
   let zoomNum = (20 - zoom) / 20;

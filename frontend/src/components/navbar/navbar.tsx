@@ -58,7 +58,6 @@ export default function Navbar(props: any) {
           <Suspense>
             <Show when={props.openDropdownNumber() === 1}>
               <SearchBar
-                baseUrl={props.baseUrl}
                 isAll={false}
                 setOpenDropdownNumber={props.setOpenDropdownNumber}
                 setMoveMapCoordinates={props.setMoveMapCoordinates}
@@ -72,7 +71,6 @@ export default function Navbar(props: any) {
                 setStates={props.setStates}
                 selectedState={props.selectedState}
                 setSelectedState={props.setSelectedState}
-                defaultState={props.defaultState}
                 propertyItems={props.propertyItems}
                 setPropertyItems={props.setPropertyItems}
                 itemSort={props.itemSort}
@@ -80,7 +78,6 @@ export default function Navbar(props: any) {
                 setCountries={props.setCountries}
                 selectedCountry={props.selectedCountry}
                 setSelectedCountry={props.setSelectedCountry}
-                defaultCountry={props.defaultCountry}
                 selectedCity={props.selectedCity}
                 setSelectedCity={props.setSelectedCity}
               />
@@ -149,7 +146,6 @@ export default function Navbar(props: any) {
             <Show when={props.openDropdownNumber() === 5}>
               <div class="dropdown-element-right button-style">
                 <Currency
-                  baseUrl={props.baseUrl}
                   isAddItem={false}
                   displayUnits={props.displayUnits}
                   setDisplayUnits={props.setDisplayUnits}
@@ -175,7 +171,7 @@ export default function Navbar(props: any) {
           <IconOptions />
           <Suspense>
             <Show when={props.openDropdownNumber() === 6}>
-              <Options theme={props.theme} setTheme={props.setTheme} />
+              <Options />
             </Show>
           </Suspense>
         </button>

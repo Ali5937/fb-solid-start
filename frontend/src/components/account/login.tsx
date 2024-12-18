@@ -1,3 +1,4 @@
+import { baseUrl } from "~/utils/store";
 import "./account.css";
 import { Show, createSignal } from "solid-js";
 
@@ -14,7 +15,7 @@ export default function Login(props: any) {
 
   // If email exists already login, otherwise sign up
   async function sendGetEmail() {
-    const response = await fetch(`${props.baseUrl}/user/email/${email()}`, {
+    const response = await fetch(`${baseUrl}/user/email/${email()}`, {
       method: "GET",
       credentials: "include",
     }).then((res) => res.json());
@@ -34,7 +35,7 @@ export default function Login(props: any) {
     };
 
     try {
-      const result = await fetch(`${props.baseUrl}/user/signup`, {
+      const result = await fetch(`${baseUrl}/user/signup`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -56,7 +57,7 @@ export default function Login(props: any) {
       password: password(),
     };
 
-    const result = await fetch(`${props.baseUrl}/user/login`, {
+    const result = await fetch(`${baseUrl}/user/login`, {
       method: "POST",
       credentials: "include",
       headers: {

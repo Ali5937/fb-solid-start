@@ -1,5 +1,4 @@
-import Cookies from "js-cookie";
-import { createEffect } from "solid-js";
+import { themes } from "~/utils/store";
 
 const getDrawStyle = (theme: string) => [
   // ACTIVE (being drawn)
@@ -13,7 +12,7 @@ const getDrawStyle = (theme: string) => [
       "line-join": "round",
     },
     paint: {
-      "line-color": theme === "dark-theme" ? "#c7cad1" : "#636469",
+      "line-color": theme === themes.dark ? "#c7cad1" : "#636469",
       "line-dasharray": [0.2, 2],
       "line-width": 2,
     },
@@ -24,8 +23,8 @@ const getDrawStyle = (theme: string) => [
     type: "fill",
     filter: ["all", ["==", "$type", "Polygon"], ["==", "active", "true"]],
     paint: {
-      "fill-color": theme === "dark-theme" ? "#c7cad1" : "#636469",
-      "fill-outline-color": theme === "dark-theme" ? "#c7cad1" : "#636469",
+      "fill-color": theme === themes.dark ? "#c7cad1" : "#636469",
+      "fill-outline-color": theme === themes.dark ? "#c7cad1" : "#636469",
       "fill-opacity": 0.1,
     },
   },
@@ -50,7 +49,7 @@ const getDrawStyle = (theme: string) => [
       "line-join": "round",
     },
     paint: {
-      "line-color": theme === "dark-theme" ? "#c7cad1" : "#636469",
+      "line-color": theme === themes.dark ? "#c7cad1" : "#636469",
       "line-dasharray": [0.2, 2],
       "line-width": 2,
     },
@@ -72,7 +71,7 @@ const getDrawStyle = (theme: string) => [
     filter: ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"]],
     paint: {
       "circle-radius": 3,
-      "circle-color": theme === "dark-theme" ? "#c7cad1" : "#636469",
+      "circle-color": theme === themes.dark ? "#c7cad1" : "#636469",
     },
   },
 
@@ -87,7 +86,7 @@ const getDrawStyle = (theme: string) => [
       "line-join": "round",
     },
     paint: {
-      "line-color": theme === "dark-theme" ? "#c7cad1" : "#636469",
+      "line-color": theme === themes.dark ? "#c7cad1" : "#636469",
       "line-width": 3,
     },
   },
@@ -97,8 +96,8 @@ const getDrawStyle = (theme: string) => [
     type: "fill",
     filter: ["all", ["==", "$type", "Polygon"], ["==", "active", "false"]],
     paint: {
-      "fill-color": theme === "dark-theme" ? "#c7cad1" : "#636469",
-      "fill-outline-color": theme === "dark-theme" ? "#c7cad1" : "#636469",
+      "fill-color": theme === themes.dark ? "#c7cad1" : "#636469",
+      "fill-outline-color": theme === themes.dark ? "#c7cad1" : "#636469",
       "fill-opacity": 0.1,
     },
   },
@@ -112,7 +111,7 @@ const getDrawStyle = (theme: string) => [
       "line-join": "round",
     },
     paint: {
-      "line-color": theme === "dark-theme" ? "#c7cad1" : "#636469",
+      "line-color": theme === themes.dark ? "#c7cad1" : "#636469",
       "line-width": 7,
     },
   },
