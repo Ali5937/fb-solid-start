@@ -1,14 +1,13 @@
 {
   "name": "example-basic",
   "dependencies": {
-    "@mapbox/mapbox-gl-draw": "^1.5.0",
+    "@mapbox/mapbox-gl-draw": "1.4.3",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.2",
     "@solidjs/start": "^1.0.10",
     "@turf/intersect": "^7.1.0",
     "@turf/simplify": "^7.1.0",
     "cropperjs": "^1.6.2",
-    "croppr": "^2.3.1",
     "isbot": "^5.1.17",
     "js-cookie": "^3.0.5",
     "maplibre-gl": "^4.7.1",
@@ -16,7 +15,7 @@
     "solid-js": "^1.9.3",
     "turf-featurecollection": "^1.0.1",
     "turf-polygon": "^1.0.3",
-    "vinxi": "^0.5.1"
+    "vinxi": "^0.4.3"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
