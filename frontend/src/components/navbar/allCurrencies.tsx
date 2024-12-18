@@ -1,5 +1,3 @@
-import { CustomLayerInterface } from "maplibre-gl";
-import { Currency } from "~/utils/interfaces";
 import { currencyData, setCurrentCurrency } from "~/utils/store";
 
 export default function allCurrencies(props: any) {

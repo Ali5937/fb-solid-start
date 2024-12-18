@@ -149,7 +149,7 @@ export default function Index() {
   const event = getRequestEvent();
   // maybe issue (crawler sees slightly different result than user)
   let isCrawler = isbot(event?.request.headers.get("User-Agent"));
-  isCrawler = !isCrawler; //check ssr
+  // isCrawler = !isCrawler; //check ssr
   if (isCrawler) {
     setPropertyItems(
       createAsync(
@@ -233,15 +233,13 @@ export default function Index() {
     const navigate = useNavigate();
     navigate(newUrl, { replace: true });
 
-    // setSearchParams(
-    //   {
-    //     country: selectedCountry(),
-    //     state: selectedState(),
-    //     city: selectedCity(),
-    //     // poly: polygonString1,
-    //     // poly2: searchParams.poly2 ?? "",
-    //   },
-    // );
+    setSearchParams({
+      country: selectedCountry(),
+      state: selectedState(),
+      city: selectedCity(),
+      // poly: polygonString1,
+      // poly2: searchParams.poly2 ?? "",
+    });
   });
 
   onMount(() => {
@@ -259,12 +257,6 @@ export default function Index() {
   createEffect(() => {
     Cookies.set("buyPriceRange", buyPriceRange().join(delimiter));
   });
-
-  //Old: http://localhost:3000/#/buy/house/0/1000000/13.3629/47.601/4/
-  //New: http://localhost:3000/user-region/buy/house?region="example"&id="example"
-  //user-region = "us" for usa or "all" for anything else
-  ///region(optional) = "germany-bavaria-munich"
-  //id(optional) = "593475"
 
   return (
     <MetaProvider>

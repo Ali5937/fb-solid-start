@@ -110,7 +110,7 @@ function Item(props: any) {
               ? props.item.EuroPrice * Number(currentCurrency()?.exchangeRate)
               : props.item.OriginalPrice
           ).toLocaleString()}{" "}
-          {currentCurrency()?.exchangeRate ?? props.item.CurrencySymbol}{" "}
+          {currentCurrency()?.symbol ?? props.item.CurrencySymbol}{" "}
         </div>
         <Show when={props.displayUnits() === "m"}>
           <div>

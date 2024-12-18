@@ -63,9 +63,7 @@ export default function SearchBar(props: any) {
 
   async function getCountries() {
     if (props.countries().length > 1) return;
-    const res = await fetch(
-      `${baseUrl}/countries${props.isAll ? "/all" : ""}`
-    ).then((res) => res.json());
+    const res = await fetch(`${baseUrl}/countries`).then((res) => res.json());
     const resCountries: string[] = [defaultCountry, ...res.data];
     props.setCountries(resCountries);
   }
@@ -75,15 +73,18 @@ export default function SearchBar(props: any) {
     props.setSelectedState("");
     props.setSelectedCity("");
     const res = await fetch(
-      `${baseUrl}/get-results-by-country?` +
+      `${baseUrl}/states?` +
         new URLSearchParams({
           country: props.selectedCountry(),
-          isAll: props.isAll,
         })
     ).then((res) => res.json());
 
-    const resStates: string[] = [defaultState, ...res.data];
-    props.setStates(resStates);
+    if (res.data?.[0] == "") {
+      props.setStates([defaultState]);
+    } else {
+      const resStates: string[] = [defaultState, ...res.data];
+      props.setStates(resStates);
+    }
     searchImmediately = true;
     if (inputRef) inputRef.value = "";
     await getInput();
@@ -153,15 +154,15 @@ export default function SearchBar(props: any) {
   }
 
   function getLowestHighestLngLat(arr: any) {
-    let lngLow = arr[0].lng;
-    let lngHigh = arr[0].lng;
-    let latLow = arr[0].lat;
-    let latHigh = arr[0].lat;
+    let lngLow = arr[0].Lng;
+    let lngHigh = arr[0].Lng;
+    let latLow = arr[0].Lat;
+    let latHigh = arr[0].Lat;
     for (let i = 0; i < arr.length; i++) {
-      if (lngLow > arr[i].lng) lngLow = arr[i].lng;
-      if (lngHigh < arr[i].lng) lngHigh = arr[i].lng;
-      if (latLow > arr[i].lat) latLow = arr[i].lat;
-      if (latHigh < arr[i].lat) latHigh = arr[i].lat;
+      if (lngLow > arr[i].Lng) lngLow = arr[i].Lng;
+      if (lngHigh < arr[i].Lng) lngHigh = arr[i].Lng;
+      if (latLow > arr[i].Lat) latLow = arr[i].Lat;
+      if (latHigh < arr[i].Lat) latHigh = arr[i].Lat;
     }
     if (lngLow === lngHigh && latLow === latHigh) {
       return {
