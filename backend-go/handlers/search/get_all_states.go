@@ -32,8 +32,10 @@ func GetAllStates(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		states = append(states, state)
 	}
 
+	res := map[string]interface{}{"data": states}
+
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(states); err != nil {
+	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, fmt.Sprintf("Failed to encode JSON: %v", err), http.StatusInternalServerError)
 	}
 }

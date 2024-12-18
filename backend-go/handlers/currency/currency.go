@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,18 +13,20 @@ func GetAllCurrencies(w http.ResponseWriter, r *http.Request) {
 	cwd, _ := os.Getwd()
 	path := filepath.Join(cwd, "currencies", "currency-updated.json")
 
-	file, err := os.Open(path)
+	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Unable to open JSON file: %v", err), http.StatusInternalServerError)
 		return
 	}
-	defer file.Close()
 
 	w.Header().Set("Content-Type", "application/json")
 
-	_, err = file.WriteTo(w)
+	res := map[string]interface{}{"data": json.RawMessage(data)}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(res)
 	if err != nil {
-		http.Error(w, "Failed to write JSON file to response", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Failed to write JSON file to response: %v", err), http.StatusInternalServerError)
 		return
 	}
 }

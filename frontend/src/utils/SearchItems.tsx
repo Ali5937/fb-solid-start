@@ -109,9 +109,9 @@ export async function SearchItems(
           state: selectedState,
           city: selectedCity,
         })
-    );
+    ).then((res) => res.json());
 
-    const responseData = await response.json();
+    const responseData = response.data;
     if (responseData.length > 0) {
       let lowestPrice = responseData[0].EuroPrice;
       let highestPrice = responseData[0].EuroPrice;

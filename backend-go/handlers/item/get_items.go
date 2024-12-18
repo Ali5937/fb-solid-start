@@ -152,9 +152,10 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	res := map[string]interface{}{"data": items}
 
-	if err := json.NewEncoder(w).Encode(items); err != nil {
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
 	}
 

@@ -25,8 +25,10 @@ func GetCountries(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	countryCache.RUnlock()
 
 	if cache.ExpiresAt.After(time.Now()) {
+		res := map[string]interface{}{"data": cache.Data}
+
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(cache.Data); err != nil {
+		if err := json.NewEncoder(w).Encode(res); err != nil {
 			http.Error(w, fmt.Sprintf("Failed to encode JSON: %v", err), http.StatusInternalServerError)
 		}
 		return
@@ -60,8 +62,10 @@ func GetCountries(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	cache = countryCache.Data
 	countryCache.Unlock()
 
+	res := map[string]interface{}{"data": cache.Data}
+
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(cache.Data); err != nil {
+	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, fmt.Sprintf("Failed to encode JSON: %v", err), http.StatusInternalServerError)
 	}
 }

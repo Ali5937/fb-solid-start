@@ -65,8 +65,10 @@ func GetCities(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		cities = append(cities, city)
 	}
 
+	res := map[string]interface{}{"data": cities}
+
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(cities); err != nil {
+	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, fmt.Sprintf("Failed to encode JSON: %v", err), http.StatusInternalServerError)
 	}
 }

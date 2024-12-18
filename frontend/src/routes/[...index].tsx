@@ -63,7 +63,7 @@ const getData = async (
         itemSort,
       })
   ).then((res) => res.json());
-  return response;
+  return response.data;
 };
 
 export default function Index() {
@@ -205,8 +205,7 @@ export default function Index() {
     const currencies = await fetch(`${baseUrl}/currencies`).then((res) =>
       res.json()
     );
-
-    setCurrencyData(currencies);
+    setCurrencyData(currencies.data);
   }
 
   createEffect(() => {
