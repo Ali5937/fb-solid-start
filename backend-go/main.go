@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/Ali5937/fb-solid-start/backend-go/config"
+	mWare "github.com/Ali5937/fb-solid-start/backend-go/middleware"
 	"github.com/Ali5937/fb-solid-start/backend-go/pgdb"
 	"github.com/Ali5937/fb-solid-start/backend-go/routes"
 	"github.com/go-chi/chi/middleware"
@@ -37,6 +38,7 @@ func main() {
 
 	r.Use(handlers.CORS(corsHeaders, corsMethods, corsHeadersAllowed, corsCredentials))
 	r.Use(middleware.Compress(5)) // Do gzipping in Nginx?
+	r.Use(mWare.RequestTiming)
 
 	r.Route("/api", func(api chi.Router) {
 		routes.ItemRoutes(api, pgDB)

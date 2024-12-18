@@ -7,15 +7,12 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/Ali5937/fb-solid-start/backend-go/models"
 	"github.com/lib/pq"
 )
 
 func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	start := time.Now()
-
 	queryParams := r.URL.Query()
 	_type := queryParams.Get("type")
 	min := queryParams.Get("min")
@@ -158,9 +155,6 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
 	}
-
-	elapsed := time.Since(start).Milliseconds()
-	fmt.Printf("/items: %vms\n", elapsed)
 }
 
 func getFinalPolygon(poly string, poly2 string) string {
