@@ -353,19 +353,9 @@ export default function Account(props: any) {
                     setLowestPrice={props.setLowestPrice}
                     highestPrice={props.highestPrice}
                     setHighestPrice={props.setHighestPrice}
-                    states={props.states}
-                    setStates={props.setStates}
-                    selectedState={props.selectedState}
-                    setSelectedState={props.setSelectedState}
                     propertyItems={props.propertyItems}
                     setPropertyItems={props.setPropertyItems}
                     itemSort={props.itemSort}
-                    countries={props.countries}
-                    setCountries={props.setCountries}
-                    selectedCountry={props.selectedCountry}
-                    setSelectedCountry={props.setSelectedCountry}
-                    selectedCity={props.selectedCity}
-                    setSelectedCity={props.setSelectedCity}
                   />
                 </Show>
                 <Show when={openFormNumber() === 2}>

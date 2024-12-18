@@ -12,6 +12,16 @@ import {
   baseUrl,
   defaultCountry,
   defaultState,
+  selectedState,
+  selectedCountry,
+  setStates,
+  setSelectedCountry,
+  setSelectedState,
+  setSelectedCity,
+  selectedCity,
+  states,
+  setCountries,
+  countries,
 } from "~/utils/store";
 
 export default function SearchBar(props: any) {
@@ -41,9 +51,8 @@ export default function SearchBar(props: any) {
       `${baseUrl}/search?` +
         new URLSearchParams({
           inputValue: inputValue(),
-          stateName: props.selectedState(),
-          countryName: props.selectedCountry(),
-          isAll: props.isAll,
+          stateName: selectedState(),
+          countryName: selectedCountry(),
         })
     ).then((res) => res.json());
     setSearchResults(response.data);
@@ -62,28 +71,28 @@ export default function SearchBar(props: any) {
   }
 
   async function getCountries() {
-    if (props.countries().length > 1) return;
+    if (countries().length > 1) return;
     const res = await fetch(`${baseUrl}/countries`).then((res) => res.json());
     const resCountries: string[] = [defaultCountry, ...res.data];
-    props.setCountries(resCountries);
+    setCountries(resCountries);
   }
 
   async function searchCountry(country: string) {
-    props.setSelectedCountry(country || "");
-    props.setSelectedState("");
-    props.setSelectedCity("");
+    setSelectedCountry(country || "");
+    setSelectedState("");
+    setSelectedCity("");
     const res = await fetch(
       `${baseUrl}/states?` +
         new URLSearchParams({
-          country: props.selectedCountry(),
+          country: selectedCountry(),
         })
     ).then((res) => res.json());
 
     if (res.data?.[0] == "") {
-      props.setStates([defaultState]);
+      setStates([defaultState]);
     } else {
       const resStates: string[] = [defaultState, ...res.data];
-      props.setStates(resStates);
+      setStates(resStates);
     }
     searchImmediately = true;
     if (inputRef) inputRef.value = "";
@@ -92,8 +101,8 @@ export default function SearchBar(props: any) {
   }
 
   async function searchState(state: string) {
-    props.setSelectedState(state || "");
-    props.setSelectedCity("");
+    setSelectedState(state || "");
+    setSelectedCity("");
     searchImmediately = true;
     if (inputRef) inputRef.value = "";
     await getInput();
@@ -102,9 +111,9 @@ export default function SearchBar(props: any) {
 
   async function clickCity(res: any) {
     searchCountry(res.country_name);
-    props.setSelectedCountry(res.country_name);
-    props.setSelectedState(res.state_name);
-    props.setSelectedCity(res.city_name);
+    setSelectedCountry(res.country_name);
+    setSelectedState(res.state_name);
+    setSelectedCity(res.city_name);
     props.setOpenDropdownNumber(0);
     setInputValue(res.city_name);
     await getSearchItems(res.lng, res.lat);
@@ -125,9 +134,9 @@ export default function SearchBar(props: any) {
       rentMax,
       buyMax,
       props.itemSort(),
-      props.selectedCountry(),
-      props.selectedState(),
-      props.selectedCity()
+      selectedCountry(),
+      selectedState(),
+      selectedCity()
     );
 
     props.setLowestPrice(resultItems?.lowestPrice);
@@ -192,9 +201,9 @@ export default function SearchBar(props: any) {
           <div class="title">Country</div>
           <select onChange={(e) => searchCountry(e.currentTarget?.value)}>
             <option value="" selected disabled hidden>
-              {props.selectedCountry() || defaultCountry}
+              {selectedCountry() || defaultCountry}
             </option>
-            <For each={props.countries()}>
+            <For each={countries()}>
               {(res: any) => (
                 <option value={res === defaultCountry ? "" : res}>{res}</option>
               )}
@@ -203,8 +212,8 @@ export default function SearchBar(props: any) {
         </div>
         <Show
           when={
-            props.selectedCountry() !== "" &&
-            (props.states().length > 1 || props.selectedCity() !== "")
+            selectedCountry() !== "" &&
+            (states().length > 1 || selectedCity() !== "")
           }
         >
           <div class="separation"></div>
@@ -212,9 +221,9 @@ export default function SearchBar(props: any) {
             <div class="title">State</div>
             <select onChange={(e) => searchState(e.currentTarget?.value)}>
               <option value="" selected disabled hidden>
-                {props.selectedState() || defaultState}
+                {selectedState() || defaultState}
               </option>
-              <For each={props.states()}>
+              <For each={states()}>
                 {(res: any) => (
                   <option value={res === defaultState ? "" : res}>{res}</option>
                 )}
