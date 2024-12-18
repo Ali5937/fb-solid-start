@@ -27,6 +27,9 @@ import {
   itemObj,
   baseUrl,
   theme,
+  selectedCity,
+  selectedCountry,
+  selectedState,
 } from "~/utils/store";
 import { isServer } from "solid-js/web";
 import Cookies from "js-cookie";
@@ -124,11 +127,6 @@ export default function Index() {
   const [highlightedItemLngLat, setHighlightedItemLngLat] = createSignal("");
   const [openDropdownNumber, setOpenDropdownNumber] = createSignal<number>(0);
   const [isProfileOpen, setIsProfileOpen] = createSignal<boolean>(false);
-  const [countries, setCountries] = createSignal<string[]>([""]);
-  const [states, setStates] = createSignal([]);
-  const [selectedCountry, setSelectedCountry] = createSignal<string>("");
-  const [selectedState, setSelectedState] = createSignal<string>("");
-  const [selectedCity, setSelectedCity] = createSignal<string>("");
 
   // let polygonString1: string = searchParams.poly;
   // let polygonString2: string = searchParams.poly2 ?? "";
@@ -289,16 +287,6 @@ export default function Index() {
           propertyItems={propertyItems}
           setPropertyItems={setPropertyItems}
           itemSort={itemSort}
-          countries={countries}
-          setCountries={setCountries}
-          selectedCountry={selectedCountry}
-          setSelectedCountry={setSelectedCountry}
-          states={states}
-          setStates={setStates}
-          selectedState={selectedState}
-          setSelectedState={setSelectedState}
-          selectedCity={selectedCity}
-          setSelectedCity={setSelectedCity}
         />
         <main>
           <Map
@@ -322,9 +310,6 @@ export default function Index() {
             isPanelOpen={isPanelOpen}
             setIsPanelOpen={setIsPanelOpen}
             initialSelectedId={initialSelectedId}
-            selectedCountry={selectedCountry}
-            selectedState={selectedState}
-            selectedCity={selectedCity}
           />
           <div
             class={`panel ${
@@ -388,19 +373,9 @@ export default function Index() {
                   highestPrice={highestPrice}
                   setHighestPrice={setHighestPrice}
                   displayUnits={displayUnits}
-                  states={states}
-                  setStates={setStates}
-                  selectedState={selectedState}
-                  setSelectedState={setSelectedState}
                   propertyItems={propertyItems}
                   setPropertyItems={setPropertyItems}
                   itemSort={itemSort}
-                  countries={countries}
-                  setCountries={setCountries}
-                  selectedCountry={selectedCountry}
-                  setSelectedCountry={setSelectedCountry}
-                  selectedCity={selectedCity}
-                  setSelectedCity={setSelectedCity}
                 />
               </Show>
             </Suspense>

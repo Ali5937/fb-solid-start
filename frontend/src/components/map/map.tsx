@@ -16,6 +16,9 @@ import {
   baseUrl,
   theme,
   themes,
+  selectedCountry,
+  selectedState,
+  selectedCity,
 } from "~/utils/store";
 import maplibregl from "maplibre-gl";
 import IconPencil from "~/assets/icon-pencil";
@@ -164,9 +167,9 @@ export default function Map(props: any) {
       rentMax,
       buyMax,
       props.itemSort(),
-      props.selectedCountry(),
-      props.selectedState(),
-      props.selectedCity()
+      selectedCountry(),
+      selectedState(),
+      selectedCity()
     );
 
     if (resultItems?.propertyItems) {
