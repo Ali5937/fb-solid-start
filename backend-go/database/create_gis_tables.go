@@ -175,9 +175,4 @@ func importCSV(filepath string, db *sql.DB) {
 			fmt.Printf("\rInserting Cities: %v%%", math.Round(float64(i)/43680))
 		}
 	}
-
 }
-
-// func insertDataBatch() {
-
-// }

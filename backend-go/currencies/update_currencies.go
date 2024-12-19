@@ -40,9 +40,9 @@ func main() {
 
 	var currenciesData map[string]models.Currency
 
-	file, err := os.Open("./currency-template.json")
+	file, err := os.Open("./currency_template.json")
 	if err != nil {
-		log.Fatalf("Error opening currency-template.json: %v", err)
+		log.Fatalf("Error opening currency_template.json: %v", err)
 	}
 	defer file.Close()
 
@@ -59,14 +59,14 @@ func main() {
 		}
 	}
 
-	writeFile, err := os.OpenFile("./currency-updated.json", os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+	writeFile, err := os.OpenFile("./currency_updated.json", os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
-		log.Fatalf("Error opening currency-template.json: %v", err)
+		log.Fatalf("Error opening currency_template.json: %v", err)
 	}
 	encoder := json.NewEncoder(writeFile)
 	err = encoder.Encode(currenciesData)
 	if err != nil {
-		log.Fatalf("Error writing co currency-template.json: %v", err)
+		log.Fatalf("Error writing co currency_template.json: %v", err)
 	}
 
 	fmt.Println("Currencies updated successfully")
