@@ -1,5 +1,3 @@
-import { itemObj, saleObj } from "./store";
-
 export async function SearchItems(
   isMoveMap: boolean,
   map: any | null,

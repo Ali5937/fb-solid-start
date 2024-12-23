@@ -116,19 +116,9 @@ export default function DualSlider(props: any) {
   createEffect(() => {
     if (sliderInstance) {
       if (saleType() === "rent") {
-        setSliderValues([
-          rentPriceRange()[0],
-          rentPriceRange()[1] <= rentPriceRange()[0]
-            ? maxValue()
-            : rentPriceRange()[1],
-        ]);
+        setSliderValues([rentPriceRange()[0], rentPriceRange()[1]]);
       } else if (saleType() === "buy") {
-        setSliderValues([
-          buyPriceRange()[0],
-          buyPriceRange()[1] <= buyPriceRange()[0]
-            ? maxValue()
-            : buyPriceRange()[1],
-        ]);
+        setSliderValues([buyPriceRange()[0], buyPriceRange()[1]]);
         sliderInstance.set([
           logLikeScale(sliderValues()[0]),
           logLikeScale(sliderValues()[1]),
@@ -151,13 +141,13 @@ export default function DualSlider(props: any) {
       <div class="price-slider-label">
         Price:{" "}
         {Math.round(
-          sliderValues()[0] * Number(currentCurrency()?.[3])
+          sliderValues()[0] * Number(currentCurrency()?.exchangeRate || 1)
         ).toLocaleString()}{" "}
         -{" "}
         {Math.round(
-          sliderValues()[1] * Number(currentCurrency()?.[3])
+          sliderValues()[1] * Number(currentCurrency()?.exchangeRate || 1)
         ).toLocaleString()}{" "}
-        <span>{currentCurrency()?.[2] ?? "€"}</span>
+        <span>{currentCurrency()?.symbol ?? "€"}</span>
       </div>
     </div>
   );

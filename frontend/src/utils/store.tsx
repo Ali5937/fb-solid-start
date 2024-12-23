@@ -47,3 +47,4 @@ export const [states, setStates] = createSignal<string[]>([""]);
 export const [selectedCountry, setSelectedCountry] = createSignal<string>("");
 export const [selectedState, setSelectedState] = createSignal<string>("");
 export const [selectedCity, setSelectedCity] = createSignal<string>("");
+export const [inputValue, setInputValue] = createSignal("");

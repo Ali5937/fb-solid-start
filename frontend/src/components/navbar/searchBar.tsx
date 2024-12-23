@@ -1,7 +1,7 @@
 import { For, Show, createEffect, createSignal, onMount } from "solid-js";
 import XIcon from "../../assets/icon-x-border";
 import { SearchItems } from "~/utils/SearchItems";
-import { LngLat } from "maplibre-gl";
+import { GetItemType, SearchItems } from "~/utils/SearchItems";
 import {
   rentPriceRange,
   buyPriceRange,
@@ -22,13 +22,14 @@ import {
   states,
   setCountries,
   countries,
+  inputValue,
+  setInputValue,
 } from "~/utils/store";
 
 export default function SearchBar(props: any) {
   let inputRef: HTMLInputElement | undefined;
-  const [inputValue, setInputValue] = createSignal("");
   const [searchResults, setSearchResults] = createSignal([]);
-  const [isInputFocused, setIsInputFocused] = createSignal(false);
+  const [isSearching, setIsSearching] = createSignal(false);
 
   const startTime = 700;
   const interval = 10;
@@ -38,7 +39,10 @@ export default function SearchBar(props: any) {
 
   setInterval(() => {
     if (timer >= interval && hasNewInput) timer = timer - interval;
-    if ((timer <= 0 && hasNewInput) || searchImmediately) {
+    if (
+      inputValue().length >= 3 &&
+      ((timer <= 0 && hasNewInput) || searchImmediately)
+    ) {
       getSearch();
       timer = startTime;
       hasNewInput = false;
@@ -47,14 +51,26 @@ export default function SearchBar(props: any) {
   }, interval);
 
   async function getSearch() {
+    setIsSearching(true);
+    const type = GetItemType(null, itemType(), saleType());
+    let min, max: number;
+    if (saleType() == "rent") {
+      [min, max] = rentPriceRange();
+    } else {
+      [min, max] = buyPriceRange();
+    }
     const response = await fetch(
-      `${baseUrl}/search?` +
+      `${baseUrl}/cities?` +
         new URLSearchParams({
-          inputValue: inputValue(),
-          stateName: selectedState(),
-          countryName: selectedCountry(),
+          type: type.toString(),
+          min: min.toString(),
+          max: max.toString(),
+          city: inputValue(),
+          state: selectedState(),
+          country: selectedCountry(),
         })
     ).then((res) => res.json());
+    setIsSearching(false);
     setSearchResults(response.data);
   }
 
@@ -81,6 +97,8 @@ export default function SearchBar(props: any) {
     setSelectedCountry(country || "");
     setSelectedState("");
     setSelectedCity("");
+    setInputValue("");
+    setSearchResults([]);
     const res = await fetch(
       `${baseUrl}/states?` +
         new URLSearchParams({
@@ -88,35 +106,40 @@ export default function SearchBar(props: any) {
         })
     ).then((res) => res.json());
 
-    if (res.data?.[0] == "") {
-      setStates([defaultState]);
-    } else {
-      const resStates: string[] = [defaultState, ...res.data];
-      setStates(resStates);
-    }
-    searchImmediately = true;
-    if (inputRef) inputRef.value = "";
-    await getInput();
+    let statesArr: string[] = [];
+    res.data.forEach((stateEl: any) => {
+      if (stateEl.length > 0) {
+        statesArr.push(stateEl);
+      }
+      searchImmediately = true;
+    });
+
+    const resStates: string[] = [defaultState, ...statesArr];
+    setStates(resStates);
     await getSearchItems();
   }
 
   async function searchState(state: string) {
     setSelectedState(state || "");
     setSelectedCity("");
+    setInputValue("");
+    setSearchResults([]);
     searchImmediately = true;
-    if (inputRef) inputRef.value = "";
-    await getInput();
     await getSearchItems();
   }
 
   async function clickCity(res: any) {
-    searchCountry(res.country_name);
-    setSelectedCountry(res.country_name);
-    setSelectedState(res.state_name);
-    setSelectedCity(res.city_name);
+    searchCountry(res.Country);
+    setSelectedCountry(res.Country);
+    setSelectedState(res.State);
+    setSelectedCity(res.City);
     props.setOpenDropdownNumber(0);
-    setInputValue(res.city_name);
-    await getSearchItems(res.lng, res.lat);
+    setInputValue(res.City);
+    await getSearchItems(res.Lng, res.Lat);
+  }
+
+  function clickInput() {
+    if (searchResults()?.length == 0) searchImmediately = true;
   }
 
   async function getSearchItems(cityLng?: number, cityLat?: number) {
@@ -239,8 +262,7 @@ export default function SearchBar(props: any) {
           class="button-style highlighted"
           ref={inputRef}
           onInput={getInput}
-          onFocus={() => setIsInputFocused(true)}
-          onBlur={() => setIsInputFocused(false)}
+          onfocus={clickInput}
           placeholder="Search..."
           value={inputValue()}
         />
@@ -248,17 +270,19 @@ export default function SearchBar(props: any) {
       <Show when={isInputFocused() && searchResults().length > 0}>
         <div class="search-result-parent">
           <div>
-            <For each={searchResults()}>
-              {(res: any) => (
-                <div class="search-result" onMouseDown={() => clickCity(res)}>
-                  <div class="city-name">{res.city_name}</div>
-                  <div>
-                    <div>{res.state_name},</div>
-                    <div>{res.country_name}</div>
+            <Show when={!isSearching()}>
+              <For each={searchResults()}>
+                {(res: any) => (
+                  <div class="search-result" onMouseDown={() => clickCity(res)}>
+                    <div class="city-name">{res.City}</div>
+                    <div>
+                      <div>{res.State},</div>
+                      <div>{res.Country}</div>
+                    </div>
                   </div>
-                </div>
-              )}
-            </For>
+                )}
+              </For>
+            </Show>
           </div>
         </div>
       </Show>
