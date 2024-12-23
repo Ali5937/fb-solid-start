@@ -1,7 +1,8 @@
 import { For, Show, createEffect, createSignal, onMount } from "solid-js";
 import XIcon from "../../assets/icon-x-border";
-import { SearchItems } from "~/utils/SearchItems";
+import IconSpinner from "~/assets/icon-spinner";
 import { GetItemType, SearchItems } from "~/utils/SearchItems";
+
 import {
   rentPriceRange,
   buyPriceRange,
@@ -267,7 +268,12 @@ export default function SearchBar(props: any) {
           value={inputValue()}
         />
       </div>
-      <Show when={isInputFocused() && searchResults().length > 0}>
+      <Show when={isSearching()}>
+        <div class="spinner">
+          <IconSpinner />
+        </div>
+      </Show>
+      <Show when={searchResults()?.length > 0}>
         <div class="search-result-parent">
           <div>
             <Show when={!isSearching()}>
