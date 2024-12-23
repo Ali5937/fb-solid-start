@@ -57,7 +57,7 @@ type PostItem struct {
 	Heating           *int16
 	UtilityCost       *int16
 	Deposit           *int16
-	IsDeleted         bool
+	IsActive          bool
 	PetsAllowed       *bool
 	Cooling           *bool
 	Elevator          *bool
@@ -70,8 +70,15 @@ type PostItem struct {
 	Pictures          []int16
 }
 
+type GetCity struct {
+	City    string
+	State   string
+	Country string
+	Lat     float64
+	Lng     float64
+}
+
 type City struct {
-	ID      int64
 	City    string
 	State   string
 	Country string

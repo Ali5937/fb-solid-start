@@ -9,14 +9,15 @@ import (
 	"strings"
 
 	"github.com/Ali5937/fb-solid-start/backend-go/models"
+	"github.com/Ali5937/fb-solid-start/backend-go/utils"
 	"github.com/lib/pq"
 )
 
 func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	queryParams := r.URL.Query()
 	_type := queryParams.Get("type")
-	min := queryParams.Get("min")
-	max := queryParams.Get("max")
+	minStr := queryParams.Get("min")
+	maxStr := queryParams.Get("max")
 	polygon := queryParams.Get("polygon")
 	polygon2 := queryParams.Get("polygon2")
 	itemSort := queryParams.Get("itemSort")
@@ -25,7 +26,11 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	city := queryParams.Get("city")
 
 	finalPolygon := getFinalPolygon(polygon, polygon2)
-	var finalType []int = parseStringArray(_type)
+	finalType, err := utils.ParseTypeStringArray(_type)
+	if err != nil {
+		http.Error(w, `{"error": "Type incorrect"}`, http.StatusInternalServerError)
+		return
+	}
 
 	var args []interface{}
 	var sqlParamCount int = 0
@@ -54,20 +59,28 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		args = append(args, pq.Array(finalType))
 	}
 
-	minVal, minErr := strconv.Atoi(min)
-	if minErr != nil {
+	minVal, err := strconv.Atoi(minStr)
+	if err != nil {
+		http.Error(w, `{"error": "Error converting string to number"}`, http.StatusInternalServerError)
 		return
 	}
 	sqlParamCount++
 	queryText += fmt.Sprintf(" AND euro_price >= $%d", sqlParamCount)
 	args = append(args, minVal)
 
-	if max != "" {
-		if maxVal, maxErr := strconv.Atoi(max); maxErr == nil {
-			sqlParamCount++
-			queryText += fmt.Sprintf(" AND euro_price <= $%d", sqlParamCount)
-			args = append(args, maxVal)
+	if maxStr != "" {
+		maxVal, err := strconv.Atoi(maxStr)
+		if err != nil {
+			http.Error(w, `{"error": "Error converting string to number"}`, http.StatusInternalServerError)
+			return
 		}
+		if maxVal < minVal {
+			http.Error(w, `{"error": "Error max price is less than min price"}`, http.StatusInternalServerError)
+			return
+		}
+		sqlParamCount++
+		queryText += fmt.Sprintf(" AND euro_price <= $%d", sqlParamCount)
+		args = append(args, maxVal)
 	}
 
 	if country != "" {
@@ -108,7 +121,7 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	rows, err := db.Query(queryText, args...)
 
 	if err != nil {
-		http.Error(w, "Error fetching items from database", http.StatusInternalServerError)
+		http.Error(w, `{"error": "Error fetching items from database"}`, http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
@@ -145,7 +158,7 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	if err := rows.Err(); err != nil {
-		http.Error(w, "Error iterating rows", http.StatusInternalServerError)
+		http.Error(w, `{"error": "Error iterating rows"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -153,7 +166,7 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
+		http.Error(w, `{"error": "Error encoding JSON}"`, http.StatusInternalServerError)
 	}
 }
 
@@ -179,17 +192,4 @@ func polyToString(poly string) string {
 		}
 	}
 	return strings.Join(formattedPairs, ", ")
-}
-
-func parseStringArray(str string) []int {
-	var numArr []int
-	for _, s := range strings.Split(str, ",") {
-		var num int
-		if _, err := fmt.Sscanf(s, "%d", &num); err == nil {
-			if num <= 18 {
-				numArr = append(numArr, num)
-			}
-		}
-	}
-	return numArr
 }

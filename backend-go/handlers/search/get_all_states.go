@@ -12,13 +12,12 @@ func GetAllStates(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	country := queryParams.Get("country")
 
 	rows, err := db.Query(`
-		SELECT DISTINCT s.state_name
-		FROM states s
-		JOIN items i ON s.state_name = i.state
-		WHERE COALESCE(s.country_name, $1) = $1
+		SELECT state_name
+		FROM states
+		WHERE country_name = $1
 		ORDER BY state_name ASC;`, country)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching all states %v", err), http.StatusInternalServerError)
+		http.Error(w, `{"error": "Error fetching all states"}`, http.StatusInternalServerError)
 	}
 	defer rows.Close()
 
@@ -36,6 +35,6 @@ func GetAllStates(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		http.Error(w, fmt.Sprintf("Failed to encode JSON: %v", err), http.StatusInternalServerError)
+		http.Error(w, `{"error": "Failed to encode JSON"}`, http.StatusInternalServerError)
 	}
 }

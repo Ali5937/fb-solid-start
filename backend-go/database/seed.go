@@ -19,6 +19,12 @@ func main() {
 
 	flag.Parse()
 
+	if *allFlag {
+		if !askConfirmation("Are you sure you want to run all commands?") {
+			return
+		}
+	}
+
 	if *allFlag || *dbFlag {
 		createDatabase()
 	}
@@ -31,10 +37,13 @@ func main() {
 	if *allFlag || *seedUsersFlag {
 		seedUsers()
 	}
-	if *allFlag || *seedItemsFlag {
+	if *seedItemsFlag {
 		if askConfirmation("Are you sure you want to seed the items?") {
 			seedItems()
 		}
+	}
+	if *allFlag {
+		seedItems()
 	}
 
 	if !*allFlag && !*dbFlag && !*gisTablesFlag && !*tablesFlag && !*seedUsersFlag && !*seedItemsFlag {

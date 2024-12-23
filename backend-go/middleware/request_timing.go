@@ -11,6 +11,6 @@ func RequestTiming(next http.Handler) http.Handler {
 		start := time.Now()
 		next.ServeHTTP(w, r)
 		elapsed := time.Since(start).Milliseconds()
-		fmt.Printf("Time: %vms - %s %s\n", r.Method, r.URL.Path, elapsed)
+		fmt.Printf("Time: %vms - %s %s\n", elapsed, r.Method, r.URL.Path)
 	})
 }

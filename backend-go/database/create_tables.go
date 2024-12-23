@@ -32,17 +32,18 @@ func createTables() {
 	createTableQueryItems := `
 	CREATE TABLE items (
 		id BIGSERIAL,
-		user_id UUID NOT NULL,
-		original_price BIGINT NOT NULL CHECK (original_price >= 0),
+		updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 		euro_price INTEGER NOT NULL CHECK (euro_price >= 0),
-		first_picture SMALLINT NOT NULL,
 		type SMALLINT NOT NULL CHECK (type >= 0),
 		size SMALLINT NOT NULL CHECK (size >= 0),
 		bed SMALLINT NOT NULL CHECK (bed >= 0),
 		bath SMALLINT NOT NULL CHECK (bath >= 0),
 		like_count SMALLINT NOT NULL CHECK (like_count >= 0),
 		ranking SMALLINT NOT NULL CHECK (ranking >= 0),
+		first_picture SMALLINT NOT NULL,
+		is_active BOOLEAN NOT NULL DEFAULT TRUE,
 		coordinates GEOGRAPHY(Point, 4326) NOT NULL,
+		original_price BIGINT NOT NULL CHECK (original_price >= 0),
 		country TEXT NOT NULL,
 		state TEXT NOT NULL,
 		city TEXT NOT NULL,
@@ -56,7 +57,6 @@ func createTables() {
 		heating SMALLINT CHECK (heating >= 0),
 		utility_cost SMALLINT CHECK (utility_cost >= 0),
 		deposit SMALLINT CHECK (deposit >= 0),
-		is_deleted BOOLEAN NOT NULL,
 		pets_allowed BOOLEAN,
 		cooling BOOLEAN,
 		elevator BOOLEAN,
@@ -65,8 +65,8 @@ func createTables() {
 		parking BOOLEAN,
 		council_home BOOLEAN,
 		auction_date DATE,
+		user_id UUID NOT NULL,
 		firm_id UUID,
-		updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 		created_at DATE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 		PRIMARY KEY (id, type)
 	) PARTITION BY RANGE (type)`
@@ -235,13 +235,13 @@ func testTables() {
 		coordinates, first_picture, original_price, user_id, euro_price, type,
 		size, bed, bath, like_count, pets_allowed, ranking,
 		city, state, country, currency_name, currency_symbol, currency_code,
-		is_deleted, cooling, garden, firm_boost, plot
+		is_active, cooling, garden, firm_boost, plot
 	)
 	VALUES (
 		ST_GeomFromText('POINT(52.502362434 13.404364548)', 4326), 1, 100, $1, 90, 1,
 		50, 2, 1, 10, true, 2,
 		'Prizren', 'Prizren', 'Kosovo', 'Euro', '€', 'EUR',
-		false, true, false, 1, 2344
+		true, true, false, 1, 2344
 	)
 	RETURNING id, type;`
 

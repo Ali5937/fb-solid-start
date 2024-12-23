@@ -18,7 +18,7 @@ func GetStates(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		WHERE COALESCE(s.country_name, $1) = $1
 		ORDER BY state_name ASC;`, country)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error fetching states %v", err), http.StatusInternalServerError)
+		http.Error(w, `{"error": "Error fetching states"}`, http.StatusInternalServerError)
 	}
 	defer rows.Close()
 
@@ -36,6 +36,6 @@ func GetStates(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		http.Error(w, fmt.Sprintf("Failed to encode JSON: %v", err), http.StatusInternalServerError)
+		http.Error(w, `{"error": "Failed to encode JSON"}`, http.StatusInternalServerError)
 	}
 }

@@ -3,7 +3,9 @@ package main
 import (
 	"database/sql"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"math"
 	"os"
@@ -13,8 +15,6 @@ import (
 	"github.com/Ali5937/fb-solid-start/backend-go/config"
 	"github.com/Ali5937/fb-solid-start/backend-go/models"
 )
-
-var rows []models.City
 
 func createGisTables() {
 	startTime := time.Now()
@@ -55,14 +55,13 @@ func createGisTables() {
 
 	_, err = db.Exec(`
     CREATE TABLE IF NOT EXISTS cities (
-      id BIGINT PRIMARY KEY,
       lat REAL NOT NULL,
       lng REAL NOT NULL,
       ranking SMALLINT NOT NULL,
       city_name TEXT NOT NULL,
       state_name TEXT NOT NULL,
       country_name TEXT NOT NULL,
-      UNIQUE (city_name, state_name, country_name, ranking),
+      PRIMARY KEY (city_name, state_name, country_name, ranking),
       FOREIGN KEY (state_name, country_name) REFERENCES states (state_name, country_name)
     );`)
 	if err != nil {
@@ -74,13 +73,14 @@ func createGisTables() {
 		log.Fatalf("Error creating index: %v", err)
 	}
 
-	importCSV("./worldcities.csv", db)
+	populateTables(db)
 
 	elapsedTime := time.Since(startTime).Milliseconds()
 	fmt.Printf("\nTime taken: %vms\n", elapsedTime) // 1008048ms ~16.8 min
 }
 
-func importCSV(filepath string, db *sql.DB) {
+func populateTables(db *sql.DB) {
+	var filepath = "./worldcities.csv"
 	file, err := os.Open(filepath)
 	if err != nil {
 		log.Fatalf("Error opening CSV file %v: %v", filepath, err)
@@ -96,16 +96,12 @@ func importCSV(filepath string, db *sql.DB) {
 
 	statesByCountry := make(map[string]map[string]struct{})
 
+	var rows []models.City
 	for _, row := range records {
-		id, err := strconv.ParseInt(row[19], 10, 64)
-		if err != nil {
-			log.Fatalf("Error converting id to int64: %v, %v", err, row[19])
-		}
 		ranking, err := strconv.ParseInt(row[16], 10, 16)
 		if err != nil {
 			log.Fatalf("Error converting ranking to int16: %v", err)
 		}
-
 		lat, err := strconv.ParseFloat(row[3], 32)
 		if err != nil {
 			log.Fatalf("Error converting lat to float32: %v", err)
@@ -116,7 +112,6 @@ func importCSV(filepath string, db *sql.DB) {
 		}
 
 		city := models.City{
-			ID:      id,
 			City:    row[1],
 			State:   row[9],
 			Country: row[5],
@@ -146,12 +141,28 @@ func importCSV(filepath string, db *sql.DB) {
 		ON CONFLICT DO NOTHING;`
 
 	insertCityQuery := `
-		INSERT INTO cities (id, city_name, state_name, country_name, ranking, lat, lng)
-		SELECT $1, $2, $3, $4, $5, $6, $7
-		WHERE EXISTS (SELECT 1 FROM states WHERE state_name = $3)
+		INSERT INTO cities (city_name, state_name, country_name, ranking, lat, lng)
+		SELECT $1, $2, $3, $4, $5, $6
+		WHERE EXISTS (
+			SELECT 1 
+			FROM states 
+			WHERE state_name = $2
+		) AND EXISTS (
+			SELECT 1 
+			FROM countries 
+			WHERE country_name = $3
+		)
 		ON CONFLICT DO NOTHING;`
 
+	jsonCountries, err := getCountriesJSON()
+	if err != nil {
+		log.Fatalf("Error: getting countries/states from JSON %v", err)
+	}
+
 	for country, states := range statesByCountry {
+		if _, exists := jsonCountries[country]; !exists {
+			continue
+		}
 		_, err := db.Exec(insertCountryQuery, country)
 		if err != nil {
 			log.Fatalf("Error executing insert query into countries: %v", err)
@@ -166,8 +177,15 @@ func importCSV(filepath string, db *sql.DB) {
 	}
 
 	for i, row := range rows {
+		if _, exists := jsonCountries[row.Country]; !exists {
+			continue
+		}
+
+		if row.City == "Bressanone" {
+			fmt.Printf("Bressanone Row: %v, %v", row, row.City)
+		}
 		_, err := db.Exec(
-			insertCityQuery, row.ID, row.City, row.State, row.Country, row.Ranking, row.Lat, row.Lng)
+			insertCityQuery, row.City, row.State, row.Country, row.Ranking, row.Lat, row.Lng)
 		if err != nil {
 			log.Fatalf("Error executing insert query into cities: %v", err)
 		}
@@ -175,4 +193,25 @@ func importCSV(filepath string, db *sql.DB) {
 			fmt.Printf("\rInserting Cities: %v%%", math.Round(float64(i)/43680))
 		}
 	}
+}
+
+func getCountriesJSON() (map[string]interface{}, error) {
+	file, err := os.Open("countries.json")
+	if err != nil {
+		return nil, fmt.Errorf("opening countries.json %v", err)
+	}
+	defer file.Close()
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		fmt.Printf("Error reading countries.json %v", err)
+	}
+
+	var result map[string]interface{}
+	err = json.Unmarshal(data, &result)
+	if err != nil {
+		return nil, fmt.Errorf("unmarshaling JSON: %v", err)
+	}
+
+	return result, nil
 }
