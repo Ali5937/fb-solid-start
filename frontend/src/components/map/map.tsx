@@ -105,7 +105,7 @@ export default function Map(props: any) {
               ]
             : mapMarkerColor[0],
         "circle-stroke-width": 1,
-        "circle-stroke-color": theme() === themes.dark ? "white" : "black",
+        "circle-stroke-color": "white",
       },
     });
   }

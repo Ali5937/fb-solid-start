@@ -44,9 +44,9 @@ var (
 )
 
 func init() {
-	workingDir, err1 := os.Getwd()
-	if err1 != nil {
-		log.Fatalf("Error getting working directory: %v", err1)
+	workingDir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Error getting working directory: %v", err)
 	}
 
 	currentDir := filepath.Base(workingDir)
@@ -55,7 +55,7 @@ func init() {
 		envPath = "../.env"
 	}
 
-	err := godotenv.Load(envPath)
+	err = godotenv.Load(envPath)
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
