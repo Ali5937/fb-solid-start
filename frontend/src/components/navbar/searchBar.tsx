@@ -25,6 +25,7 @@ import {
   countries,
   inputValue,
   setInputValue,
+  selectState,
 } from "~/utils/store";
 
 export default function SearchBar(props: any) {
@@ -108,7 +109,7 @@ export default function SearchBar(props: any) {
     ).then((res) => res.json());
 
     let statesArr: string[] = [];
-    res.data.forEach((stateEl: any) => {
+    res.data?.forEach((stateEl: any) => {
       if (stateEl.length > 0) {
         statesArr.push(stateEl);
       }
@@ -209,6 +210,23 @@ export default function SearchBar(props: any) {
     }
   }
 
+  function removeCountry() {
+    searchCountry("");
+    setSelectedCountry("");
+    setInputValue("");
+  }
+
+  function removeState() {
+    searchState("");
+    setSelectedState("");
+    setInputValue("");
+  }
+
+  function removeInput() {
+    setInputValue("");
+    setSearchResults([]);
+  }
+
   onMount(() => {
     getCountries();
   });
@@ -223,16 +241,28 @@ export default function SearchBar(props: any) {
       <div>
         <div class="search-element select-country">
           <div class="title">Country</div>
-          <select onChange={(e) => searchCountry(e.currentTarget?.value)}>
-            <option value="" selected disabled hidden>
-              {selectedCountry() || defaultCountry}
-            </option>
-            <For each={countries()}>
-              {(res: any) => (
-                <option value={res === defaultCountry ? "" : res}>{res}</option>
-              )}
-            </For>
-          </select>
+          <div class="search-field-parent">
+            <select
+              value={selectedCountry()}
+              onChange={(e) => searchCountry(e.currentTarget?.value)}
+            >
+              <option value="" selected disabled hidden>
+                {selectedCountry() || defaultCountry}
+              </option>
+              <For each={countries()}>
+                {(res: any) => (
+                  <option value={res === defaultCountry ? "" : res}>
+                    {res}
+                  </option>
+                )}
+              </For>
+            </select>
+            <Show when={selectedCountry()}>
+              <div class="icon-x-border" onclick={removeCountry}>
+                <XIcon />
+              </div>
+            </Show>
+          </div>
         </div>
         <Show
           when={
@@ -243,30 +273,49 @@ export default function SearchBar(props: any) {
           <div class="separation"></div>
           <div class="search-element select-state">
             <div class="title">State</div>
-            <select onChange={(e) => searchState(e.currentTarget?.value)}>
-              <option value="" selected disabled hidden>
-                {selectedState() || defaultState}
-              </option>
-              <For each={states()}>
-                {(res: any) => (
-                  <option value={res === defaultState ? "" : res}>{res}</option>
-                )}
-              </For>
-            </select>
+            <div class="search-field-parent">
+              <select
+                value={selectedState()}
+                onChange={(e) => searchState(e.currentTarget?.value)}
+              >
+                <option value="" selected disabled hidden>
+                  {selectedState() || defaultState}
+                </option>
+                <For each={states()}>
+                  {(res: any) => (
+                    <option value={res === defaultState ? "" : res}>
+                      {res}
+                    </option>
+                  )}
+                </For>
+              </select>
+              <Show when={selectedState()}>
+                <div class="icon-x-border" onclick={removeState}>
+                  <XIcon />
+                </div>
+              </Show>
+            </div>
           </div>
         </Show>
       </div>
       <div class="separation"></div>
       <div class="search-element">
         <div class="title">Search Cities</div>
-        <input
-          class="button-style highlighted"
-          ref={inputRef}
-          onInput={getInput}
-          onfocus={clickInput}
-          placeholder="Search..."
-          value={inputValue()}
-        />
+        <div class="search-field-parent">
+          <input
+            class="button-style highlighted"
+            ref={inputRef}
+            onInput={getInput}
+            onfocus={clickInput}
+            placeholder="Search..."
+            value={inputValue()}
+          />
+          <Show when={inputValue()}>
+            <div class="icon-x-border" onclick={removeInput}>
+              <XIcon />
+            </div>
+          </Show>
+        </div>
       </div>
       <Show when={isSearching()}>
         <div class="spinner">
