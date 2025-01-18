@@ -181,9 +181,6 @@ func populateTables(db *sql.DB) {
 			continue
 		}
 
-		if row.City == "Bressanone" {
-			fmt.Printf("Bressanone Row: %v, %v", row, row.City)
-		}
 		_, err := db.Exec(
 			insertCityQuery, row.City, row.State, row.Country, row.Ranking, row.Lat, row.Lng)
 		if err != nil {
