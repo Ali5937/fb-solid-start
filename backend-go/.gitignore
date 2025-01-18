@@ -172,5 +172,8 @@ dist
 # World City Database
 worldcities.csv
 
-#Go Build
+# Go Build
 backend-go.exe
+
+# test folder
+/1test
