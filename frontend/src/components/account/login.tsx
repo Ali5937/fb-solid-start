@@ -1,4 +1,4 @@
-import { baseUrl } from "~/utils/store";
+import { baseUrl, setUserId } from "~/utils/store";
 import "./account.css";
 import { Show, createSignal } from "solid-js";
 
@@ -67,7 +67,7 @@ export default function Login(props: any) {
     }).then((res) => res.json());
     if (result.status === "success") {
       props.setIsLoggedIn(true);
-      props.setUserId(result.userId);
+      setUserId(result.user_id);
     }
     console.log("login result: ", result.status);
   }

@@ -102,14 +102,6 @@ export default function Index() {
   const [itemId, setItemId] = createSignal<string>(oldId.toString() || "");
   // const [userId, setUserId] = createSignal<string>();
 
-  const [lowestPrice, setLowestPrice] = createSignal<number>();
-  const [highestPrice, setHighestPrice] = createSignal<number>();
-  const [moveMapCoordinates, setMoveMapCoordinates] = createSignal<{
-    lng1: number;
-    lat1: number;
-    lng2: number;
-    lat2: number;
-  }>();
   const [markers, setMarkers] = createSignal<any>();
   const [mapLocation, setMapLocation] = createSignal<[number, number, number]>([
     oldLng,
@@ -275,13 +267,8 @@ export default function Index() {
           setIsProfileOpen={setIsProfileOpen}
           isPanelOpen={setIsPanelOpen}
           setIsPanelOpen={setIsPanelOpen}
-          setMoveMapCoordinates={setMoveMapCoordinates}
           markers={markers}
           setMarkers={setMarkers}
-          lowestPrice={lowestPrice}
-          setLowestPrice={setLowestPrice}
-          highestPrice={highestPrice}
-          setHighestPrice={setHighestPrice}
           displayUnits={displayUnits}
           setDisplayUnits={setDisplayUnits}
           propertyItems={propertyItems}
@@ -290,12 +277,6 @@ export default function Index() {
         />
         <main>
           <Map
-            lowestPrice={lowestPrice}
-            setLowestPrice={setLowestPrice}
-            highestPrice={highestPrice}
-            setHighestPrice={setHighestPrice}
-            moveMapCoordinates={moveMapCoordinates}
-            setMoveMapCoordinates={setMoveMapCoordinates}
             mapLocation={mapLocation}
             setMapLocation={setMapLocation}
             displayUnits={displayUnits}
@@ -365,13 +346,8 @@ export default function Index() {
                   windowWidth={windowWidth}
                   windowHeight={windowHeight}
                   setOpenDropdownNumber={setOpenDropdownNumber}
-                  setMoveMapCoordinates={setMoveMapCoordinates}
                   markers={markers}
                   setMarkers={setMarkers}
-                  lowestPrice={lowestPrice}
-                  setLowestPrice={setLowestPrice}
-                  highestPrice={highestPrice}
-                  setHighestPrice={setHighestPrice}
                   displayUnits={displayUnits}
                   propertyItems={propertyItems}
                   setPropertyItems={setPropertyItems}

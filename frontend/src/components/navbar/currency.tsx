@@ -1,4 +1,4 @@
-import { For, Show, Suspense, createEffect, createSignal } from "solid-js";
+import { Show, Suspense } from "solid-js";
 import AllCurrencies from "./allCurrencies";
 import {
   currencyData,

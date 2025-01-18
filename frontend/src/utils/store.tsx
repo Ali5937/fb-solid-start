@@ -33,9 +33,14 @@ export const [buyPriceRange, setBuyPriceRange] = createSignal<[number, number]>(
   maxValues.buyPrice
 );
 
+export const [lowestPrice, setLowestPrice] = createSignal<number>(0);
+export const [highestPrice, setHighestPrice] = createSignal<number>(1);
+
 export const [currencyData, setCurrencyData] = createSignal<any>();
 export const [currentCurrency, setCurrentCurrency] =
   createSignal<Currency | null>(GetCurrentCurrency().currentCurrency);
+
+export const [userId, setUserId] = createSignal<string>();
 
 export const defaultCountry = "All Countries";
 export const defaultState = "All States";
@@ -48,3 +53,10 @@ export const [selectedCountry, setSelectedCountry] = createSignal<string>("");
 export const [selectedState, setSelectedState] = createSignal<string>("");
 export const [selectedCity, setSelectedCity] = createSignal<string>("");
 export const [inputValue, setInputValue] = createSignal("");
+
+export const [moveMapCoordinates, setMoveMapCoordinates] = createSignal<{
+  lng1: number;
+  lat1: number;
+  lng2: number;
+  lat2: number;
+}>();

@@ -25,7 +25,9 @@ import {
   countries,
   inputValue,
   setInputValue,
-  selectState,
+  setMoveMapCoordinates,
+  setLowestPrice,
+  setHighestPrice,
 } from "~/utils/store";
 
 export default function SearchBar(props: any) {
@@ -164,21 +166,21 @@ export default function SearchBar(props: any) {
       selectedCity()
     );
 
-    props.setLowestPrice(resultItems?.lowestPrice);
-    props.setHighestPrice(resultItems?.highestPrice);
+    setLowestPrice(resultItems?.lowestPrice);
+    setHighestPrice(resultItems?.highestPrice);
     props.setMarkers(resultItems?.markers);
     props.setPropertyItems(resultItems?.propertyItems);
 
     if (props.propertyItems()) {
       const lowHighLngLat = getLowestHighestLngLat(props.propertyItems());
-      props.setMoveMapCoordinates({
+      setMoveMapCoordinates({
         lng1: lowHighLngLat.lngLow,
         lat1: lowHighLngLat.latLow,
         lng2: lowHighLngLat.lngHigh,
         lat2: lowHighLngLat.latHigh,
       });
     } else if (cityLng && cityLat) {
-      props.setMoveMapCoordinates({
+      setMoveMapCoordinates({
         lng1: cityLng - 0.02,
         lat1: cityLat - 0.02,
         lng2: cityLng + 0.02,

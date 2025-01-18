@@ -112,7 +112,7 @@ export async function SearchItems(
     ).then((res) => res.json());
 
     const responseData = response.data;
-    if (responseData.length > 0) {
+    if (responseData?.length > 0) {
       let lowestPrice = responseData[0].EuroPrice;
       let highestPrice = responseData[0].EuroPrice;
 

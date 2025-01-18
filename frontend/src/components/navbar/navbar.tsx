@@ -60,13 +60,8 @@ export default function Navbar(props: any) {
               <SearchBar
                 isAll={false}
                 setOpenDropdownNumber={props.setOpenDropdownNumber}
-                setMoveMapCoordinates={props.setMoveMapCoordinates}
                 markers={props.markers}
                 setMarkers={props.setMarkers}
-                lowestPrice={props.lowestPrice}
-                setLowestPrice={props.setLowestPrice}
-                highestPrice={props.highestPrice}
-                setHighestPrice={props.setHighestPrice}
                 propertyItems={props.propertyItems}
                 setPropertyItems={props.setPropertyItems}
                 itemSort={props.itemSort}

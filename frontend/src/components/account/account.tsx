@@ -9,7 +9,6 @@ import {
   untrack,
 } from "solid-js";
 import IconArrow from "~/assets/icon-arrow";
-import Cookies from "js-cookie";
 import "./account.css";
 import IconRotate from "~/assets/icon-rotate";
 import Pagination from "./pagination";
@@ -274,10 +273,7 @@ export default function Account(props: any) {
     <div class="account">
       <Suspense>
         <Show when={!props.isLoggedIn()}>
-          <Login
-            setIsLoggedIn={props.setIsLoggedIn}
-            setUserId={props.setUserId}
-          />
+          <Login setIsLoggedIn={props.setIsLoggedIn} />
         </Show>
       </Suspense>
       <Suspense>
@@ -346,13 +342,8 @@ export default function Account(props: any) {
                   <SearchBar
                     isAll={true}
                     setOpenDropdownNumber={props.setOpenDropdownNumber}
-                    setMoveMapCoordinates={props.setMoveMapCoordinates}
                     markers={props.markers}
                     setMarkers={props.setMarkers}
-                    lowestPrice={props.lowestPrice}
-                    setLowestPrice={props.setLowestPrice}
-                    highestPrice={props.highestPrice}
-                    setHighestPrice={props.setHighestPrice}
                     propertyItems={props.propertyItems}
                     setPropertyItems={props.setPropertyItems}
                     itemSort={props.itemSort}

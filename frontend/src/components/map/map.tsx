@@ -19,6 +19,11 @@ import {
   selectedCountry,
   selectedState,
   selectedCity,
+  moveMapCoordinates,
+  lowestPrice,
+  highestPrice,
+  setLowestPrice,
+  setHighestPrice,
 } from "~/utils/store";
 import maplibregl from "maplibre-gl";
 import IconPencil from "~/assets/icon-pencil";
@@ -93,14 +98,14 @@ export default function Map(props: any) {
       paint: {
         "circle-radius": 10,
         "circle-color":
-          markerCount > 1 && props.highestPrice() > props.lowestPrice()
+          markerCount > 1 && highestPrice() > lowestPrice()
             ? [
                 "interpolate",
                 ["linear"],
                 ["get", "euroPrice"],
-                props.lowestPrice(),
+                lowestPrice(),
                 mapMarkerColor[0],
-                props.highestPrice(),
+                highestPrice(),
                 mapMarkerColor[1],
               ]
             : mapMarkerColor[0],
@@ -173,8 +178,8 @@ export default function Map(props: any) {
     );
 
     if (resultItems?.propertyItems) {
-      props.setLowestPrice(resultItems?.lowestPrice);
-      props.setHighestPrice(resultItems?.highestPrice);
+      setLowestPrice(resultItems?.lowestPrice);
+      setHighestPrice(resultItems?.highestPrice);
       props.setMarkers(resultItems?.markers);
       props.setPropertyItems(resultItems?.propertyItems);
       checkIfSelectedItemIsVisibleOnMap();
@@ -316,17 +321,20 @@ export default function Map(props: any) {
   });
 
   createEffect(() => {
-    if (props.moveMapCoordinates())
+    if (moveMapCoordinates()) {
       untrack(() => {
-        const m = props.moveMapCoordinates();
-        map.fitBounds(
-          [
-            [m.lng1, m.lat1],
-            [m.lng2, m.lat2],
-          ],
-          { padding: { top: 40, bottom: 100, left: 80, right: 40 } }
-        );
+        const m = moveMapCoordinates();
+        if (m) {
+          map.fitBounds(
+            [
+              [m.lng1, m.lat1],
+              [m.lng2, m.lat2],
+            ],
+            { padding: { top: 40, bottom: 100, left: 80, right: 40 } }
+          );
+        }
       });
+    }
   });
 
   createEffect(() => {
