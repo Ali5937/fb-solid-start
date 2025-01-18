@@ -13,10 +13,11 @@ func createTables() {
 	createTableQueryUsers := `
 	CREATE TABLE users (
 		id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+		firm_id UUID,
+		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 		email TEXT NOT NULL UNIQUE,
 		password_hash TEXT NOT NULL,
-		firm_id UUID,
-		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+		refresh_token TEXT
 	)`
 
 	createTableQueryFirms := `
@@ -244,8 +245,6 @@ func testTables() {
 		true, true, false, 1, 2344
 	)
 	RETURNING id, type;`
-
-	// ARRAY[12346,5486,1847,3756,734,31,1,93,34,4,45,127,9,47,24,6,467,2377,48,22442]
 
 	db, err := pgdb.InitDB()
 	if err != nil {

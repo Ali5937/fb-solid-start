@@ -101,6 +101,11 @@ type CurrencyResponse struct {
 	Rates     map[string]float64
 }
 
+type PostUser struct {
+	Email    string `db:"email"`
+	Password string `db:"password"`
+}
+
 func (c *Currency) UnmarshalJSON(data []byte) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(data, &raw); err != nil {

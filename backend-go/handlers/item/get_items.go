@@ -26,9 +26,9 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	city := queryParams.Get("city")
 
 	finalPolygon := getFinalPolygon(polygon, polygon2)
-	finalType, err := utils.ParseTypeStringArray(_type)
+	finalType, err := utils.ParseItemType(_type)
 	if err != nil {
-		http.Error(w, `{"error": "Type incorrect"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("type incorrect"), http.StatusInternalServerError)
 		return
 	}
 
@@ -61,7 +61,7 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	minVal, err := strconv.Atoi(minStr)
 	if err != nil {
-		http.Error(w, `{"error": "Error converting string to number"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("error converting string to number"), http.StatusInternalServerError)
 		return
 	}
 	sqlParamCount++
@@ -71,11 +71,11 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	if maxStr != "" {
 		maxVal, err := strconv.Atoi(maxStr)
 		if err != nil {
-			http.Error(w, `{"error": "Error converting string to number"}`, http.StatusInternalServerError)
+			http.Error(w, utils.GetErrorString("error converting string to number"), http.StatusInternalServerError)
 			return
 		}
 		if maxVal < minVal {
-			http.Error(w, `{"error": "Error max price is less than min price"}`, http.StatusInternalServerError)
+			http.Error(w, utils.GetErrorString("error max price is less than min price"), http.StatusInternalServerError)
 			return
 		}
 		sqlParamCount++
@@ -121,7 +121,7 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	rows, err := db.Query(queryText, args...)
 
 	if err != nil {
-		http.Error(w, `{"error": "Error fetching items from database"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("error fetching items from database"), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
@@ -158,7 +158,7 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	if err := rows.Err(); err != nil {
-		http.Error(w, `{"error": "Error iterating rows"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("error iterating rows"), http.StatusInternalServerError)
 		return
 	}
 
@@ -166,7 +166,7 @@ func Items(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		http.Error(w, `{"error": "Error encoding JSON}"`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("error encoding JSON"), http.StatusInternalServerError)
 	}
 }
 

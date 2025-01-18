@@ -32,15 +32,19 @@ var (
 )
 
 var (
-	DBUser          string
-	DBPassword      string
-	DBName          string
-	DBHost          string
-	SSLMode         string
-	Postgres        string
-	ConnStr         string
-	ConnStrPostgres string
-	CurrencyApi     string
+	DBUser            string
+	DBPassword        string
+	DBName            string
+	DBHost            string
+	SSLMode           string
+	Postgres          string
+	ConnStr           string
+	ConnStrPostgres   string
+	CurrencyApi       string
+	JWTSecretAccess   string
+	JWTSecretRefresh  string
+	PasswordMinLength int = 8
+	PasswordMaxLength int = 100
 )
 
 func init() {
@@ -74,4 +78,7 @@ func init() {
 
 	ConnStr = fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", DBUser, DBPassword, DBHost, DBName, SSLMode)
 	ConnStrPostgres = fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", DBUser, DBPassword, DBHost, Postgres, SSLMode)
+
+	JWTSecretAccess = os.Getenv("JWT_SECRET_ACCESS")
+	JWTSecretRefresh = os.Getenv("JWT_SECRET_REFRESH")
 }

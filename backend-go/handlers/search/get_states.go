@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/Ali5937/fb-solid-start/backend-go/utils"
 )
 
 func GetStates(w http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -18,7 +20,7 @@ func GetStates(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		WHERE COALESCE(s.country_name, $1) = $1
 		ORDER BY state_name ASC;`, country)
 	if err != nil {
-		http.Error(w, `{"error": "Error fetching states"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("error fetching states"), http.StatusInternalServerError)
 	}
 	defer rows.Close()
 
@@ -36,6 +38,6 @@ func GetStates(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		http.Error(w, `{"error": "Failed to encode JSON"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("failed to encode JSON"), http.StatusInternalServerError)
 	}
 }

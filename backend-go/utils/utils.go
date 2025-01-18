@@ -1,11 +1,15 @@
 package utils
 
 import (
+	"database/sql"
+	"encoding/json"
 	"fmt"
+	"log"
+	"net/mail"
 	"strings"
 )
 
-func ParseTypeStringArray(str string) ([]int, error) {
+func ParseItemType(str string) ([]int, error) {
 	var numArr []int
 	for i, s := range strings.Split(str, ",") {
 		if i > 3 {
@@ -27,4 +31,29 @@ func ParseTypeStringArray(str string) ([]int, error) {
 		}
 	}
 	return numArr, nil
+}
+
+func GetErrorString(errString string) string {
+	errorMap := map[string]string{"error": errString}
+	jsonData, err := json.Marshal(errorMap)
+	if err != nil {
+		log.Println("Error marshaling JSON:", err)
+		return `{"error": "internal server error"}`
+	}
+	return string(jsonData)
+}
+
+func DoesEmailExist(db *sql.DB, email string) (bool, error) {
+	var exists bool
+	err := db.QueryRow(`
+    SELECT EXISTS (SELECT 1 FROM users WHERE email = $1)`, email).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("checking if email exists in database")
+	}
+	return exists, nil
+}
+
+func IsEmailValid(email string) bool {
+	_, err := mail.ParseAddress(email)
+	return err == nil
 }

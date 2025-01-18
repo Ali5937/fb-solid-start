@@ -21,28 +21,28 @@ func GetCities(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	state := queryParams.Get("state")
 	country := queryParams.Get("country")
 
-	finalType, err := utils.ParseTypeStringArray(_type)
+	finalType, err := utils.ParseItemType(_type)
 	if err != nil {
-		http.Error(w, `{"error": "Type incorrect"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("incorrect type"), http.StatusInternalServerError)
 		return
 	}
 
 	minVal, err := strconv.Atoi(minStr)
 	if err != nil {
-		http.Error(w, `{"error": "Error converting string to number"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("error converting string to number"), http.StatusInternalServerError)
 		return
 	}
 	var maxVal int = 0
 	if maxStr != "" {
 		maxVal, err = strconv.Atoi(maxStr)
 		if err != nil {
-			http.Error(w, `{"error": "Error converting string to number"}`, http.StatusInternalServerError)
+			http.Error(w, utils.GetErrorString("error converting string to number"), http.StatusInternalServerError)
 			return
 		}
 	}
 
 	if len(city) < 3 {
-		http.Error(w, `{"error": "Error request string too short"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("error request string too short"), http.StatusInternalServerError)
 		return
 	}
 
@@ -80,7 +80,7 @@ func GetCities(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	rows, err := db.Query(queryText, params...)
 	if err != nil {
-		http.Error(w, `{"error": "Error getting cities from database:"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("error getting cities from database:"), http.StatusInternalServerError)
 		return
 	}
 
@@ -98,6 +98,6 @@ func GetCities(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		http.Error(w, `{"error": "Failed to encode JSON"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("failed to encode JSON"), http.StatusInternalServerError)
 	}
 }

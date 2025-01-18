@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/Ali5937/fb-solid-start/backend-go/utils"
 )
 
 func GetAllCities(w http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -38,7 +40,7 @@ func GetAllCities(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		ORDER BY ranking ASC
 		LIMIT 5;`, city, state, country)
 	if err != nil {
-		http.Error(w, `{"error": "Error getting cities from database"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("error getting cities from database"), http.StatusInternalServerError)
 		return
 	}
 
@@ -56,6 +58,6 @@ func GetAllCities(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		http.Error(w, `{"error": "Failed to encode JSON"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("failed to encode JSON"), http.StatusInternalServerError)
 	}
 }

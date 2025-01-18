@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/Ali5937/fb-solid-start/backend-go/utils"
 )
 
 var allCountryCache = struct {
@@ -24,7 +26,7 @@ func GetAllCountries(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(res); err != nil {
-			http.Error(w, `{"error": "Failed to encode JSON"}`, http.StatusInternalServerError)
+			http.Error(w, utils.GetErrorString("failed to encode JSON"), http.StatusInternalServerError)
 		}
 		return
 	}
@@ -33,7 +35,7 @@ func GetAllCountries(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		FROM countries
 		ORDER BY country_name ASC;`)
 	if err != nil {
-		http.Error(w, `{"error": "Error fetching all countries"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("error fetching all countries"), http.StatusInternalServerError)
 	}
 	defer rows.Close()
 
@@ -59,6 +61,6 @@ func GetAllCountries(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		http.Error(w, `{"error": "Failed to encode JSON"}`, http.StatusInternalServerError)
+		http.Error(w, utils.GetErrorString("failed to encode JSON"), http.StatusInternalServerError)
 	}
 }

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Ali5937/fb-solid-start/backend-go/auth"
 	"github.com/Ali5937/fb-solid-start/backend-go/config"
-	"github.com/alexedwards/argon2id"
 )
 
 var emailPasswordPairs = [][2]string{
@@ -33,12 +33,12 @@ func seedUsers() {
 		email := pair[0]
 		password := pair[1]
 
-		hash, err := argon2id.CreateHash(password, argon2id.DefaultParams)
+		hash, err := auth.GenerateHashFromPassword(password)
 		if err != nil {
 			log.Fatalf("Error hashing password: %v", err)
 		}
 
-		_, err = db.Exec(`INSERT INTO "users" ("email", "password_hash") VALUES ($1, $2) RETURNING id`, email, hash)
+		_, err = db.Exec(`INSERT INTO "users" ("email", "password_hash") VALUES ($1, $2)`, email, hash)
 		if err != nil {
 			log.Fatalf("Error inserting user into database: %v", err)
 		}

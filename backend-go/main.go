@@ -13,7 +13,7 @@ import (
 	"github.com/Ali5937/fb-solid-start/backend-go/routes"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
-	"github.com/gorilla/handlers"
+	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -24,26 +24,28 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	pgDB, err := pgdb.InitDB()
+	db, err := pgdb.InitDB()
 	if err != nil {
 		log.Fatalf("Error initializing database: %v", err)
 	}
-	defer pgDB.Close()
+	defer db.Close()
 
 	r := chi.NewRouter()
-	corsHeaders := handlers.AllowedOrigins([]string{"http://localhost:3000"})
-	corsMethods := handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"})
-	corsHeadersAllowed := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
-	corsCredentials := handlers.AllowCredentials()
-
-	r.Use(handlers.CORS(corsHeaders, corsMethods, corsHeadersAllowed, corsCredentials))
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: true,
+		MaxAge:           300, // 5 min
+	}))
 	r.Use(middleware.Compress(5)) // Do gzipping in Nginx?
 	r.Use(mWare.RequestTiming)
 
 	r.Route("/api", func(api chi.Router) {
-		routes.ItemRoutes(api, pgDB)
+		routes.ItemRoutes(api, db)
+		routes.UserRoutes(api, db)
 		routes.CurrencyRoutes(api)
-		routes.SearchRoutes(api, pgDB)
+		routes.SearchRoutes(api, db)
 	})
 
 	log.Printf("Server is running on port %+v", config.Port)
