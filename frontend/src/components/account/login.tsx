@@ -1,6 +1,8 @@
 import { baseUrl, setUserId } from "~/utils/store";
 import "./account.css";
 import { Show, createSignal } from "solid-js";
+import { createForm } from "@tanstack/solid-form";
+import { z } from "zod";
 
 export default function Login(props: any) {
   const [email, setEmail] = createSignal<string>("");
@@ -15,16 +17,19 @@ export default function Login(props: any) {
 
   // If email exists already login, otherwise sign up
   async function sendGetEmail() {
-    const response = await fetch(`${baseUrl}/user/email/${email()}`, {
-      method: "GET",
-      credentials: "include",
-    }).then((res) => res.json());
-    //If user DOESN'T Exist already
-    if (response.status === 204) {
-      setLoginType(1);
-      //If user Exists already
-    } else if (response.status === 200) {
+    const response = await fetch(
+      `${baseUrl}/user/email?email=${encodeURIComponent(email())}`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+    //If user Exists already
+    if (response.status === 200) {
       setLoginType(2);
+      //If user DOESN'T Exist already
+    } else if (response.status === 204) {
+      setLoginType(1);
     }
   }
 
@@ -44,8 +49,7 @@ export default function Login(props: any) {
         body: JSON.stringify(data),
       });
 
-      const resultData = result.json();
-      console.log("signup result: ", resultData);
+      console.log("signup result: ", result);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -64,18 +68,82 @@ export default function Login(props: any) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    }).then((res) => res.json());
-    if (result.status === "success") {
+    });
+    console.log(result);
+    if (result.status === 200) {
       props.setIsLoggedIn(true);
       setUserId(result.user_id);
     }
     console.log("login result: ", result.status);
   }
 
+  function isEmailValid(email: string) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  const form = createForm(() => ({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    onSubmit: async ({ value }) => {
+      // Do something with form data
+      console.log(value);
+    },
+  }));
+
   return (
     <div class="login">
       <div class="login-type">{loginType() === 1 ? "Sign Up" : "Login"}</div>
-      <div class="login-email-parent">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+      >
+        <form.Field
+          name="email"
+          validators={{
+            onChange: z.string().email(),
+          }}
+          children={(field) => (
+            <>
+              <input
+                name={field().name}
+                value={field().state.value}
+                onBlur={field().handleBlur}
+                onInput={(e) => {
+                  field().handleChange(e.target.value);
+                  setEmail(e.target.value);
+                }}
+              />
+              <div class="error-message">{field().state.meta.errors}</div>
+            </>
+          )}
+        />
+        <Show when={loginType() !== 0}>
+          <div class="login-password-parent">
+            <label for="login-password">Password</label>
+            <form.Field
+              name="password"
+              children={(field) => (
+                <input
+                  name={field().name}
+                  value={field().state.value}
+                  onBlur={field().handleBlur}
+                  onInput={(e) => {
+                    field().handleChange(e.target.value);
+                    setPassword(e.target.value);
+                  }}
+                />
+              )}
+            />
+          </div>
+        </Show>
+      </form>
+      {/* <div class="login-email-parent">
         <label for="login-email">Email</label>
         <input
           type="text"
@@ -94,7 +162,7 @@ export default function Login(props: any) {
             onInput={(e) => setPassword(e.target.value)}
           />
         </div>
-      </Show>
+      </Show> */}
       <button onMouseDown={sendRequest}>OK</button>
     </div>
   );

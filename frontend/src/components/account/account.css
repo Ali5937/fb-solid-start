@@ -194,6 +194,11 @@ label.input-price input {
   margin-right: var(--side-margin);
 }
 
+.error-message {
+  margin-top: var(--side-margin);
+  color: red;
+}
+
 .upload-parent {
   display: flex;
   gap: var(--side-margin);
